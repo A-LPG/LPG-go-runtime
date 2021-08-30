@@ -24,9 +24,7 @@ func NewConfigurationStack(prs ParseTable) *ConfigurationStack {
 	a.stacks_size = 0
 	return a
 }
-func (this ConfigurationStack) name() {
 
-}
 
 func (this ConfigurationStack) makeStateList(parent *StateElement, stack []int, index int, stack_top int) *StateElement {
 	var i int

@@ -2,479 +2,288 @@ package lpg2
 
 
 type LexParser struct {
+     taking_actions bool
+     STACK_INCREMENT int 
+     START_STATE int 
+     LA_STATE_OFFSET int
+     EOFT_SYMBOL int 
+     ACCEPT_ACTION int 
+     ERROR_ACTION int 
+     START_SYMBOL int 
+     NUM_RULES int 
 
-    def reset( tokStream: ILexStream, prs: ParseTable, ra: RuleAction):
-        a.tokStream = tokStream
-        a.prs = prs
-        a.ra = ra
-        a.START_STATE = prs.getStartState()
-        a.LA_STATE_OFFSET = prs.getLaStateOffset()
-        a.EOFT_SYMBOL = prs.getEoftSymbol()
-        a.ACCEPT_ACTION = prs.getAcceptAction()
-        a.ERROR_ACTION = prs.getErrorAction()
-        a.START_SYMBOL = prs.getStartSymbol()
-        a.NUM_RULES = prs.getNumRules()
+     tokStream ILexStream
+     prs ParseTable 
+     ra RuleAction 
+     action *IntTuple
+     stateStackTop int 
+     stackLength int 
+     stack []int 
+     locationStack []int 
+     tempStack []int 
+     lastToken int 
+     currentAction int 
+     curtok int 
+     starttok int 
+     current_kind int 
+}
+func NewLexParser(tokStream ILexStream , prs ParseTable , ra RuleAction ) *LexParser {
+    this := new(LexParser)
+    this.STACK_INCREMENT = 1024
+    if (tokStream != nil && prs!= nil && ra!= nil){
+            this.reset(tokStream, prs, ra)
+    }
 
-    def __init__( tokStream: ILexStream = nil, prs: ParseTable = nil, ra: RuleAction = nil):
-        a.taking_actions: bool = False
+    return this
+}
 
-        a.START_STATE int = 0
-        a.LA_STATE_OFFSET int = 0
-        a.EOFT_SYMBOL int = 0
-        a.ACCEPT_ACTION int = 0
-        a.ERROR_ACTION int = 0
-        a.START_SYMBOL int = 0
-        a.NUM_RULES int = 0
+func (this *LexParser) reset(tokStream ILexStream, prs ParseTable, ra RuleAction)  {
+    this.tokStream = tokStream
+    this.prs = prs
+    this.ra = ra
+    this.START_STATE = prs.getStartState()
+    this.LA_STATE_OFFSET = prs.getLaStateOffset()
+    this.EOFT_SYMBOL = prs.getEoftSymbol()
+    this.ACCEPT_ACTION = prs.getAcceptAction()
+    this.ERROR_ACTION = prs.getErrorAction()
+    this.START_SYMBOL = prs.getStartSymbol()
+    this.NUM_RULES = prs.getNumRules()
+}
 
-        a.tokStream: ILexStream = nil
-        a.prs: ParseTable = nil
-        a.ra: RuleAction = nil
-        a.action: IntTuple = IntTuple(0)
 
-        a.stateStackTop int = 0
-        a.stackLength int = 0
-        a.stack: list = []
-        a.locationStack: list = []
-        a.tempStack: list = []
+//
+// Stacks portion
+//
 
-        a.lastToken int = 0
-        a.currentAction int = 0
-        a.curtok int = 0
-        a.starttok int = 0
-        a.current_kind int = 0
-        if tokStream and prs and ra:
-            a.reset(tokStream, prs, ra)
 
+
+func (this *LexParser) reallocateStacks()  {
+    var old_stack_length int
+    if len(this.stack) == 0 {
+        old_stack_length = 0
+    } else{
+        old_stack_length=this.stackLength
+    }  
+    this.stackLength += this.STACK_INCREMENT
+    if old_stack_length == 0 {
+        this.stack = make([]int,this.stackLength) 
+        this.locationStack = make([]int,this.stackLength)
+        this.tempStack = make([]int,this.stackLength)
+    } else {
+        this.stack =  arraycopy(this.stack, 0, make([]int,this.stackLength) , 0, old_stack_length)
+        this.locationStack = arraycopy(this.locationStack, 0,make([]int,this.stackLength) , 0, old_stack_length)
+        this.tempStack =arraycopy(this.tempStack, 0,  make([]int,this.stackLength) , 0, old_stack_length)
+    }
+    return
+}
+
+//
+// The following functions can be invoked only when the parser is
+// processing actions. Thus, they can be invoked when the parser
+// was entered via the main entry point (parseCharacters()). When using
+// the incremental parser (via the entry point scanNextToken(int [], int)),
+// they always return 0 when invoked. // TODO Should we throw an Exception instead?
+// However, note that when parseActions() is invoked after successfully
+// parsing an input with the incremental parser, then they can be invoked.
+//
+func (this *LexParser) getFirstTokenAt(i int) (int,error) {
+    return this.getToken(i)
+}
+func (this *LexParser) getFirstToken() int {
+    return this.starttok
+}
+func (this *LexParser) getLastToken() int {
+        return this.lastToken
+}
+func (this *LexParser) getLastTokenAt(i int) (int,error) {
+
+    if this.taking_actions {
+        if i >= this.prs.rhs(this.currentAction){
+            return  this.lastToken ,nil
+        }else{
+            var index,e = this.getToken(i + 1)
+            if e != nil{
+                return  -1,e
+            }
+            return this.tokStream.getPrevious(index),nil
+        }
+
+    }
+    return -1,NewUnavailableParserInformationException("")
+}
+func (this *LexParser) getCurrentRule() (int,error) {
+    if this.taking_actions {
+        return this.currentAction,nil
+    }
+    return -1,NewUnavailableParserInformationException("")
+}
+
+//
+// Given a rule of the form     A = x1 x2 ... xn     n > 0
+//
+// the function getToken(i) yields the symbol xi, if xi is a terminal
+// or ti, if xi is a nonterminal that produced a string of the form
+// xi => ti w. If xi is a nullable nonterminal, then ti is the first
+//  symbol that immediately follows xi in the input (the lookahead).
+//
+func (this *LexParser) getToken(i int) (int,error) {
+    if this.taking_actions {
+        return this.locationStack[this.stateStackTop + (i - 1)],nil
+    }
+    return -1,NewUnavailableParserInformationException("")
+}
+func (this *LexParser) setSym1(i int)  { }
+func (this *LexParser) getSym(i int) int {
+    i,_= this.getLastTokenAt(i)
+    return  i
+}
+
+func (this *LexParser) resetTokenStream(i int)  {
     //
-    // Stacks portion
+    // if i exceeds the upper bound, reset it to point to the last element.
     //
-    STACK_INCREMENT int = 1024
+    var temp int
+    if i > this.tokStream.getStreamLength(){
+       temp= this.tokStream.getStreamLength()
+    }else {
+        temp = i
+    }
+    this.tokStream.reset(temp)
+    this.curtok = this.tokStream.getToken()
+    this.current_kind = this.tokStream.getKind(this.curtok)
+    if len(this.stack) == 0 {
+        this.reallocateStacks()
+    }
+    if this.action == nil {
+        this.action = NewIntTupleWithEstimate(1 << 10)
+    }
+}
 
-    def reallocateStacks()
-        old_stack_length int = (0 if a.stack.__len__() == 0 else a.stackLength)
-        a.stackLength += a.STACK_INCREMENT
-        if old_stack_length == 0:
-            a.stack = [0] * a.stackLength
-            a.locationStack = [0] * a.stackLength
-            a.tempStack = [0] * a.stackLength
-        else:
-            a.stack = arraycopy(a.stack, 0, [0] * a.stackLength, 0, old_stack_length)
-            a.locationStack = arraycopy(a.locationStack, 0, [0] * a.stackLength, 0, old_stack_length)
-            a.tempStack = arraycopy(a.tempStack, 0, [0] * a.stackLength, 0, old_stack_length)
-
-        return
-
-    //
-    // The following functions can be invoked only when the parser is
-    // processing actions. Thus, they can be invoked when the parser
-    // was entered via the main entry point (parseCharacters()). When using
-    // the incremental parser (via the entry point scanNextToken(int [], int)):,
-    // they always return 0 when invoked. // TODO: Should we raise an Exception instead?
-    // However, note that when parseActions() is invoked after successfully
-    // parsing an input with the incremental parser, then they can be invoked.
-    //
-    def getFirstToken( i int = nil) int {
-        if i is nil:
-            return a.starttok
-
-        return a.getToken(i)
-
-    def getLastToken( i int = nil) int {
-        if i is nil:
-            return a.lastToken
-
-        if a.taking_actions:
-            return (a.lastToken if i >= a.prs.rhs(a.currentAction) else a.tokStream.getPrevious(
-                a.getToken(i + 1)))
-
-        raise UnavailableParserInformationException()
-
-    def getCurrentRule() int {
-        if a.taking_actions:
-            return a.currentAction
-
-        raise UnavailableParserInformationException()
-
-    //
-    // Given a rule of the form     A ::= x1 x2 ... xn     n > 0
-    //
-    // the function getToken(i): yields the symbol xi, if xi is a terminal
-    // or ti, if xi is a nonterminal that produced a string of the form
-    // xi => ti w. If xi is a nullable nonterminal, then ti is the first
-    //  symbol that immediately follows xi in the input (the lookahead).
-    //
-    def getToken( i int) int {
-        if a.taking_actions:
-            return a.locationStack[a.stateStackTop + (i - 1)]
-
-        raise UnavailableParserInformationException()
-
-    def setSym1( i int):
-        pass
-
-    def getSym( i int) int {
-        return a.getLastToken(i)
-
-    def resetTokenStream( i int):
+//
+// Parse the input and create a stream of tokens.
+//
+func (this *LexParser) parseCharacters(start_offset int, end_offset int, monitor Monitor)  {
+    this.resetTokenStream(start_offset)
+    for;this.curtok <= end_offset; {
         //
-        // if i exceeds the upper bound, reset it to point to the last element.
+        // if the parser needs to stop processing,
+        // it may do so here.
         //
-        a.tokStream.reset(a.tokStream.getStreamLength() if i > a.tokStream.getStreamLength() else i)
-        a.curtok = a.tokStream.getToken()
-        a.current_kind = a.tokStream.getKind(a.curtok)
-        if not a.stack or a.stack.__len__() == 0:
-            a.reallocateStacks()
-
-        if a.action.capacity() == 0:
-            a.action = IntTuple(1 << 10)
-
+        if monitor !=nil && monitor.isCancelled() {
+            return
+        }
+        this.lexNextToken(end_offset)
+    }
+}
+//
+// Parse the input and create a stream of tokens.
+//
+func (this *LexParser) parseCharactersWhitMonitor(monitor Monitor)  {
     //
-    // Parse the input and create a stream of tokens.
+    // Indicate that we are running the regular parser and that it's
+    // ok to use the utility functions to query the parser.
     //
-    def parseCharacters( start_offset int, end_offset int, monitor: Monitor):
-        a.resetTokenStream(start_offset)
-        while a.curtok <= end_offset:
-            //
-            // if the parser needs to stop processing,
-            // it may do so here.
-            //
-            if monitor and monitor.isCancelled()
-                return
-
-            a.lexNextToken(end_offset)
+    this.taking_actions = true
+    this.resetTokenStream(0)
+    this.lastToken = this.tokStream.getPrevious(this.curtok)
 
     //
-    // Parse the input and create a stream of tokens.
+    // Until it reaches the end-of-file token, this outer loop
+    // resets the parser and processes the next token.
     //
-    def parseCharactersWhitMonitor( monitor: Monitor = nil):
+    ProcessTokens:
+        for;this.current_kind != this.EOFT_SYMBOL; {
         //
-        // Indicate that we are running the regular parser and that it's
-        // ok to use the utility functions to query the parser.
+        // if the parser needs to stop processing,
+        // it may do so here.
         //
-        a.taking_actions = true
+        if monitor != nil && monitor.isCancelled() {
+            break ProcessTokens
+        }
 
-        a.resetTokenStream(0)
-        a.lastToken = a.tokStream.getPrevious(a.curtok)
-        //
-        // Until it reaches the end-of-file token, a outer loop
-        // resets the parser and processes the next token.
-        //
 
-        // ProcessTokens:
-        while a.current_kind != a.EOFT_SYMBOL:
-            //
-            // if the parser needs to stop processing,
-            // it may do so here.
-            //
-            if monitor is not nil and monitor.isCancelled()
-                break  // ProcessTokens
+        this.stateStackTop = -1
+        this.currentAction = this.START_STATE
+        this.starttok = this.curtok
 
-            a.stateStackTop = -1
-            a.currentAction = a.START_STATE
-            a.starttok = a.curtok
-            b_continue_process_tokens: bool = False
-            // ScanToken:
-            while true:
+        ScanToken:
+         for ;; {
+             this.stateStackTop+=1
+            if this.stateStackTop >= len(this.stack) {
+                this.reallocateStacks()
+            }
+            this.stack[this.stateStackTop] = this.currentAction
 
-                a.stateStackTop += 1
-                if a.stateStackTop >= a.stack.__len__()
-                    a.reallocateStacks()
-                a.stack[a.stateStackTop] = a.currentAction
-
-                a.locationStack[a.stateStackTop] = a.curtok
-
-                //
-                // Compute the action on the next character. If it is a reduce action, we do not
-                // want to accept it until we are sure that the character in question is can be parsed.
-                // What we are trying to avoid is a situation where Curtok is not the EOF token
-                // but it yields a default reduce action in the current configuration even though
-                // it cannot ultimately be shifted However, the state on top of the configuration also
-                // contains a valid reduce action on EOF which, if taken, would lead to the successful
-                // scanning of the token.
-                //
-                // Thus, if the character can be parsed, we proceed normally. Otherwise, we proceed
-                // as if we had reached the end of the file (end of the token, since we are really
-                // scanning).
-                //
-                if a.curtok == 275:
-                    a.curtok = 275
-                a.parseNextCharacter(a.curtok, a.current_kind)
-                if a.curtok == 275:
-                    a.curtok = 275
-
-                if (a.currentAction == a.ERROR_ACTION and
-                        a.current_kind != a.EOFT_SYMBOL):  // if not successful try EOF
-
-                    save_next_token = a.tokStream.peek()  // save position after curtok
-                    a.tokStream.reset(a.tokStream.getStreamLength() - 1)  // point to the end of the input
-                    a.parseNextCharacter(a.curtok, a.EOFT_SYMBOL)
-                    // assert (currentAction == ACCEPT_ACTION or currentAction == ERROR_ACTION):
-                    a.tokStream.reset(save_next_token)  // reset the stream for the next token after curtok.
-
-                //
-                // At a point, currentAction is either a Shift, Shift-Reduce, Accept or Error action.
-                //
-                if a.currentAction > a.ERROR_ACTION:  // Shift-reduce
-
-                    a.lastToken = a.curtok
-                    a.curtok = a.tokStream.getToken()
-                    a.current_kind = a.tokStream.getKind(a.curtok)
-                    a.currentAction -= a.ERROR_ACTION
-                    while true:
-                        a.stateStackTop -= (a.prs.rhs(a.currentAction) - 1)
-                        a.ra.ruleAction(a.currentAction)
-                        lhs_symbol = a.prs.lhs(a.currentAction)
-                        if lhs_symbol == a.START_SYMBOL:
-                            b_continue_process_tokens = true
-                            break
-                        a.currentAction = a.prs.ntAction(a.stack[a.stateStackTop], lhs_symbol)
-                        if not a.currentAction <= a.NUM_RULES:
-                            break
-                    if b_continue_process_tokens:
-                        break
-                elif a.currentAction < a.ACCEPT_ACTION:  // Shift
-
-                    a.lastToken = a.curtok
-                    a.curtok = a.tokStream.getToken()
-                    a.current_kind = a.tokStream.getKind(a.curtok)
-
-                elif a.currentAction == a.ACCEPT_ACTION:
-                    b_continue_process_tokens = true
-                    break
-                else:
-                    break  // ScanToken ERROR_ACTION
-
-            if b_continue_process_tokens:
-                continue
-            //
-            // Whenever we reach a point, an error has been detected.
-            // Note that the parser loop above can never reach the ACCEPT
-            // point as it is short-circuited each time it reduces a phrase
-            // to the START_SYMBOL.
-            //
-            // If an error is detected on a single bad character,
-            // we advance to the next character before resuming the
-            // scan. However, if an error is detected after we start
-            // scanning a construct, we form a bad token out of the
-            // characters that have already been scanned and resume
-            // scanning on the character on which the problem was
-            // detected. In other words, in that case, we do not advance.
-            //
-            if a.starttok == a.curtok:
-                if a.current_kind == a.EOFT_SYMBOL:
-                    break  // ProcessTokens
-                a.tokStream.reportLexicalError(a.starttok, a.curtok)
-                a.lastToken = a.curtok
-                a.curtok = a.tokStream.getToken()
-                a.current_kind = a.tokStream.getKind(a.curtok)
-
-            else:
-                a.tokStream.reportLexicalError(a.starttok, a.lastToken)
-
-        a.taking_actions = False  // indicate that we are done
-
-        return
-
-    //
-    // This function takes as argument a configuration ([stack, stackTop], [tokStream, curtok]):
-    // and determines whether or not curtok can be validly parsed in a configuration. If so,
-    // it parses curtok and returns the final shift or shift-reduce action on it. Otherwise, it
-    // leaves the configuration unchanged and returns ERROR_ACTION.
-    //
-    def parseNextCharacter( token int, kind int):
-        start_action int = a.stack[a.stateStackTop]
-        pos int = a.stateStackTop
-        tempStackTop int = a.stateStackTop - 1
-
-        a.currentAction = a.tAction(start_action, kind)
-
-        b_break_scan: bool = False
-        // Scan:
-        while a.currentAction <= a.NUM_RULES:
-            while true:
-                lhs_symbol = a.prs.lhs(a.currentAction)
-                if lhs_symbol == a.START_SYMBOL:
-                    b_break_scan = true
-                    break
-
-                tempStackTop -= (a.prs.rhs(a.currentAction) - 1)
-
-                state = (a.tempStack[tempStackTop] if tempStackTop > pos else a.stack[tempStackTop])
-
-                a.currentAction = a.prs.ntAction(state, lhs_symbol)
-                if not a.currentAction <= a.NUM_RULES:
-                    break
-
-            if b_break_scan:
-                break
-
-            if tempStackTop + 1 >= a.stack.__len__()
-                a.reallocateStacks()
-            //
-            // ... Update the maximum useful position of the stack,
-            // push goto state into (temporary): stack, and compute
-            // the next action on the current symbol ...
-            //
-            pos = pos if pos < tempStackTop else tempStackTop
-            a.tempStack[tempStackTop + 1] = a.currentAction
-
-            a.currentAction = a.tAction(a.currentAction, kind)
-        //
-        // If no error was detected, we update the configuration up to the point prior to the
-        // shift or shift-reduce on the token by processing all reduce and goto actions associated
-        // with the current token.
-        //
-        if a.currentAction != a.ERROR_ACTION:
-            //
-            // Note that it is important that the global variable currentAction be used here when
-            // we are actually processing the rules. The reason being that the user-defined function
-            // ra.ruleAction() may call def functions defined in a type (such as getLastToken()):
-            // which require that currentAction be properly initialized.
-            //
-
-            a.currentAction = a.tAction(start_action, kind)
-            // Replay:
-            bBreakReplay: bool = False
-            while a.currentAction <= a.NUM_RULES:
-                a.stateStackTop -= 1
-                while true:
-                    a.stateStackTop -= (a.prs.rhs(a.currentAction) - 1)
-                    a.ra.ruleAction(a.currentAction)
-                    lhs_symbol = a.prs.lhs(a.currentAction)
-                    if lhs_symbol == a.START_SYMBOL:
-                        a.currentAction = (a.ERROR_ACTION
-                                              if a.starttok == token  // nil string reduction to START_SYMBOL is illegal
-                                              else a.ACCEPT_ACTION)
-                        bBreakReplay = true
-                        break  // Replay
-
-                    a.currentAction = a.prs.ntAction(a.stack[a.stateStackTop], lhs_symbol)
-                    if not a.currentAction <= a.NUM_RULES:
-                        break
-                if bBreakReplay:
-                    break
-
-                a.stateStackTop += 1
-                if a.stateStackTop >= a.stack.__len__()
-                    a.reallocateStacks()
-                a.stack[a.stateStackTop] = a.currentAction
-
-                a.locationStack[a.stateStackTop] = token
-
-                a.currentAction = a.tAction(a.currentAction, kind)
-
-        return
-
-    //
-    // keep looking ahead until we compute a valid action
-    //
-    def lookahead( act int, token int) int {
-        act = a.prs.lookAhead(act - a.LA_STATE_OFFSET, a.tokStream.getKind(token))
-        return a.lookahead(act, a.tokStream.getNext(token)) if act > a.LA_STATE_OFFSET else act
-
-    //
-    // Compute the next action defined on act and sym. If a
-    // action requires more lookahead, these lookahead symbols
-    // are in the token stream beginning at the next token that
-    // is yielded by peek().
-    //
-    def tAction( act int, sym int) int {
-        act = a.prs.tAction(act, sym)
-        return a.lookahead(act, a.tokStream.peek()) if act > a.LA_STATE_OFFSET else act
-
-    def scanNextToken2()  bool:
-        return a.lexNextToken(a.tokStream.getStreamLength())
-
-    def scanNextToken( start_offset int = nil)  bool:
-        if start_offset is nil:
-            return a.scanNextToken2()
-
-        a.resetTokenStream(start_offset)
-        return a.lexNextToken(a.tokStream.getStreamLength())
-
-    def lexNextToken( end_offset int)  bool:
-        //
-        // Indicate that we are going to run the incremental parser and that
-        // it's forbidden to use the utility functions to query the parser.
-        //
-        a.taking_actions = False
-
-        a.stateStackTop = -1
-        a.currentAction = a.START_STATE
-        a.starttok = a.curtok
-        a.action.reset()
-
-        // ScanToken:
-        while true:
-
-            a.stateStackTop += 1
-            if a.stateStackTop >= a.stack.__len__()
-                a.reallocateStacks()
-            a.stack[a.stateStackTop] = a.currentAction
+            this.locationStack[this.stateStackTop] = this.curtok
 
             //
-            // Compute the the action on the next character. If it is a reduce action, we do not
-            // want to accept it until we are sure that the character in question is parsable.
-            // What we are trying to avoid is a situation where a.curtok is not the EOF token
-            // but it yields a default reduce a.action in the current configuration even though
+            // Compute the action on the next character. If it is a reduce action, we do not
+            // want to accept it until we are sure that the character in question is can be parsed.
+            // What we are trying to avoid is a situation where Curtok is not the EOF token
+            // but it yields a default reduce action in the current configuration even though
             // it cannot ultimately be shifted However, the state on top of the configuration also
-            // contains a valid reduce a.action on EOF which, if taken, would lead to the succesful
+            // contains a valid reduce action on EOF which, if taken, would lead to the successful
             // scanning of the token.
             //
-            // Thus, if the character is parsable, we proceed normally. Otherwise, we proceed
+            // Thus, if the character can be parsed, we proceed normally. Otherwise, we proceed
             // as if we had reached the end of the file (end of the token, since we are really
             // scanning).
             //
-            a.currentAction = a.lexNextCharacter(a.currentAction, a.current_kind)
-            if (a.currentAction == a.ERROR_ACTION and
-                    a.current_kind != a.EOFT_SYMBOL):  // if not successful try EOF
+            this.parseNextCharacter(this.curtok, this.current_kind)
+            if this.currentAction == this.ERROR_ACTION && this.current_kind != this.EOFT_SYMBOL { // if not successful try EOF
 
-                save_next_token = a.tokStream.peek()  // save position after a.curtok
-                a.tokStream.reset(a.tokStream.getStreamLength() - 1)  // point to the end of the input
-                a.currentAction = a.lexNextCharacter(a.stack[a.stateStackTop], a.EOFT_SYMBOL)
-                // assert (a.currentAction == a.ACCEPT_ACTION or a.currentAction == a.ERROR_ACTION):
-                a.tokStream.reset(save_next_token)  // reset the stream for the next token after a.curtok.
-
-            a.action.add(a.currentAction)  // save the a.action
+                var save_next_token = this.tokStream.peek() // save position after curtok
+                this.tokStream.reset(this.tokStream.getStreamLength() - 1) // point to the end of the input
+                this.parseNextCharacter(this.curtok, this.EOFT_SYMBOL)
+                // assert (currentAction == ACCEPT_ACTION || currentAction == ERROR_ACTION)
+                this.tokStream.reset(save_next_token) // reset the stream for the next token after curtok.
+            }
 
             //
-            // At a point, a.currentAction is either a Shift, Shift-Reduce, Accept or Error a.action.
+            // At this point, currentAction is either a Shift, Shift-Reduce, Accept or Error action.
             //
-            if a.currentAction > a.ERROR_ACTION:  // Shift-reduce
+            if this.currentAction > this.ERROR_ACTION { // Shift-reduce
 
-                a.curtok = a.tokStream.getToken()
-                if a.curtok > end_offset:
-                    a.curtok = a.tokStream.getStreamLength()
-                a.current_kind = a.tokStream.getKind(a.curtok)
-                a.currentAction -= a.ERROR_ACTION
-                while true:
-                    lhs_symbol = a.prs.lhs(a.currentAction)
-                    if lhs_symbol == a.START_SYMBOL:
-                        a.parseActions()
-                        return true
+                this.lastToken = this.curtok
+                this.curtok = this.tokStream.getToken()
+                this.current_kind = this.tokStream.getKind(this.curtok)
+                this.currentAction -= this.ERROR_ACTION
+                for;; {
+                    this.stateStackTop -= (this.prs.rhs(this.currentAction) - 1)
+                    this.ra.ruleAction(this.currentAction)
+                    var lhs_symbol = this.prs.lhs(this.currentAction)
+                    if lhs_symbol == this.START_SYMBOL {
+                        continue ProcessTokens
+                    }
 
-                    a.stateStackTop -= (a.prs.rhs(a.currentAction) - 1)
-                    a.currentAction = a.prs.ntAction(a.stack[a.stateStackTop], lhs_symbol)
-                    if not a.currentAction <= a.NUM_RULES:
+                    this.currentAction = this.prs.ntAction(this.stack[this.stateStackTop], lhs_symbol)
+                    if this.currentAction <= this.NUM_RULES{
+                        continue
+                    }else{
                         break
+                    }
+                }
+            } else{
+                if this.currentAction < this.ACCEPT_ACTION { // Shift
 
-            elif a.currentAction < a.ACCEPT_ACTION:  // Shift
-
-                a.curtok = a.tokStream.getToken()
-                if a.curtok > end_offset:
-                    a.curtok = a.tokStream.getStreamLength()
-                a.current_kind = a.tokStream.getKind(a.curtok)
-
-            elif a.currentAction == a.ACCEPT_ACTION:
-                return true
-            else:
-                break  // ScanToken // a.ERROR_ACTION
+                 this.lastToken = this.curtok
+                 this.curtok = this.tokStream.getToken()
+                 this.current_kind = this.tokStream.getKind(this.curtok)
+                } else {
+                    if this.currentAction == this.ACCEPT_ACTION {
+                        continue ProcessTokens
+                    } else {
+                        break ScanToken // ERROR_ACTION
+                    }
+                }
+             }
+        }
 
         //
-        // Whenever we reach a point, an error has been detected.
+        // Whenever we reach this point, an error has been detected.
         // Note that the parser loop above can never reach the ACCEPT
         // point as it is short-circuited each time it reduces a phrase
-        // to the a.START_SYMBOL.
+        // to the START_SYMBOL.
         //
         // If an error is detected on a single bad character,
         // we advance to the next character before resuming the
@@ -484,150 +293,436 @@ type LexParser struct {
         // scanning on the character on which the problem was
         // detected. In other words, in that case, we do not advance.
         //
-        if a.starttok == a.curtok:
-            if a.current_kind == a.EOFT_SYMBOL:
-                a.action = IntTuple(0)  // turn into garbage!
-                return False
+        if this.starttok == this.curtok {
+            if this.current_kind == this.EOFT_SYMBOL {
+                break ProcessTokens
+            }
 
-            a.lastToken = a.curtok
-            a.tokStream.reportLexicalError(a.starttok, a.curtok)
-            a.curtok = a.tokStream.getToken()
-            if a.curtok > end_offset:
-                a.curtok = a.tokStream.getStreamLength()
-            a.current_kind = a.tokStream.getKind(a.curtok)
+            this.tokStream.reportLexicalError(this.starttok, this.curtok,0,0,0,nil)
+            this.lastToken = this.curtok
+            this.curtok = this.tokStream.getToken()
+            this.current_kind = this.tokStream.getKind(this.curtok)
+        } else {
+            this.tokStream.reportLexicalError(this.starttok, this.lastToken ,0,0,0,nil)
+        }
 
-        else:
-            a.lastToken = a.tokStream.getPrevious(a.curtok)
-            a.tokStream.reportLexicalError(a.starttok, a.lastToken)
+    }
 
-        return true
+    this.taking_actions = false // indicate that we are done
+
+    return
+
+}
+//
+// This function takes as argument a configuration ([stack, stackTop], [tokStream, curtok])
+// and determines whether or not curtok can be validly parsed in this configuration. If so,
+// it parses curtok and returns the final shift or shift-reduce action on it. Otherwise, it
+// leaves the configuration unchanged and returns ERROR_ACTION.
+//
+func (this *LexParser)  parseNextCharacter(token int, kind int)  {
+    var start_action int = this.stack[this.stateStackTop]
+     var   pos int = this.stateStackTop
+     var   tempStackTop int = this.stateStackTop - 1
+
+    Scan :
+    for this.currentAction = this.tAction(start_action, kind);
+        this.currentAction <= this.NUM_RULES;
+        this.currentAction = this.tAction(this.currentAction, kind) {
+        for;; {
+            var lhs_symbol = this.prs.lhs(this.currentAction)
+            if (lhs_symbol == this.START_SYMBOL) {
+                break Scan
+            }
+            tempStackTop -= (this.prs.rhs(this.currentAction) - 1)
+            var state int
+                if tempStackTop > pos{
+                    state=  this.tempStack[tempStackTop]
+                }else{
+                    state=this.stack[tempStackTop]
+                }
+
+
+            this.currentAction = this.prs.ntAction(state, lhs_symbol)
+            if this.currentAction <= this.NUM_RULES {
+                continue
+            }else{
+                break
+            }
+        }
+        if tempStackTop + 1 >= len(this.stack) {
+            this.reallocateStacks()
+        }
+        //
+        // ... Update the maximum useful position of the stack,
+        // push goto state into (temporary) stack, and compute
+        // the next action on the current symbol ...
+        //
+        if !(pos < tempStackTop){
+            pos = tempStackTop
+        }
+        this.tempStack[tempStackTop + 1] = this.currentAction
+    }
 
     //
-    // This function takes as argument a configuration ([a.stack, stackTop], [a.tokStream, a.curtok]):
-    // and determines whether or not the reduce a.action the a.curtok can be validly parsed in a
+    // If no error was detected, we update the configuration up to the point prior to the
+    // shift or shift-reduce on the token by processing all reduce and goto actions associated
+    // with the current token.
+    //
+    if (this.currentAction != this.ERROR_ACTION) {
+        //
+        // Note that it is important that the global variable currentAction be used here when
+        // we are actually processing the rules. The reason being that the user-defined function
+        // ra.ruleAction() may call func (this *LexParser) functions defined in this class (such as getLastToken())
+        // which require that currentAction be properly initialized.
+        //
+        Replay :
+        for this.currentAction = this.tAction(start_action, kind);
+            this.currentAction <= this.NUM_RULES;
+            this.currentAction = this.tAction(this.currentAction, kind) {
+            this.stateStackTop--
+            for;; {
+                this.stateStackTop -= (this.prs.rhs(this.currentAction) - 1)
+                this.ra.ruleAction(this.currentAction)
+                var lhs_symbol = this.prs.lhs(this.currentAction)
+                if lhs_symbol == this.START_SYMBOL {
+
+                    if this.starttok == token{ // null string reduction to START_SYMBOL is illegal
+                        this.currentAction=this.ERROR_ACTION
+                    }else{
+                        this.currentAction=this.ACCEPT_ACTION
+                    }
+                    break Replay
+                }
+                this.currentAction = this.prs.ntAction(this.stack[this.stateStackTop], lhs_symbol)
+                if this.currentAction <= this.NUM_RULES{
+                    continue
+                }else{
+                    break
+                }
+            }
+            this.stateStackTop+=1
+            if this.stateStackTop >= len(this.stack) {
+                this.reallocateStacks()
+            }
+            this.stack[this.stateStackTop] = this.currentAction
+
+            this.locationStack[this.stateStackTop] = token
+        }
+    }
+
+    return
+}
+//
+// keep looking ahead until we compute a valid action
+//
+func (this *LexParser)  lookahead(act int, token int) int {
+    act = this.prs.lookAhead(act - this.LA_STATE_OFFSET, this.tokStream.getKind(token))
+    if  act > this.LA_STATE_OFFSET{
+        return   this.lookahead(act, this.tokStream.getNext(token))
+    }else{
+        return  act
+    }
+}
+//
+// Compute the next action defined on act and sym. If this
+// action requires more lookahead, these lookahead symbols
+// are in the token stream beginning at the next token that
+// is yielded by peek().
+//
+func (this *LexParser)  tAction(act int, sym int) int {
+    act = this.prs.tAction(act, sym)
+    if act > this.LA_STATE_OFFSET{
+        return this.lookahead(act, this.tokStream.peek())
+    }else {
+        return  act
+    }
+
+}
+
+func (this *LexParser) scanNextToken() bool {
+    return this.lexNextToken(this.tokStream.getStreamLength())
+}
+func (this *LexParser) scanNextTokenFromStartOffset(start_offset int) bool {
+    this.resetTokenStream(start_offset)
+    return this.lexNextToken(this.tokStream.getStreamLength())
+}
+func (this *LexParser)  lexNextToken(end_offset int) bool {
+    //
+    // Indicate that we are going to run the incremental parser and that
+    // it's forbidden to use the utility functions to query the parser.
+    //
+    this.taking_actions = false
+
+    this.stateStackTop = -1
+    this.currentAction = this.START_STATE
+    this.starttok = this.curtok
+    this.action.reset()
+
+    ScanToken:
+     for ;; {
+         this.stateStackTop+=1
+        if this.stateStackTop >= len(this.stack) {
+            this.reallocateStacks()
+        }
+        this.stack[this.stateStackTop] = this.currentAction
+
+        //
+        // Compute the this.action on the next character. If it is a reduce this.action, we do not
+        // want to accept it until we are sure that the character in question is parsable.
+        // What we are trying to avoid is a situation where this.curtok is not the EOF token
+        // but it yields a default reduce this.action in the current configuration even though
+        // it cannot ultimately be shifted However, the state on top of the configuration also
+        // contains a valid reduce this.action on EOF which, if taken, would lead to the succesful
+        // scanning of the token.
+        //
+        // Thus, if the character is parsable, we proceed normally. Otherwise, we proceed
+        // as if we had reached the end of the file (end of the token, since we are really
+        // scanning).
+        //
+        this.currentAction = this.lexNextCharacter(this.currentAction, this.current_kind)
+        if this.currentAction == this.ERROR_ACTION && this.current_kind != this.EOFT_SYMBOL { // if not successful try EOF
+
+            var save_next_token = this.tokStream.peek() // save position after this.curtok
+            this.tokStream.reset(this.tokStream.getStreamLength() - 1) // point to the end of the input
+            this.currentAction = this.lexNextCharacter(this.stack[this.stateStackTop], this.EOFT_SYMBOL)
+            // assert (this.currentAction == this.ACCEPT_ACTION || this.currentAction == this.ERROR_ACTION)
+            this.tokStream.reset(save_next_token) // reset the stream for the next token after this.curtok.
+        }
+
+        this.action.add(this.currentAction) // save the this.action
+
+        //
+        // At this point, this.currentAction is either a Shift, Shift-Reduce, Accept or Error this.action.
+        //
+        if this.currentAction > this.ERROR_ACTION { //Shift-reduce
+
+            this.curtok = this.tokStream.getToken()
+            if this.curtok > end_offset {
+                this.curtok = this.tokStream.getStreamLength()
+            }
+
+            this.current_kind = this.tokStream.getKind(this.curtok)
+            this.currentAction -= this.ERROR_ACTION
+            for;; {
+                var lhs_symbol = this.prs.lhs(this.currentAction)
+                if lhs_symbol == this.START_SYMBOL {
+                    this.parseActions()
+                    return true
+                }
+                this.stateStackTop -= (this.prs.rhs(this.currentAction) - 1)
+                this.currentAction = this.prs.ntAction(this.stack[this.stateStackTop], lhs_symbol)
+                if this.currentAction <= this.NUM_RULES{
+                    continue
+                }else{
+                    break
+                }
+            }
+        }else {
+              if this.currentAction < this.ACCEPT_ACTION { // Shift
+
+                 this.curtok = this.tokStream.getToken()
+                 if this.curtok > end_offset {
+                     this.curtok = this.tokStream.getStreamLength()
+                 }
+                 this.current_kind = this.tokStream.getKind(this.curtok)
+             } else {
+                  if this.currentAction == this.ACCEPT_ACTION {
+                      return true
+                  } else{
+                      break ScanToken // this.ERROR_ACTION
+                  }
+              }
+
+         }
+    }
+
+    //
+    // Whenever we reach this point, an error has been detected.
+    // Note that the parser loop above can never reach the ACCEPT
+    // point as it is short-circuited each time it reduces a phrase
+    // to the this.START_SYMBOL.
+    //
+    // If an error is detected on a single bad character,
+    // we advance to the next character before resuming the
+    // scan. However, if an error is detected after we start
+    // scanning a construct, we form a bad token out of the
+    // characters that have already been scanned and resume
+    // scanning on the character on which the problem was
+    // detected. In other words, in that case, we do not advance.
+    //
+    if this.starttok == this.curtok {
+        if this.current_kind == this.EOFT_SYMBOL {
+            this.action = nil // turn into garbage!
+            return false
+        }
+        this.lastToken = this.curtok
+        this.tokStream.reportLexicalError(this.starttok, this.curtok,0,0,0,nil)
+        this.curtok = this.tokStream.getToken()
+        if this.curtok > end_offset {
+            this.curtok = this.tokStream.getStreamLength()
+        }
+        this.current_kind = this.tokStream.getKind(this.curtok)
+    } else {
+        this.lastToken = this.tokStream.getPrevious(this.curtok)
+        this.tokStream.reportLexicalError(this.starttok, this.lastToken ,0,0,0,nil)
+    }
+
+
+    return true
+}
+    //
+    // This function takes as argument a configuration ([this.stack, stackTop], [this.tokStream, this.curtok])
+    // and determines whether or not the reduce this.action the this.curtok can be validly parsed in this
     // configuration.
     //
-    def lexNextCharacter( act int, kind int):
-        action_save = a.action.size()
-        pos = a.stateStackTop,
-        tempStackTop = a.stateStackTop - 1
-        act = a.tAction(act, kind)
-        // Scan:
-        b_break_scan = False
-        while act <= a.NUM_RULES:
-            a.action.add(act)
+func (this *LexParser)  lexNextCharacter(act int, kind int) int {
+        var action_save = this.action.size()
+        var pos = this.stateStackTop
+        var tempStackTop = this.stateStackTop - 1
+        act = this.tAction(act, kind)
+        Scan:
+            for;act <= this.NUM_RULES; {
+                this.action.add(act)
 
-            while true:
-                lhs_symbol = a.prs.lhs(act)
-                if lhs_symbol == a.START_SYMBOL:
-                    if a.starttok == a.curtok:  // nil string reduction to a.START_SYMBOL is illegal
+                for;; {
+                    var lhs_symbol = this.prs.lhs(act)
+                    if lhs_symbol == this.START_SYMBOL {
+                        if this.starttok == this.curtok { // null string reduction to this.START_SYMBOL is illegal
+                            act = this.ERROR_ACTION
+                            break Scan
+                        } else {
+                            this.parseActions()
+                            return this.ACCEPT_ACTION
+                        }
+                    }
+                    tempStackTop -= (this.prs.rhs(act) - 1)
+                    var state int
+                    if tempStackTop > pos{
+                        state=this.tempStack[tempStackTop]
+                    }else {
+                        state=this.stack[tempStackTop]
+                    }
+                    act = this.prs.ntAction(state, lhs_symbol)
+                    if act <= this.NUM_RULES{
+                        continue
+                    }else {
+                        break
+                    }
+                }
+                if tempStackTop + 1 >= len(this.stack) {
+                    this.reallocateStacks()
+                }
+                //
+                // ... Update the maximum useful position of the this.stack,
+                // push goto state into (temporary) this.stack, and compute
+                // the next this.action on the current symbol ...
+                //
 
-                        act = a.ERROR_ACTION
-                        b_break_scan = true
-                        break  // Scan
-
-                    else:
-                        a.parseActions()
-                        return a.ACCEPT_ACTION
-
-                tempStackTop -= (a.prs.rhs(act) - 1)
-                state = (a.tempStack[tempStackTop] if tempStackTop > pos else a.stack[tempStackTop])
-                act = a.prs.ntAction(state, lhs_symbol)
-
-                if not act <= a.NUM_RULES:
-                    break
-            if b_break_scan:
-                break
-
-            if tempStackTop + 1 >= a.stack.__len__()
-                a.reallocateStacks()
-            //
-            // ... Update the maximum useful position of the a.stack,
-            // push goto state into (temporary): a.stack, and compute
-            // the next a.action on the current symbol ...
-            //
-            pos = pos if pos < tempStackTop else tempStackTop
-            a.tempStack[tempStackTop + 1] = act
-            act = a.tAction(act, kind)
+                if!(pos < tempStackTop)  {
+                    pos = tempStackTop
+                }
+                this.tempStack[tempStackTop + 1] = act
+                act = this.tAction(act, kind)
+        }
 
         //
         // If an error was detected, we restore the original configuration.
         // Otherwise, we update configuration up to the point prior to the
         // shift or shift-reduce on the token.
         //
-        if act == a.ERROR_ACTION:
-            a.action.reset(action_save)
-        else:
-            a.stateStackTop = tempStackTop + 1
-            for i in range(pos + 1, a.stateStackTop + 1):  // update stack
-                a.stack[i] = a.tempStack[i]
+        if act == this.ERROR_ACTION {
+            this.action.resetFrom(action_save)
+        } else {
+            this.stateStackTop = tempStackTop + 1
+            var i = pos + 1
+            for ; i <= this.stateStackTop; i++{ // update this.stack
+                this.stack[i] = this.tempStack[i]
+            }
+        }
 
         return act
+    }
 
     //
     // Now do the final parse of the input based on the actions in
-    // the list "a.action" and the sequence of tokens in the token stream.
+    // the list "this.action" and the sequence of tokens in the token stream.
     //
-    def parseActions()
-        //
-        // Indicate that we are running the regular parser and that it's
-        // ok to use the utility functions to query the parser.
-        //
-        a.taking_actions = true
+func (this *LexParser)  parseActions()  {
+    //
+    // Indicate that we are running the regular parser and that it's
+    // ok to use the utility functions to query the parser.
+    //
+    this.taking_actions = true
 
-        a.curtok = a.starttok
-        a.lastToken = a.tokStream.getPrevious(a.curtok)
+    this.curtok = this.starttok
+    this.lastToken = this.tokStream.getPrevious(this.curtok)
 
-        //
-        // Reparse the input...
-        //
-        a.stateStackTop = -1
-        a.currentAction = a.START_STATE
-        // process_actions:
-        b_break_process_actions = False
-        for i in range(0, a.action.size()):
-            a.stateStackTop += 1
-            a.stack[a.stateStackTop] = a.currentAction
-            a.locationStack[a.stateStackTop] = a.curtok
+    //
+    // Reparse the input...
+    //
+    this.stateStackTop = -1
+    this.currentAction = this.START_STATE
+    var i = 0
 
-            a.currentAction = a.action.get(i)
-            if a.currentAction <= a.NUM_RULES:  // a reduce a.action?
+    process_actions:
+     for ; i < this.action.size(); i++ {
+         this.stateStackTop+=1
+        this.stack[this.stateStackTop] = this.currentAction
+        this.locationStack[this.stateStackTop] = this.curtok
 
-                a.stateStackTop -= 1  // turn reduction into shift-reduction
-                while true:
-                    a.stateStackTop -= (a.prs.rhs(a.currentAction) - 1)
-                    a.ra.ruleAction(a.currentAction)
-                    lhs_symbol = a.prs.lhs(a.currentAction)
-                    if lhs_symbol == a.START_SYMBOL:
-                        // assert(starttok != a.curtok):  // nil string reduction to a.START_SYMBOL is illegal
-                        b_break_process_actions = true
-                        break  // process_actions
+        this.currentAction = this.action.get(i)
+        if this.currentAction <= this.NUM_RULES { // a reduce this.action?
 
-                    a.currentAction = a.prs.ntAction(a.stack[a.stateStackTop], lhs_symbol)
-                    if not a.currentAction <= a.NUM_RULES:
+            this.stateStackTop-- // turn reduction intoshift-reduction
+            for;; {
+                this.stateStackTop -= (this.prs.rhs(this.currentAction) - 1)
+                this.ra.ruleAction(this.currentAction)
+                var lhs_symbol = this.prs.lhs(this.currentAction)
+                if (lhs_symbol == this.START_SYMBOL) {
+                    // assert(starttok != this.curtok)  // null string reduction to this.START_SYMBOL is illegal
+                    break process_actions
+                }
+                this.currentAction = this.prs.ntAction(this.stack[this.stateStackTop], lhs_symbol)
+                if this.currentAction <= this.NUM_RULES{
+                    continue
+                }else{
+                    break
+                }
+            }
+        } else{ // a shift or shift-reduce this.action
+
+            this.lastToken = this.curtok
+            this.curtok = this.tokStream.getNext(this.curtok)
+            if this.currentAction > this.ERROR_ACTION { // a shift-reduce this.action?
+
+                this.current_kind = this.tokStream.getKind(this.curtok)
+                this.currentAction -= this.ERROR_ACTION
+                for;; {
+                    this.stateStackTop -= (this.prs.rhs(this.currentAction) - 1)
+                    this.ra.ruleAction(this.currentAction)
+                    var lhs_symbol = this.prs.lhs(this.currentAction)
+                    if (lhs_symbol == this.START_SYMBOL) {
+                        break process_actions
+                    }
+                    this.currentAction = this.prs.ntAction(this.stack[this.stateStackTop], lhs_symbol)
+                    if this.currentAction <= this.NUM_RULES{
+                        continue
+                    }else{
                         break
-            else:  // a shift or shift-reduce a.action
+                    }
+                }
+            }
+        }
+    }
 
-                a.lastToken = a.curtok
-                a.curtok = a.tokStream.getNext(a.curtok)
-                if a.currentAction > a.ERROR_ACTION:  // a shift-reduce a.action?
+    this.taking_actions = false // indicate that we are done
 
-                    a.current_kind = a.tokStream.getKind(a.curtok)
-                    a.currentAction -= a.ERROR_ACTION
-                    while true:
-                        a.stateStackTop -= (a.prs.rhs(a.currentAction) - 1)
-                        a.ra.ruleAction(a.currentAction)
-                        lhs_symbol = a.prs.lhs(a.currentAction)
-                        if lhs_symbol == a.START_SYMBOL:
-                            b_break_process_actions = true
-                            break  // process_actions
-                        a.currentAction = a.prs.ntAction(a.stack[a.stateStackTop], lhs_symbol)
-                        if not a.currentAction <= a.NUM_RULES:
-                            break
+    return
+    }
 
-            if b_break_process_actions:
-                break
 
-        a.taking_actions = False  // indicate that we are done
 
-        return
+
+
+
+

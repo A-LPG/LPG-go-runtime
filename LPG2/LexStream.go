@@ -1,313 +1,359 @@
 package lpg2
 
-
+import (
+    "bytes"
+    "io"
+    "os"
+    "fmt"
+)
 
 //
 // LexStream contains an array of characters as the input stream to be parsed.
 // There are methods to retrieve and classify characters.
 // The lexparser "token" is implemented simply as the index of the next character in the array.
-// The user must subclass LexStreamBase and implement the abstract methods: getKind.
+// The user must subclass LexStreamBase and implement the abstract methods getKind.
 //
-type LexStream(ILexStream):
-    DEFAULT_TAB int = 1
 
+type LexStream struct {
+     DEFAULT_TAB int
+     index int
+     streamLength int
+     inputChars  []rune
 
-    def __init__( fileName: string, inputChars: string = nil, tab int = DEFAULT_TAB,
-                 lineOffsets: IntSegmentedTuple = nil):
-        a.index int = -1
-        a.streamLength int = 0
-        a.inputChars: string = ""
-        a.fileName: string = ""
-        a.lineOffsets: IntSegmentedTuple
-        a.tab int = a.DEFAULT_TAB
+     fileName string
+     lineOffsets *IntSegmentedTuple
+     tab int 
+     prsStream IPrsStream
+     errMsg IMessageHandler
+}
 
-        a.prsStream: IPrsStream = nil
-        a.errMsg: IMessageHandler = nil
-        a.lineOffsets = IntSegmentedTuple(12)
-        a.setLineOffset(-1)
-        a.tab = tab
-        a.initialize(fileName, inputChars, lineOffsets)
+func NewLexStream(fileName string, inputChars *string, tab int, lineOffsets *IntSegmentedTuple) *LexStream{
+    this := new(LexStream)
+    this.lineOffsets = NewIntSegmentedTuple(12,4)
+    this.setLineOffset(-1)
+    this.tab = tab
+    this.initialize(fileName, inputChars, lineOffsets)
+    return  this
+}
+func (this *LexStream) GetFileString(fileName string) (*string, error) {
 
-    def thisTab( tab int = DEFAULT_TAB):
-        a.lineOffsets = IntSegmentedTuple(12)
-        a.setLineOffset(-1)
-        a.tab = tab
+    buf := bytes.NewBuffer(nil)
 
-    @staticmethod
-    def readDataFrom(fileName: string, encoding: string = 'utf-8', errors: string = 'strict'):
-        // read binary to avoid line ending conversion
-        with open(fileName, 'rb') as file:
-            _bytes = file.read()
-            return codecs.decode(_bytes, encoding, errors)
+    f, err := os.Open(fileName)
+    if err != nil {
+        return nil, err
+    }
+    defer f.Close()
+    _, err = io.Copy(buf, f)
+    if err != nil {
+        return nil, err
+    }
 
-    def initialize( fileName: string, input_content: string = nil, lineOffsets: IntSegmentedTuple = nil):
-        if input_content is nil:
-            try:
-                input_content = a.readDataFrom(fileName, "utf-8")
-            except Exception as ex:
-                print(string(ex))
-                raise ex
+    s := string(buf.Bytes())
 
-        if input_content is nil:
-            return
+    return &s, nil
 
-        a.setInputChars(input_content)
-        a.setStreamLength(input_content.__len__())
-        a.setFileName(fileName)
-        if lineOffsets is not nil:
-            a.lineOffsets = lineOffsets
-        else:
-            a.computeLineOffsets()
+}
+func (this *LexStream) initialize(fileName string, inputChars *string, lineOffsets *IntSegmentedTuple)  error {
+    if nil == inputChars {
+        var str,ex = this.GetFileString(fileName)
+        if ex != nil{
+            return ex
+        }
+        inputChars = str
+    }
 
-    def computeLineOffsets()
-        a.lineOffsets.reset()
-        a.setLineOffset(-1)
-        for i in range(0, a.inputChars.__len__()):
-            if ord(a.inputChars[i]) == 0x0A:
-                a.setLineOffset(i)
+    if nil == inputChars {
+        return nil
+    }
 
-    def setInputChars( inputChars: string):
-        a.inputChars = inputChars
-        a.index = -1  // reset the start index to the beginning of the input
+    this.setInputChars(*inputChars)
+    this.setStreamLength(len(*inputChars))
+    this.setFileName(fileName)
+    if lineOffsets != nil {
+        this.lineOffsets = lineOffsets
+    } else {
+        this.computeLineOffsets()
+    }
+    return nil
+}
+func (this *LexStream) computeLineOffsets()  {
+    this.lineOffsets.reset()
+    this.setLineOffset(-1)
+    var i int = 0
+    for ;i < len(this.inputChars); i++ {
+        if this.inputChars[i] == 0x0A {
+            this.setLineOffset(i)
+        }
+    }
+}
+func (this *LexStream) setInputChars(inputChars string)  {
+    this.inputChars = []rune(inputChars)
+    this.index = -1 // reset the start index to the beginning of the input
+}
+func (this *LexStream) getInputChars() string {
+    return string(this.inputChars)
+}
+func (this *LexStream) setFileName(fileName string)  {
+    this.fileName = fileName
+}
+func (this *LexStream) getFileName() string {
+    return this.fileName
+}
+func (this *LexStream) setLineOffsets(lineOffsets *IntSegmentedTuple)  {
+    this.lineOffsets = lineOffsets
+}
+func (this *LexStream) getLineOffsets() *IntSegmentedTuple {
+    return this.lineOffsets
+}
+func (this *LexStream) setTab(tab int)  {
+    this.tab = tab
+}
+func (this *LexStream) getTab() int {
+    return this.tab
+}
+func (this *LexStream) setStreamIndex(index int)  {
+    this.index = index
+}
+func (this *LexStream) getStreamIndex() int {
+    return this.index
+}
+func (this *LexStream) setStreamLength(streamLength int)  {
+    this.streamLength = streamLength
+}
+func (this *LexStream) getStreamLength() int {
+    return this.streamLength
+}
+func (this *LexStream) setLineOffset(i int)  {
+    this.lineOffsets.add(i)
+}
+func (this *LexStream) getLineOffset(i int) int {
+    return this.lineOffsets.get(i)
+}
+func (this *LexStream) setPrsStream(prsStream IPrsStream)  {
+    prsStream.setLexStream(this)
+    this.prsStream = prsStream
+}
+func (this *LexStream) getIPrsStream() IPrsStream{
+    return this.prsStream
+}
 
-    def getInputChars()  string:
-        return a.inputChars
+func (this *LexStream) orderedExportedSymbols() []string {
+    return nil
+}
+func (this *LexStream) getCharValue(i int) string {
+    return string(this.inputChars[i])
+}
+func (this *LexStream) getIntValue(i int) int {
+    return int(this.inputChars[i])
+}
 
-    def setFileName( fileName: string):
-        a.fileName = fileName
-
-    def getFileName()  string:
-        return a.fileName
-
-    def setLineOffsets( lineOffsets: IntSegmentedTuple):
-        a.lineOffsets = lineOffsets
-
-    def getLineOffsets()  IntSegmentedTuple:
-        return a.lineOffsets
-
-    def setTab( tab int):
-        a.tab = tab
-
-    def getTab() int {
-        return a.tab
-
-    def setStreamIndex( index int):
-        a.index = index
-
-    def getStreamIndex() int {
-        return a.index
-
-    def setStreamLength( length int):
-        a.streamLength = length
-
-    def getStreamLength() int {
-        return a.streamLength
-
-    def setLineOffset( i int):
-        a.lineOffsets.add(i)
-
-    def getLineOffset( i int) int {
-        return a.lineOffsets.get(i)
-
-    def setPrsStream( stream: IPrsStream):
-        stream.setLexStream()
-        a.prsStream = stream
-
-    def getIPrsStream()  IPrsStream:
-        return a.prsStream
-
-    def orderedExportedSymbols()  list:
-        return []
-
-    def getCharValue( i int)  string:
-        return a.inputChars[i]
-
-    def getIntValue( i int) int {
-        return ord(a.inputChars[i])
-
-    def getLineCount() int {
-        return a.lineOffsets.size() - 1
-
-    def getLineNumberOfCharAt( i int) int {
-        index int = a.lineOffsets.binarySearch(i)
-        return -index if index < 0 else (1 if index == 0 else index)
-
-    def getColumnOfCharAt( i int) int {
-        lineNo int = a.getLineNumberOfCharAt(i)
-        start int = a.lineOffsets.get(lineNo - 1)
-        if start + 1 >= a.streamLength:
+func (this *LexStream) getLineCount() int {
+    return this.lineOffsets.size() - 1
+}
+func (this *LexStream) getLineNumberOfCharAt(i int) int {
+    var index int = this.lineOffsets.binarySearch(i)
+    if  index < 0 {
+        return  -index
+    } else{
+        if index == 0 {
             return 1
-        for k in range(start + 1, i):
-            if a.inputChars[k] == '\t':
-                offset int = (k - start) - 1
-                start -= ((a.tab - 1) - offset % a.tab)
-
-        return i - start
-
-    def getToken2() int {
-        a.index = a.getNext(a.index)
-        return a.index
-
-    def getToken( end_token int = nil) int {
-        if end_token is nil:
-            return a.getToken2()
-
-        a.index = (a.getNext(a.index) if a.index < end_token else a.streamLength)
-        return a.index
-
-    def getKind( i int) int {
+        } else{
+            return index
+        }
+    }
+}
+func (this *LexStream) getColumnOfCharAt(i int) int {
+    var lineNo int = this.getLineNumberOfCharAt(i)
+     var   start int = this.lineOffsets.get(lineNo - 1)
+    if start + 1 >= this.streamLength {
+        return 1
+    }
+    var k int = start + 1
+    for  ;k < i ;k++ {
+        if this.inputChars[k] == '\t' {
+            var offset int = (k - start) - 1
+            start -= ((this.tab - 1) - offset % this.tab)
+        }
+    }
+    return i - start
+}
+func (this *LexStream) getToken() int {
+    this.index = this.getNext(this.index)
+    return this.index
+}
+func (this *LexStream) getTokenFromEndToken(end_token int ) int {
+     if this.index < end_token {
+         this.index =this.getNext(this.index)
+     }else{
+         this.index =this.streamLength
+     }
+     return  this.index
+}
+func (this *LexStream) getKind(i int) int {
+    return 0
+}
+func (this *LexStream) next(i int) int {
+    return this.getNext(i)
+}
+func (this *LexStream) getNext(i int) int {
+     i+=1
+     if i < this.streamLength {
+         return  i
+     }else{
+        return  this.streamLength
+     }
+}
+func (this *LexStream) previous(i int) int {
+    return this.getPrevious(i)
+}
+func (this *LexStream) getPrevious(i int) int {
+    if i <= 0 {
         return 0
+    }else {
+       return i - 1
+    }
+}
+func (this *LexStream) getName(i int) string {
+    if i >= this.getStreamLength() {
+        return ""
+    }else{
+        return  "" + this.getCharValue(i)
+    }
+}
+func (this *LexStream) peek() int {
+    return this.getNext(this.index)
+}
+func (this *LexStream) resetTo(i int)  {
+    this.index = i - 1
+}
+func (this *LexStream) reset()  {
+    this.index = -1
+}
 
-    def next( i int) int {
-        return a.getNext(i)
+func (this *LexStream) badToken() int {
+    return 0
+}
+func (this *LexStream) getLine(i int) int {
+    return this.getLineNumberOfCharAt(i)
+}
 
-    def getNext( i int) int {
-        i += 1
-        return i if i < a.streamLength else a.streamLength
+func (this *LexStream) getColumn(i int) int {
+    return this.getColumnOfCharAt(i)
+}
+func (this *LexStream) getEndLine(i int) int {
+    return this.getLine(i)
+}
+func (this *LexStream) getEndColumn(i int) int {
+    return this.getColumnOfCharAt(i)
+}
+func (this *LexStream) afterEol(i int) bool {
+    if i < 1 {
+        return  true
+    } else{
+        return this.getLineNumberOfCharAt(i - 1) < this.getLineNumberOfCharAt(i)
+    }
+}
+func (this *LexStream) getFirstErrorToken(i int) int {
+    return this.getFirstRealToken(i)
+}
+func (this *LexStream) getFirstRealToken(i int) int {
+    return i
+}
+func (this *LexStream) getLastErrorToken(i int) int {
+    return this.getLastRealToken(i)
+}
+func (this *LexStream) getLastRealToken(i int) int {
+    return i
+}
+func (this *LexStream) setMessageHandler(errMsg IMessageHandler)  {
+    this.errMsg = errMsg
+}
+func (this *LexStream) getMessageHandler() IMessageHandler {
+    return this.errMsg
+}
+func (this *LexStream) makeToken(startLoc int, endLoc int, kind int)  {
+    if this.prsStream == nil {
+        this.prsStream.makeToken(startLoc, endLoc, kind)
+    } else {
+        this.reportLexicalError(startLoc, endLoc,0,0,0,nil)
+    }
+}
 
-    def previous( i int) int {
-        return a.getPrevious(i)
+func (this *LexStream) getLocation(left_loc int, right_loc int) []int {
+    var end_loc int
+    if right_loc < this.streamLength {
+        end_loc = right_loc
+    }else{
+        end_loc=this.streamLength - 1
+    }
+    var length int = end_loc - left_loc + 1
 
-    def getPrevious( i int) int {
-        return 0 if i <= 0 else i - 1
+    return []int{left_loc, length, this.getLineNumberOfCharAt(left_loc), this.getColumnOfCharAt(left_loc),
+        this.getLineNumberOfCharAt(right_loc), this.getColumnOfCharAt(right_loc)}
+}
+func (this *LexStream) reportLexicalError(left_loc int, right_loc int, errorCode int, error_left_loc int,
+    error_right_loc int, errorInfo  []string)  {
 
-    def getName( i int)  string:
-        return "" if i >= a.getStreamLength() else "" + a.getCharValue(i)
+    if NIL_CODE == errorCode && errorInfo == nil {
 
-    def peek() int {
-        return a.getNext(a.index)
+            if right_loc >= this.streamLength {
+                errorCode =EOF_CODE
+            } else{
+                if  left_loc == right_loc{
+                    errorCode=LEX_ERROR_CODE
+                }else{
+                    errorCode=INVALID_TOKEN_CODE
+                }
+            }
+            var tokenText string
+            if errorCode == EOF_CODE {
+                tokenText = "End-of-file "
+            }else{
+                if   errorCode == INVALID_TOKEN_CODE{
+                    tokenText= "\"" + this.toString(left_loc,  right_loc  + 1) + "\" "
+                }else{
+                    tokenText = "\"" + this.getCharValue(left_loc) + "\" ";
+                }
+            }
+        error_left_loc = 0
+        error_right_loc = 0
+        errorInfo = []string{tokenText}
+    }
 
-    def reset( i int = nil):
-        if i is not nil:
-            a.index = i - 1
-        else:
-            a.index = -1
 
-    def badToken() int {
-        return 0
+    if nil == this.errMsg {
+       var locationInfo =fmt.Sprintf("%s : %d : %d : %d : %d : %d : %d : %d",this.getFileName(),this.getLineNumberOfCharAt(left_loc),
+            this.getColumnOfCharAt(left_loc),this.getLineNumberOfCharAt(right_loc),this.getColumnOfCharAt(right_loc),
+            error_left_loc,error_right_loc,errorCode)
 
-    def getLine( i int = nil) int {
-        if i is nil:
-            return a.getLineCount()
+        print("****Error " + locationInfo)
+        var i int = 0
+            for  ;i < len(errorInfo); i++ {
+                print(errorInfo[i] + " ")
+            }
 
-        return a.getLineNumberOfCharAt(i)
+        println(errorMsgText[errorCode])
+    } else {
+        this.errMsg.handleMessage(errorCode, this.getLocation(left_loc, right_loc), this.getLocation(error_left_loc, error_right_loc), this.getFileName(), errorInfo)
+    }
+}
 
-    def getColumn( i int) int {
-        return a.getColumnOfCharAt(i)
+func (this *LexStream) reportError(errorCode int, leftToken int, rightToken int, errorInfo []string, errorToken int)  {
+    this.reportLexicalError(leftToken, rightToken, errorCode,  errorToken,errorToken, errorInfo)
+}
 
-    def getEndLine( i int) int {
-        return a.getLine(i)
+func (this *LexStream) toString(startOffset int, endOffset int) string {
+    var length int = endOffset - startOffset + 1
+    if endOffset >= len(this.inputChars) {
+        return "$EOF"
+    } else{
+        if length <= 0 {
+            return ""
+        } else{
+            return string(this.inputChars[startOffset : startOffset+ length])
+        }
+    }
+}
 
-    def getEndColumn( i int) int {
-        return a.getColumnOfCharAt(i)
 
-    def afterEol( i int)  bool:
-        return true if i < 1 else a.getLineNumberOfCharAt(i - 1) < a.getLineNumberOfCharAt(i)
-
-    def getFirstErrorToken( i int) int {
-        return a.getFirstRealToken(i)
-
-    def getFirstRealToken( i int) int {
-        return i
-
-    def getLastErrorToken( i int) int {
-        return a.getLastRealToken(i)
-
-    def getLastRealToken( i int) int {
-        return i
-
-    def setMessageHandler( handler: IMessageHandler):
-        a.errMsg = handler
-
-    def getMessageHandler()  IMessageHandler:
-        return a.errMsg
-
-    def makeToken( start_loc int, end_loc int, kind int):
-        if a.prsStream is not nil:
-            a.prsStream.makeToken(start_loc, end_loc, kind)
-        else:
-            a.reportLexicalError(start_loc, end_loc)
-
-    '''/**
-     * See IMessaageHandler for a description of the int[] return value.
-     */'''
-
-    def getLocation( left_loc int, right_loc int)  list:
-        length int = (right_loc if right_loc < a.streamLength else a.streamLength - 1) - left_loc + 1
-        return [left_loc,
-                length,
-                a.getLineNumberOfCharAt(left_loc),
-                a.getColumnOfCharAt(left_loc),
-                a.getLineNumberOfCharAt(right_loc),
-                a.getColumnOfCharAt(right_loc)
-                ]
-
-    def reportLexicalError( left_loc int, right_loc int, error_code int = nil,
-                           error_left_loc_arg int = nil, error_right_loc_arg int = nil, error_info: list = nil):
-
-        error_left_loc int = 0
-        if error_left_loc_arg is not nil:
-            error_left_loc = error_left_loc_arg
-
-        error_right_loc int = 0
-        if error_right_loc_arg is not nil:
-            error_right_loc = error_right_loc_arg
-
-        if error_info is nil:
-            error_info = []
-
-        if error_code is nil:
-            error_code = (ParseErrorCodes.EOF_CODE if right_loc >= a.streamLength
-                          else (ParseErrorCodes.LEX_ERROR_CODE
-                                if left_loc == right_loc
-                                else ParseErrorCodes.INVALID_TOKEN_CODE))
-
-            token_text: string = ("End-of-file " if error_code == ParseErrorCodes.EOF_CODE
-                               else ("\"" + a.inputChars[left_loc:  right_loc + 1] + "\" "
-                                     if error_code == ParseErrorCodes.INVALID_TOKEN_CODE
-                                     else "\"" + a.getCharValue(left_loc) + "\" "))
-
-            error_info = [token_text]
-
-        if a.errMsg is nil:
-            location_info: string = (a.getFileName() + ':' + string(a.getLineNumberOfCharAt(left_loc)) + ':'
-                                  + string(a.getColumnOfCharAt(left_loc)) + ':'
-                                  + string(a.getLineNumberOfCharAt(right_loc)) + ':'
-                                  + string(a.getColumnOfCharAt(right_loc)) + ':'
-                                  + string(error_left_loc) + ':'
-                                  + string(error_right_loc) + ':'
-                                  + string(error_code) + ": ")
-            print("****Error: " + location_info, end=''),
-
-            if error_info:
-                for i in range(0, error_info.__len__()):
-                    print(error_info[i] + " ", end=''),
-
-            print(ParseErrorCodes.errorMsgText[error_code])
-        else:
-            '''/**
-             * This is the only method in the IMessageHandler interface
-             * It is called with the following arguments:
-             */'''
-            a.errMsg.handleMessage(error_code,
-                                      a.getLocation(left_loc, right_loc),
-                                      a.getLocation(error_left_loc, error_right_loc),
-                                      a.getFileName(),
-                                      error_info)
-
-    def reportError( errorCode int, leftToken int, rightToken int, errorInfo=nil, errorToken int = 0):
-
-        if isinstance(errorInfo, string):
-            temp_info = [errorInfo]
-
-        elif isinstance(errorInfo, list):
-            temp_info = errorInfo
-        else:
-            temp_info = []
-
-        a.reportLexicalError(leftToken, rightToken, errorCode, errorToken, errorToken, temp_info)
-
-    def toString( startOffset int, endOffset int)  string:
-        length int = endOffset - startOffset + 1
-        return ("$EOF" if endOffset >= a.inputChars.__len__() else (
-            "" if length <= 0 else a.inputChars[startOffset: startOffset + length]))

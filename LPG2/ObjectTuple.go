@@ -36,7 +36,7 @@ func NewObjectTupleWithEstimate(estimate int ) *ObjectTuple{
 func(a *ObjectTuple) reset( n int ){
     a.top = n
 }
-func(a *ObjectTuple) resetFromZero(){
+func(a *ObjectTuple) reset(){
     a.top = 0
 }
 func(a *ObjectTuple) capacity() int {

@@ -2,7 +2,9 @@ package lpg2
 
 type TokenStream interface {
 
-	getToken(end_token int) int
+	getTokenFromEndToken(end_token int) int
+
+	getToken() int
 
 	getKind(i int) int
 
@@ -13,8 +15,8 @@ type TokenStream interface {
 	getName(i int) string
 
 	peek() int
-	resetDefault()
-	reset(i int)
+	reset()
+	resetTo(i int)
 
 	badToken() int
 
@@ -26,7 +28,7 @@ type TokenStream interface {
 
 	getEndColumn(i int) int
 
-	afterEol(i int) int
+	afterEol(i int) bool
 
 	getFileName() string
 
@@ -36,5 +38,5 @@ type TokenStream interface {
 
 	getLastRealToken(i int) int
 
-	reportError(errorCode int, leftToken int, rightToken int, errorInfo string, errorToken int)
+	reportError(errorCode int, leftToken int, rightToken int, errorInfo []string, errorToken int)
 }

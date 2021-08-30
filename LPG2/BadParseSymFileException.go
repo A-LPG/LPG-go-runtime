@@ -1,16 +1,23 @@
 package lpg2
-
-
 type BadParseSymFileException struct {
-    
+    wrap error
+}
+func  NewBadParseSymFileException(info string) *BadParseSymFileException{
+    t := new(BadParseSymFileException)
+    if info == ""{
+        info="BadParseSymFileException"
+    }
+    t.wrap = NewErr(info)
 
-    def __init__( info: string = nil):
-        super().__init__()
+    return t
+}
 
-        if info is nil:
-            a.info = "BadParseSymFileException"
-        else:
-            a.info = info
+func (a *BadParseSymFileException) toString() string  {
+    return a.wrap.Error()
+}
 
-    def toString()  string:
-        return a.info
+// Error implements the interface of Error, it returns all the error as string.
+func (a *BadParseSymFileException) Error() string {
+    return a.wrap.Error()
+}
+

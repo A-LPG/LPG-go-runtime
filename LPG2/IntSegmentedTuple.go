@@ -126,10 +126,10 @@ func (a *IntSegmentedTuple) resize( n int ){
     // argument n which indicates the  size or with no argument which
     // indicates that the size should be reset to 0.
     //
-func (a *IntSegmentedTuple) resetDefault() {
-   a.reset(0)
+func (a *IntSegmentedTuple) reset() {
+   a.resetTo(0)
 }
-func (a *IntSegmentedTuple) reset( n int) {
+func (a *IntSegmentedTuple) resetTo( n int) {
     a.top = n
 }
 //

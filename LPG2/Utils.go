@@ -1,9 +1,29 @@
 package lpg2
 
-type ArrayList struct {
-    array []IAst
-}
 
+// Copyright GoFrame Author(https://goframe.org). All Rights Reserved.
+//
+// This Source Code Form is subject to the terms of the MIT License.
+// If a copy of the MIT was not distributed with this file,
+// You can obtain one at https://github.com/gogf/gf.
+
+import (
+    "strings"
+)
+
+import "time"
+func AppendRune(str string, c rune) string {
+    var buffer strings.Builder
+    buffer.WriteString(str)
+    buffer.WriteRune(c)
+    return buffer.String()
+}
+func get_now() int {
+    now := time.Now()
+    nanos := now.UnixNano()
+    millis := nanos / 1000000
+    return int(millis)
+}
 func  ObjectArraycopy(src []interface{}, srcPos int,
     dest []interface{}, destPos int, length int) []interface{}{
     for i:=0; i < length; i++ {
@@ -20,130 +40,128 @@ func arraycopy(src []int, srcPos int,
 }
 
 
-func NewArrayListFrom(array []IAst) *ArrayList {
-    return &ArrayList{
-        array: array,
-    }
-}
-func NewArrayListFromCopy(array []IAst, safe ...bool) *ArrayList {
-    newArray := make([]IAst, len(array))
-    copy(newArray, array)
-    return &ArrayList{
-        array: newArray,
-    }
-}
-func NewArrayListSize(size int, cap int) *ArrayList {
-    return &ArrayList{
-        array: make([]IAst, size, cap),
-    }
-}
-func  NewArrayList() *ArrayList {
-    return NewArrayListSize(0,0)
-}
-func (a *ArrayList) clone() *ArrayList {
-    array := make([]IAst, len(a.array))
-    copy(array, a.array)
-    return NewArrayListFrom(array)
-}
+var (
+    // DefaultTrimChars are the characters which are stripped by Trim* functions in default.
+    DefaultTrimChars = string([]byte{
+        '\t', // Tab.
+        '\v', // Vertical tab.
+        '\n', // New line (line feed).
+        '\r', // Carriage return.
+        '\f', // New page.
+        ' ',  // Ordinary space.
+        0x00, // NUL-byte.
+        0x85, // Delete.
+        0xA0, // Non-breaking space.
+    })
+)
 
-func (a *ArrayList) clear() bool{
-    if len(a.array) > 0 {
-        a.array = make([]IAst, 0)
-    }
-    return  true
-}
-func (a *ArrayList) removeAt(index int)  (value IAst, found bool){
-    if index < 0 || index >= len(a.array) {
-        return nil, false
-    }
-    // Determine array boundaries when deleting to improve deletion efficiency.
-    if index == 0 {
-        value := a.array[0]
-        a.array = a.array[1:]
-        return value, true
-    } else if index == len(a.array)-1 {
-        value := a.array[index]
-        a.array = a.array[:index]
-        return value, true
-    }
-    // If it is a non-boundary delete,
-    // it will involve the creation of an array,
-    // then the deletion is less efficient.
-    value = a.array[index]
-    a.array = append(a.array[:index], a.array[index+1:]...)
-    return value, true
-}
-func (a *ArrayList) remove(value IAst) bool{
-    if i := a.search(value); i != -1 {
-        _, found := a.removeAt(i)
-        return found
+// IsLetterUpper checks whether the given byte b is in upper case.
+func IsLetterUpper(b byte) bool {
+    if b >= byte('A') && b <= byte('Z') {
+        return true
     }
     return false
 }
-func (a *ArrayList) search(value IAst) int {
 
-    if len(a.array) == 0 {
-        return -1
+// IsLetterLower checks whether the given byte b is in lower case.
+func IsLetterLower(b byte) bool {
+    if b >= byte('a') && b <= byte('z') {
+        return true
     }
-    result := -1
-    for index, v := range a.array {
-        if v == value {
-            result = index
-            break
+    return false
+}
+
+// IsLetter checks whether the given byte b is a letter.
+func IsLetter(b byte) bool {
+    return IsLetterUpper(b) || IsLetterLower(b)
+}
+
+// IsNumeric checks whether the given string s is numeric.
+// Note that float string like "123.456" is also numeric.
+func IsNumeric(s string) bool {
+    length := len(s)
+    if length == 0 {
+        return false
+    }
+    for i := 0; i < len(s); i++ {
+        if s[i] == '-' && i == 0 {
+            continue
+        }
+        if s[i] == '.' {
+            if i > 0 && i < len(s)-1 {
+                continue
+            } else {
+                return false
+            }
+        }
+        if s[i] < '0' || s[i] > '9' {
+            return false
         }
     }
-    return result
+    return true
 }
 
-func (a *ArrayList) removeAll() bool{
-    return a.clear()
+// UcFirst returns a copy of the string s with the first letter mapped to its upper case.
+func UcFirst(s string) string {
+    if len(s) == 0 {
+        return s
+    }
+    if IsLetterLower(s[0]) {
+        return string(s[0]-32) + s[1:]
+    }
+    return s
 }
 
-func (a *ArrayList) toArray() []IAst {
-    array := make([]IAst, len(a.array))
-    copy(array, a.array)
+// ReplaceByMap returns a copy of `origin`,
+// which is replaced by a map in unordered way, case-sensitively.
+func ReplaceByMap(origin string, replaces map[string]string) string {
+    for k, v := range replaces {
+        origin = strings.Replace(origin, k, v, -1)
+    }
+    return origin
+}
+
+// RemoveSymbols removes all symbols from string and lefts only numbers and letters.
+func RemoveSymbols(s string) string {
+    var b []byte
+    for _, c := range s {
+        if (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') {
+            b = append(b, byte(c))
+        }
+    }
+    return string(b)
+}
+
+// EqualFoldWithoutChars checks string `s1` and `s2` equal case-insensitively,
+// with/without chars '-'/'_'/'.'/' '.
+func EqualFoldWithoutChars(s1, s2 string) bool {
+    return strings.EqualFold(RemoveSymbols(s1), RemoveSymbols(s2))
+}
+
+// SplitAndTrim splits string <str> by a string <delimiter> to an array,
+// and calls Trim to every element of this array. It ignores the elements
+// which are empty after Trim.
+func SplitAndTrim(str, delimiter string, characterMask ...string) []string {
+    array := make([]string, 0)
+    for _, v := range strings.Split(str, delimiter) {
+        v = Trim(v, characterMask...)
+        if v != "" {
+            array = append(array, v)
+        }
+    }
     return array
 }
 
-func (a *ArrayList) size() int {
-    return len(a.array)
-}
-func (a *ArrayList) add(elem IAst) *ArrayList{
-    a.array = append(a.array, elem)
-    return a
-}
-func (a *ArrayList) get(index int) IAst{
-    if index < 0 || index >= len(a.array) {
-        return nil
+// Trim strips whitespace (or other characters) from the beginning and end of a string.
+// The optional parameter <characterMask> specifies the additional stripped characters.
+func Trim(str string, characterMask ...string) string {
+    trimChars := DefaultTrimChars
+    if len(characterMask) > 0 {
+        trimChars += characterMask[0]
     }
-    return a.array[index]
+    return strings.Trim(str, trimChars)
 }
-func (a *ArrayList) at(index int) (value IAst) {
-    return a.get(index)
-}
-func (a *ArrayList) contains( val IAst) bool{
-    return a.search(val) != -1
-}
-func (a *ArrayList) isEmpty() bool{
-    return a.size() == 0
-}
-func (a *ArrayList) set(index int, element IAst) bool {
-    if index < 0 || index >= len(a.array) {
-        return  false
-    }
-    a.array[index] = element
-    return  true
-}
-func (a *ArrayList) indexOf(elem IAst) int {
-    return a.search(elem)
-}
-func (a *ArrayList) lastIndexOf(  elem IAst ) int{
-    var size = a.size()
-    for i:= size; i > 0; i--{
-        if a.array[size - i - 1] == elem{
-            return size - i - 1
-        }
-
-    }
-    return -1
+func charAt(str string, start int)  rune {
+    var rs,s,_ =SubStrRuneRange(str,start,1)
+    return rs[s]
 }

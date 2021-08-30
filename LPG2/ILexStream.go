@@ -27,7 +27,7 @@ type ILexStream interface {
 
 	getMessageHandler() IMessageHandler
 
-	getLocation(left_loc int, right_loc int) int
+	getLocation(left_loc int, right_loc int) []int
 
 	reportLexicalError(left_loc int, right_loc int,
 		error_code int , error_left_loc_arg int , error_right_loc_arg int , error_info []string)
