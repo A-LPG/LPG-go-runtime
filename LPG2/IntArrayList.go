@@ -12,7 +12,7 @@ func NewIntArrayListFrom(array []int) *IntArrayList {
 		array: array,
 	}
 }
-func NewIntArrayListFromCopy(array []int, safe ...bool) *IntArrayList {
+func NewIntArrayListFromCopy(array []int) *IntArrayList {
 	newArray := make([]int, len(array))
 	copy(newArray, array)
 	return &IntArrayList{

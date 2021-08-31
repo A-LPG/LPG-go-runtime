@@ -17,7 +17,7 @@ type IntTuple struct {
      top int
 }
 
-//
+// NewIntTuple 
 // Constructor of a Tuple
 //
 func NewIntTuple() *IntTuple{
@@ -26,7 +26,7 @@ func NewIntTuple() *IntTuple{
 func NewIntTupleWithEstimate(estimate int ) *IntTuple{
     return &IntTuple{
         top: 0,
-        array: make([]int, estimate, estimate),
+        array: make([]int, estimate),
     }
 }
 //
@@ -35,7 +35,7 @@ func NewIntTupleWithEstimate(estimate int ) *IntTuple{
 // argument n which indicates the  size or with no argument which
 // indicates that the size should be reset to 0.
 //
-func(a *IntTuple) resetFrom( n int ){
+func(a *IntTuple) resetTo( n int ){
     a.top = n
 }
 func(a *IntTuple) reset(){
@@ -78,7 +78,7 @@ func(a *IntTuple) nextIndex() int {
     var i int = a.top
     a.top += 1
     if i >=  len(a.array){
-        a.array = arraycopy(a.array,0, make([]int, i * 2, i * 2),0,i)
+        a.array = arraycopy(a.array,0, make([]int, i * 2),0,i)
     }
 
 

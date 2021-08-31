@@ -4,7 +4,7 @@
 // If a copy of the MIT was not distributed with this file,
 // You can obtain one at https://github.com/gogf/gf.
 
-// Package gstr provides functions for string handling.
+// Package lpg2 Package gstr provides functions for string handling.
 package lpg2
 
 import (
@@ -32,7 +32,7 @@ func Replace(origin, search, replace string, count ...int) string {
 	return strings.Replace(origin, search, replace, n)
 }
 
-// Replace returns a copy of the string <origin>
+// ReplaceI Replace returns a copy of the string <origin>
 // in which string <search> replaced by <replace> case-insensitively.
 func ReplaceI(origin, search, replace string, count ...int) string {
 	n := -1

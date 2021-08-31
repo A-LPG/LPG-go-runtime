@@ -8,6 +8,6 @@ type StateElement struct {
 }
 func NewStateElement() * StateElement{
     return &StateElement{
-
+        parent:nil,children: nil,siblings: nil,number: 0,
     }
 }

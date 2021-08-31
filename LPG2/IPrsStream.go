@@ -33,7 +33,7 @@ type IPrsStream interface {
 
 	getSize() int
 
-	remapTerminalSymbols(ordered_parser_symbols []string, eof_symbol int)
+	remapTerminalSymbols(ordered_parser_symbols []string, eof_symbol int) error
 
 	orderedTerminalSymbols() []string
 
@@ -43,6 +43,7 @@ type IPrsStream interface {
 
 	getStreamIndex() int
 
+	resetStreamLength()
 	setStreamIndex(index int)
 
 	setStreamLength(length int )
@@ -53,9 +54,9 @@ type IPrsStream interface {
 
 	orderedExportedSymbols() []string
 
-	getTokens() ArrayList
+	getTokens() *TokenArrayList
 
-	getAdjuncts() ArrayList
+	getAdjuncts() *TokenArrayList
 
 	getFollowingAdjuncts(i int) []IToken
 
@@ -86,8 +87,6 @@ type IPrsStream interface {
 	getEndColumnOfTokenAt(i int) int
 
 	getInputChars() string
-
-	getInputBytes()
 
 	toStringFromIndex(first_token int, last_token int) string
 

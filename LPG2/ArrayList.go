@@ -1,40 +1,40 @@
 package lpg2
-type ArrayList struct {
+type AstArrayList struct {
 	array []IAst
 }
-func NewArrayListFrom(array []IAst) *ArrayList {
-	return &ArrayList{
+func NewAstArrayListFrom(array []IAst) *AstArrayList {
+	return &AstArrayList{
 		array: array,
 	}
 }
-func NewArrayListFromCopy(array []IAst, safe ...bool) *ArrayList {
+func NewAstArrayListFromCopy(array []IAst) *AstArrayList {
 	newArray := make([]IAst, len(array))
 	copy(newArray, array)
-	return &ArrayList{
+	return &AstArrayList{
 		array: newArray,
 	}
 }
-func NewArrayListSize(size int, cap int) *ArrayList {
-	return &ArrayList{
+func NewAstArrayListSize(size int, cap int) *AstArrayList {
+	return &AstArrayList{
 		array: make([]IAst, size, cap),
 	}
 }
-func  NewArrayList() *ArrayList {
-	return NewArrayListSize(0,0)
+func NewAstArrayList() *AstArrayList {
+	return NewAstArrayListSize(0,0)
 }
-func (a *ArrayList) clone() *ArrayList {
+func (a *AstArrayList) clone() *AstArrayList {
 	array := make([]IAst, len(a.array))
 	copy(array, a.array)
-	return NewArrayListFrom(array)
+	return NewAstArrayListFrom(array)
 }
 
-func (a *ArrayList) clear() bool{
+func (a *AstArrayList) clear() bool{
 	if len(a.array) > 0 {
 		a.array = make([]IAst, 0)
 	}
 	return  true
 }
-func (a *ArrayList) removeAt(index int)  (value IAst, found bool){
+func (a *AstArrayList) removeAt(index int)  (value IAst, found bool){
 	if index < 0 || index >= len(a.array) {
 		return nil, false
 	}
@@ -55,14 +55,14 @@ func (a *ArrayList) removeAt(index int)  (value IAst, found bool){
 	a.array = append(a.array[:index], a.array[index+1:]...)
 	return value, true
 }
-func (a *ArrayList) remove(value IAst) bool{
+func (a *AstArrayList) remove(value IAst) bool{
 	if i := a.search(value); i != -1 {
 		_, found := a.removeAt(i)
 		return found
 	}
 	return false
 }
-func (a *ArrayList) search(value IAst) int {
+func (a *AstArrayList) search(value IAst) int {
 
 	if len(a.array) == 0 {
 		return -1
@@ -77,49 +77,49 @@ func (a *ArrayList) search(value IAst) int {
 	return result
 }
 
-func (a *ArrayList) removeAll() bool{
+func (a *AstArrayList) removeAll() bool{
 	return a.clear()
 }
 
-func (a *ArrayList) toArray() []IAst {
+func (a *AstArrayList) toArray() []IAst {
 	array := make([]IAst, len(a.array))
 	copy(array, a.array)
 	return array
 }
 
-func (a *ArrayList) size() int {
+func (a *AstArrayList) size() int {
 	return len(a.array)
 }
-func (a *ArrayList) add(elem IAst) *ArrayList{
+func (a *AstArrayList) add(elem IAst) *AstArrayList {
 	a.array = append(a.array, elem)
 	return a
 }
-func (a *ArrayList) get(index int) IAst{
+func (a *AstArrayList) get(index int) IAst{
 	if index < 0 || index >= len(a.array) {
 		return nil
 	}
 	return a.array[index]
 }
-func (a *ArrayList) at(index int) (value IAst) {
+func (a *AstArrayList) at(index int) (value IAst) {
 	return a.get(index)
 }
-func (a *ArrayList) contains( val IAst) bool{
+func (a *AstArrayList) contains( val IAst) bool{
 	return a.search(val) != -1
 }
-func (a *ArrayList) isEmpty() bool{
+func (a *AstArrayList) isEmpty() bool{
 	return a.size() == 0
 }
-func (a *ArrayList) set(index int, element IAst) bool {
+func (a *AstArrayList) set(index int, element IAst) bool {
 	if index < 0 || index >= len(a.array) {
 		return  false
 	}
 	a.array[index] = element
 	return  true
 }
-func (a *ArrayList) indexOf(elem IAst) int {
+func (a *AstArrayList) indexOf(elem IAst) int {
 	return a.search(elem)
 }
-func (a *ArrayList) lastIndexOf(  elem IAst ) int{
+func (a *AstArrayList) lastIndexOf(  elem IAst ) int{
 	var size = a.size()
 	for i:= size; i > 0; i--{
 		if a.array[size - i - 1] == elem{

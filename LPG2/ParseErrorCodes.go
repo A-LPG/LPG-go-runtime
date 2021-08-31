@@ -1,7 +1,7 @@
 package lpg2
 
 
-const  NIL_CODE int  = 1
+const  NIL_CODE int  = -1
 const  LEX_ERROR_CODE int  = 0
 const  ERROR_CODE int = 1
 const  BEFORE_CODE int = 2

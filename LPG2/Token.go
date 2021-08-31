@@ -7,11 +7,7 @@ type Token  struct{
 
 func NewToken( startOffset int, endOffset int, kind int, iPrsStream IPrsStream) *Token {
     t := new (Token)
-    t.AbstractToken = new(AbstractToken)
-    t.startOffset=startOffset
-    t.endOffset=endOffset
-    t.kind=kind
-    t.iPrsStream=iPrsStream
+    t.AbstractToken = NewAbstractToken(startOffset,endOffset,kind,iPrsStream)
     return  t
 }
 

@@ -5,7 +5,7 @@
 // You can obtain one at https://github.com/gogf/gf.
 //
 
-// Package command provides console operations, like options/arguments reading.
+// Package lpg2 Package command provides console operations, like options/arguments reading.
 package lpg2
 
 import (
@@ -20,7 +20,7 @@ var (
 	argumentRegex        = regexp.MustCompile(`^\-{1,2}([\w\?\.\-]+)(=){0,1}(.*)$`)
 )
 
-// Custom initialization.
+// Init Custom initialization.
 func Init(args ...string) {
 	if len(args) == 0 {
 		if len(defaultParsedArgs) == 0 && len(defaultParsedOptions) == 0 {

@@ -1,68 +1,43 @@
 package lpg2
 
-
 const EOF int = 0xffff
 
 type IToken interface {
+	getKind() int
 
-    getKind() int 
-    
-    setKind( kind int)
+	setKind(kind int)
 
-    getStartOffset() int 
-    
-    setStartOffset( startOffset int)
-    
-    getEndOffset() int 
-    
-    setEndOffset( endOffset int)
-    
-    getTokenIndex() int 
-    
+	getStartOffset() int
 
+	setStartOffset(startOffset int)
 
-    setTokenIndex( i int)
-    
+	getEndOffset() int
 
+	setEndOffset(endOffset int)
 
-    getAdjunctIndex() int 
-    
+	getTokenIndex() int
 
+	setTokenIndex(i int)
 
-    setAdjunctIndex( i int)
-    
+	getAdjunctIndex() int
 
+	setAdjunctIndex(i int)
 
-    getPrecedingAdjuncts()  []IToken
-    
+	getPrecedingAdjuncts() []IToken
 
+	getFollowingAdjuncts() []IToken
 
-    getFollowingAdjuncts()  []IToken
-    
+	getILexStream() ILexStream
 
+	getIPrsStream() IPrsStream
 
-    getILexStream() ILexStream
-    
+	getLine() int
 
+	getColumn() int
 
-    getIPrsStream() IPrsStream
-    
+	getEndLine() int
 
+	getEndColumn() int
 
-    getLine() int 
-    
-
-
-    getColumn() int 
-    
-
-
-    getEndLine() int 
-    
-
-
-    getEndColumn() int 
-    
-    toString()  string
+	toString() string
 }
-        

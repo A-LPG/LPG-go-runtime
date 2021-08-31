@@ -18,19 +18,20 @@ type ILexStream interface {
 	getColumnOfCharAt(i int) int
 
 	getCharValue(i int) string
+	getInputChars() string
 
 	getIntValue(i int) int
 
-	makeToken(start_loc int, end_loc int, kind int)
+	makeToken(startLoc int, endLoc int, kind int)
 
 	setMessageHandler(handler IMessageHandler)
 
 	getMessageHandler() IMessageHandler
 
-	getLocation(left_loc int, right_loc int) []int
-
-	reportLexicalError(left_loc int, right_loc int,
-		error_code int , error_left_loc_arg int , error_right_loc_arg int , error_info []string)
+	getLocation(leftLoc int, rightLoc int) []int
+	reportLexicalErrorPosition(leftLoc int, rightLoc int)
+	reportLexicalError(leftLoc int, rightLoc int,
+		errorCode int , errorLeftLoc int , errorRightLoc int , errorInfo []string)
 
 	toString(startOffset int, endOffset int) string
 }

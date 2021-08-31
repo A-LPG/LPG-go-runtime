@@ -1,7 +1,7 @@
 package lpg2
 
-const TABLE_SIZE int = 1021 // 1021 is a prime
 type ConfigurationStack struct {
+	TABLE_SIZE             int
 	table                  []*ConfigurationElement
 	configuration_stack    *ObjectTuple
 	state_root             *StateElement
@@ -13,24 +13,25 @@ type ConfigurationStack struct {
 
 func NewConfigurationStack(prs ParseTable) *ConfigurationStack {
 	a := new(ConfigurationStack)
+	a.TABLE_SIZE = 1021 // 1021 is a prime
 	a.prs = prs
 	a.state_element_size = 1
 	a.state_root = NewStateElement()
 
 	a.state_root.number = prs.getStartState()
 
-	a.table = make([]*ConfigurationElement, TABLE_SIZE, TABLE_SIZE)
+	a.table = make([]*ConfigurationElement, a.TABLE_SIZE, a.TABLE_SIZE)
+	a.configuration_stack = NewObjectTupleWithEstimate(1 << 12)
 	a.max_configuration_size = 0
 	a.stacks_size = 0
 	return a
 }
 
-
-func (this ConfigurationStack) makeStateList(parent *StateElement, stack []int, index int, stack_top int) *StateElement {
+func (self ConfigurationStack) makeStateList(parent *StateElement, stack []int, index int, stack_top int) *StateElement {
 	var i int
 	for i = index; i <= stack_top; i++ {
 
-		this.state_element_size++
+		self.state_element_size++
 
 		var state = NewStateElement()
 
@@ -45,7 +46,7 @@ func (this ConfigurationStack) makeStateList(parent *StateElement, stack []int, 
 	}
 	return parent
 }
-func (this ConfigurationStack) findOrInsertStack(root *StateElement, stack []int, index int, stack_top int) *StateElement {
+func (self ConfigurationStack) findOrInsertStack(root *StateElement, stack []int, index int, stack_top int) *StateElement {
 	var state_number = stack[index]
 	var p *StateElement
 	for p = root; p != nil; p = p.siblings {
@@ -53,17 +54,17 @@ func (this ConfigurationStack) findOrInsertStack(root *StateElement, stack []int
 		if p.number == state_number {
 			if index == stack_top {
 				return p
-			}
-		} else {
-			if p.children == nil {
-				return this.makeStateList(p, stack, index+1, stack_top)
 			} else {
-				this.findOrInsertStack(p.children, stack, index+1, stack_top)
+				if p.children == nil {
+					return self.makeStateList(p, stack, index+1, stack_top)
+				} else {
+					self.findOrInsertStack(p.children, stack, index+1, stack_top)
+				}
 			}
 		}
 	}
 
-	this.state_element_size++
+	self.state_element_size++
 
 	var node = NewStateElement()
 	node.number = state_number
@@ -75,16 +76,16 @@ func (this ConfigurationStack) findOrInsertStack(root *StateElement, stack []int
 	if index == stack_top {
 		return node
 	} else {
-		return this.makeStateList(node, stack, index+1, stack_top)
+		return self.makeStateList(node, stack, index+1, stack_top)
 	}
 }
 
-func (this ConfigurationStack) findConfiguration(stack []int, stack_top int, curtok int) bool {
+func (self ConfigurationStack) findConfiguration(stack []int, stack_top int, curtok int) bool {
 
-	var last_element = this.findOrInsertStack(this.state_root, stack, 0, stack_top)
-	var hash_address = curtok % TABLE_SIZE
+	var last_element = self.findOrInsertStack(self.state_root, stack, 0, stack_top)
+	var hash_address = curtok % self.TABLE_SIZE
 	var configuration *ConfigurationElement
-	for configuration = this.table[hash_address]; configuration != nil; configuration = configuration.next {
+	for configuration = self.table[hash_address]; configuration != nil; configuration = configuration.next {
 		if configuration.curtok == curtok && last_element == configuration.last_element {
 			return true
 		}
@@ -92,24 +93,24 @@ func (this ConfigurationStack) findConfiguration(stack []int, stack_top int, cur
 	return false
 }
 
-func (this ConfigurationStack) push(stack []int, stack_top int, conflict_index int, curtok int, action_length int) {
+func (self ConfigurationStack) push(stack []int, stack_top int, conflict_index int, curtok int, action_length int) {
 
 	var configuration = NewConfigurationElement()
-	var hash_address = curtok % TABLE_SIZE
+	var hash_address = curtok % self.TABLE_SIZE
 
-	configuration.next = this.table[hash_address]
+	configuration.next = self.table[hash_address]
 
-	this.table[hash_address] = configuration
-	this.max_configuration_size++ // keep track of int of configurations
+	self.table[hash_address] = configuration
+	self.max_configuration_size++ // keep track of int of configurations
 
 	configuration.stack_top = stack_top
-	this.stacks_size += stack_top + 1 // keep track of int of stack elements processed
-	configuration.last_element = this.findOrInsertStack(this.state_root, stack, 0, stack_top)
+	self.stacks_size += stack_top + 1 // keep track of int of stack elements processed
+	configuration.last_element = self.findOrInsertStack(self.state_root, stack, 0, stack_top)
 	configuration.conflict_index = conflict_index
 	configuration.curtok = curtok
 	configuration.action_length = action_length
 
-	this.configuration_stack.add(configuration)
+	self.configuration_stack.add(configuration)
 	return
 }
 func (a *ConfigurationStack) cast(c interface{}) *ConfigurationElement {
@@ -119,16 +120,17 @@ func (a *ConfigurationStack) cast(c interface{}) *ConfigurationElement {
 	}
 	return nil
 }
-func (this ConfigurationStack) pop() *ConfigurationElement {
+func (self ConfigurationStack) pop() *ConfigurationElement {
 	var configuration *ConfigurationElement = nil
-	if this.configuration_stack.size() > 0 {
-		var index = this.configuration_stack.size() - 1
-		configuration = this.cast(this.configuration_stack.get(index))
+	if self.configuration_stack.size() > 0 {
+		var index = self.configuration_stack.size() - 1
+		configuration = self.cast(self.configuration_stack.get(index))
 		if configuration != nil {
-			configuration.act = this.prs.baseAction(configuration.conflict_index)
+			configuration.act = self.prs.baseAction(configuration.conflict_index)
 			configuration.conflict_index += 1
-			if this.prs.baseAction(configuration.conflict_index) == 0 {
-				this.configuration_stack.reset(index)
+
+			if self.prs.baseAction(configuration.conflict_index) == 0 {
+				self.configuration_stack.resetTo(index)
 			}
 		} else {
 			return nil
@@ -138,25 +140,25 @@ func (this ConfigurationStack) pop() *ConfigurationElement {
 
 	return configuration
 }
-func (this ConfigurationStack) top() *ConfigurationElement {
+func (self ConfigurationStack) top() *ConfigurationElement {
 	var configuration *ConfigurationElement = nil
-	if this.configuration_stack.size() > 0 {
-		var index = this.configuration_stack.size() - 1
-		var configuration = this.cast(this.configuration_stack.get(index))
-		configuration.act = this.prs.baseAction(configuration.conflict_index)
+	if self.configuration_stack.size() > 0 {
+		var index = self.configuration_stack.size() - 1
+		var configuration = self.cast(self.configuration_stack.get(index))
+		configuration.act = self.prs.baseAction(configuration.conflict_index)
 	}
 
 	return configuration
 }
-func (this ConfigurationStack) size() int {
-	return this.configuration_stack.size()
+func (self ConfigurationStack) size() int {
+	return self.configuration_stack.size()
 }
-func (this ConfigurationStack) maxConfigurationSize() int {
-	return this.max_configuration_size
+func (self ConfigurationStack) maxConfigurationSize() int {
+	return self.max_configuration_size
 }
-func (this ConfigurationStack) numStateElements() int {
-	return this.state_element_size
+func (self ConfigurationStack) numStateElements() int {
+	return self.state_element_size
 }
-func (this ConfigurationStack) stacksSize() int {
-	return this.stacks_size
+func (self ConfigurationStack) stacksSize() int {
+	return self.stacks_size
 }

@@ -50,16 +50,16 @@ func (a *Stacks)  setSym1(ast interface{}) {
 //
 func (a *Stacks)  reallocateStacks(){
     var oldStackLength int = len(a.stateStack)
-    var stackLength int = oldStackLength + STACK_INCREMENT
+    var stackLength int = oldStackLength + a.STACK_INCREMENT
 
     if len(a.stateStack) == 0 {
-        a.stateStack = make([]int, stackLength, stackLength)
-        a.locationStack =make([]int, stackLength, stackLength)
+        a.stateStack = make([]int, stackLength)
+        a.locationStack =make([]int, stackLength)
         a.parseStack = make([]interface{}, stackLength, stackLength)
     }else {
-        a.stateStack = arraycopy(a.stateStack, 0, make([]int, stackLength, stackLength), 0, oldStackLength)
-        a.locationStack = arraycopy(a.locationStack, 0, make([]int, stackLength, stackLength), 0, oldStackLength)
-        a.parseStack = ObjectArraycopy(a.parseStack, 0, make([]interface{}, stackLength, stackLength), 0, oldStackLength)
+        a.stateStack = arraycopy(a.stateStack, 0, make([]int, stackLength), 0, oldStackLength)
+        a.locationStack = arraycopy(a.locationStack, 0, make([]int, stackLength), 0, oldStackLength)
+        a.parseStack = ObjectArraycopy(a.parseStack, 0, make([]interface{}, stackLength), 0, oldStackLength)
     }
     return
 }
@@ -68,11 +68,11 @@ func (a *Stacks)  reallocateStacks(){
 //
 func (a *Stacks)  reallocateStateStack(){
     var oldStackLength int = len(a.stateStack)
-    var stackLength int = oldStackLength + STACK_INCREMENT
+    var stackLength int = oldStackLength + a.STACK_INCREMENT
     if len(a.stateStack) == 0{
-        a.stateStack = make([]int, stackLength, stackLength)
+        a.stateStack = make([]int, stackLength)
     }else{
-        a.stateStack = arraycopy(a.stateStack, 0, make([]int, stackLength, stackLength), 0, oldStackLength)
+        a.stateStack = arraycopy(a.stateStack, 0, make([]int, stackLength), 0, oldStackLength)
     }
     return
 }
@@ -81,7 +81,7 @@ func (a *Stacks)  reallocateStateStack(){
 //
 func (a *Stacks)  allocateOtherStacks() {
     var stackLength = len(a.stateStack)
-    a.locationStack = make([]int, stackLength, stackLength)
-    a.parseStack = make([]interface{}, stackLength, stackLength)
+    a.locationStack = make([]int, stackLength)
+    a.parseStack = make([]interface{}, stackLength)
     return
 }

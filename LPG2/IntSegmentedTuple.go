@@ -36,7 +36,7 @@ func  NewIntSegmentedTuple(logBlksize int, baseSize int ) *IntSegmentedTuple {
         }else {
             a.baseSize = baseSize
         }
-        a.base = make([][]int,a.baseSize,a.baseSize)
+        a.base = make([][]int,a.baseSize)
         return a
 }
 func   NewIntSegmentedTupleDefault() *IntSegmentedTuple {
@@ -79,10 +79,10 @@ func (a *IntSegmentedTuple) allocateMoreSpace(){
         //
         if k == a.baseSize {
             a.baseSize *= 2
-            a.base = a.arraycopy(a.base, 0, make([][]int,a.baseSize,a.baseSize), 0, k)
+            a.base = a.arraycopy(a.base, 0, make([][]int,a.baseSize), 0, k)
         }
-        var length = 1 << a.logBlksize
-        a.base[k] = make([]int,length,length)
+
+        a.base[k] = make([]int,1 << a.logBlksize)
 
         //
         // Finally, we update SIZE.
@@ -100,10 +100,10 @@ func (a *IntSegmentedTuple) allocateMoreSpace(){
     // invoked with no argument(or 0){, it frees up all dynamic space that
     // was allocated for the array.
     //
-func (a *IntSegmentedTuple) resizeDefault(){
-    a.resize(0)
+func (a *IntSegmentedTuple) resize(){
+    a.resizeTo(0)
 }
-func (a *IntSegmentedTuple) resize( n int ){
+func (a *IntSegmentedTuple) resizeTo( n int ){
     //
     // If array did not previously contain enough space, allocate
     // the necessary additional space. Otherwise, if the array had
@@ -193,7 +193,7 @@ func (a *IntSegmentedTuple) binarySearch( element int) int {
     var low = 0
     var high = a.top
     for ;high > low; {
-        var mid int= (high + low) / 2
+        var mid int= int((high + low) / 2)
         var midElement int = a.get(mid)
         if element == midElement {
             return mid

@@ -2,9 +2,9 @@ package lpg2
 
 import (
     "bytes"
+    "fmt"
     "io"
     "os"
-    "fmt"
 )
 
 //
@@ -27,15 +27,24 @@ type LexStream struct {
      errMsg IMessageHandler
 }
 
-func NewLexStream(fileName string, inputChars *string, tab int, lineOffsets *IntSegmentedTuple) *LexStream{
-    this := new(LexStream)
-    this.lineOffsets = NewIntSegmentedTuple(12,4)
-    this.setLineOffset(-1)
-    this.tab = tab
-    this.initialize(fileName, inputChars, lineOffsets)
-    return  this
+
+
+func NewLexStream(fileName string, inputChars *string, tab int, lineOffsets *IntSegmentedTuple) (*LexStream,error){
+    self := new(LexStream)
+    self.DEFAULT_TAB  = 1
+    self.index  = -1
+    self.streamLength = 0
+    self.tab = self.DEFAULT_TAB
+    self.lineOffsets = NewIntSegmentedTuple(12,4)
+    self.setLineOffset(-1)
+
+    err := self.initialize(fileName, inputChars, lineOffsets)
+    if err != nil {
+        return nil,err
+    }
+    return  self, nil
 }
-func (this *LexStream) GetFileString(fileName string) (*string, error) {
+func (self *LexStream) GetFileString(fileName string) (*string, error) {
 
     buf := bytes.NewBuffer(nil)
 
@@ -54,9 +63,9 @@ func (this *LexStream) GetFileString(fileName string) (*string, error) {
     return &s, nil
 
 }
-func (this *LexStream) initialize(fileName string, inputChars *string, lineOffsets *IntSegmentedTuple)  error {
+func (self *LexStream) initialize(fileName string, inputChars *string, lineOffsets *IntSegmentedTuple)  error {
     if nil == inputChars {
-        var str,ex = this.GetFileString(fileName)
+        var str,ex = self.GetFileString(fileName)
         if ex != nil{
             return ex
         }
@@ -67,92 +76,96 @@ func (this *LexStream) initialize(fileName string, inputChars *string, lineOffse
         return nil
     }
 
-    this.setInputChars(*inputChars)
-    this.setStreamLength(len(*inputChars))
-    this.setFileName(fileName)
+    self.setInputChars(*inputChars)
+    self.setStreamLength(len(self.inputChars))
+    self.setFileName(fileName)
     if lineOffsets != nil {
-        this.lineOffsets = lineOffsets
+        self.lineOffsets = lineOffsets
     } else {
-        this.computeLineOffsets()
+        self.computeLineOffsets()
     }
     return nil
 }
-func (this *LexStream) computeLineOffsets()  {
-    this.lineOffsets.reset()
-    this.setLineOffset(-1)
+func (self *LexStream) computeLineOffsets()  {
+    self.lineOffsets.reset()
+    self.setLineOffset(-1)
     var i int = 0
-    for ;i < len(this.inputChars); i++ {
-        if this.inputChars[i] == 0x0A {
-            this.setLineOffset(i)
+    var size = len(self.inputChars)
+    for ;i < size; i++ {
+        if self.inputChars[i] == 0x0A {
+            self.setLineOffset(i)
         }
     }
 }
-func (this *LexStream) setInputChars(inputChars string)  {
-    this.inputChars = []rune(inputChars)
-    this.index = -1 // reset the start index to the beginning of the input
+func (self *LexStream) setInputChars(inputChars string)  {
+    self.inputChars = []rune(inputChars)
+    self.index = -1 // reset the start index to the beginning of the input
 }
-func (this *LexStream) getInputChars() string {
-    return string(this.inputChars)
+func (self *LexStream) getInputChars() string {
+    return string(self.inputChars)
 }
-func (this *LexStream) setFileName(fileName string)  {
-    this.fileName = fileName
+func (self *LexStream) setFileName(fileName string)  {
+    self.fileName = fileName
 }
-func (this *LexStream) getFileName() string {
-    return this.fileName
+func (self *LexStream) getFileName() string {
+    return self.fileName
 }
-func (this *LexStream) setLineOffsets(lineOffsets *IntSegmentedTuple)  {
-    this.lineOffsets = lineOffsets
+func (self *LexStream) setLineOffsets(lineOffsets *IntSegmentedTuple)  {
+    self.lineOffsets = lineOffsets
 }
-func (this *LexStream) getLineOffsets() *IntSegmentedTuple {
-    return this.lineOffsets
+func (self *LexStream) getLineOffsets() *IntSegmentedTuple {
+    return self.lineOffsets
 }
-func (this *LexStream) setTab(tab int)  {
-    this.tab = tab
+func (self *LexStream) setTab(tab int)  {
+    self.tab = tab
 }
-func (this *LexStream) getTab() int {
-    return this.tab
+func (self *LexStream) getTab() int {
+    return self.tab
 }
-func (this *LexStream) setStreamIndex(index int)  {
-    this.index = index
+func (self *LexStream) setStreamIndex(index int)  {
+    self.index = index
 }
-func (this *LexStream) getStreamIndex() int {
-    return this.index
+func (self *LexStream) getStreamIndex() int {
+    return self.index
 }
-func (this *LexStream) setStreamLength(streamLength int)  {
-    this.streamLength = streamLength
+func (self *LexStream) setStreamLength(streamLength int)  {
+    self.streamLength = streamLength
 }
-func (this *LexStream) getStreamLength() int {
-    return this.streamLength
+func (self *LexStream) getStreamLength() int {
+    return self.streamLength
 }
-func (this *LexStream) setLineOffset(i int)  {
-    this.lineOffsets.add(i)
+func (self *LexStream) setLineOffset(i int)  {
+    self.lineOffsets.add(i)
 }
-func (this *LexStream) getLineOffset(i int) int {
-    return this.lineOffsets.get(i)
+func (self *LexStream) getLineOffset(i int) int {
+    return self.lineOffsets.get(i)
 }
-func (this *LexStream) setPrsStream(prsStream IPrsStream)  {
-    prsStream.setLexStream(this)
-    this.prsStream = prsStream
+func (self *LexStream) setPrsStream(prsStream IPrsStream)  {
+    if nil == prsStream{
+        return
+    }
+    prsStream.setLexStream(self)
+    self.prsStream = prsStream
 }
-func (this *LexStream) getIPrsStream() IPrsStream{
-    return this.prsStream
+func (self *LexStream) getIPrsStream() IPrsStream{
+    return self.prsStream
 }
 
-func (this *LexStream) orderedExportedSymbols() []string {
+func (self *LexStream) orderedExportedSymbols() []string {
     return nil
 }
-func (this *LexStream) getCharValue(i int) string {
-    return string(this.inputChars[i])
+func (self *LexStream) getCharValue(i int) string {
+    return string(self.inputChars[i])
 }
-func (this *LexStream) getIntValue(i int) int {
-    return int(this.inputChars[i])
+func (self *LexStream) getIntValue(i int) int {
+    return int(self.inputChars[i])
 }
 
-func (this *LexStream) getLineCount() int {
-    return this.lineOffsets.size() - 1
+func (self *LexStream) getLineCount() int {
+    return self.lineOffsets.size() - 1
 }
-func (this *LexStream) getLineNumberOfCharAt(i int) int {
-    var index int = this.lineOffsets.binarySearch(i)
+func (self *LexStream) getLineNumberOfCharAt(i int) int {
+    var index int = self.lineOffsets.binarySearch(i)
     if  index < 0 {
         return  -index
     } else{
@@ -163,195 +176,223 @@ func (this *LexStream) getLineNumberOfCharAt(i int) int {
         }
     }
 }
-func (this *LexStream) getColumnOfCharAt(i int) int {
-    var lineNo int = this.getLineNumberOfCharAt(i)
-     var   start int = this.lineOffsets.get(lineNo - 1)
-    if start + 1 >= this.streamLength {
+func (self *LexStream) getColumnOfCharAt(i int) int {
+    var lineNo int = self.getLineNumberOfCharAt(i)
+    var start int = self.lineOffsets.get(lineNo - 1)
+    if start + 1 >= self.streamLength {
         return 1
     }
     var k int = start + 1
     for  ;k < i ;k++ {
-        if this.inputChars[k] == '\t' {
+        if self.inputChars[k] == '\t' {
             var offset int = (k - start) - 1
-            start -= ((this.tab - 1) - offset % this.tab)
+            start -= ((self.tab - 1) - offset % self.tab)
         }
     }
     return i - start
 }
-func (this *LexStream) getToken() int {
-    this.index = this.getNext(this.index)
-    return this.index
+func (self *LexStream) getToken() int {
+    self.index = self.getNext(self.index)
+    return self.index
 }
-func (this *LexStream) getTokenFromEndToken(end_token int ) int {
-     if this.index < end_token {
-         this.index =this.getNext(this.index)
+func (self *LexStream) getTokenFromEndToken(end_token int ) int {
+     if self.index < end_token {
+         self.index =self.getNext(self.index)
      }else{
-         this.index =this.streamLength
+         self.index =self.streamLength
      }
-     return  this.index
+     return  self.index
 }
-func (this *LexStream) getKind(i int) int {
+func (self *LexStream) getKind(i int) int {
     return 0
 }
-func (this *LexStream) next(i int) int {
-    return this.getNext(i)
+func (self *LexStream) next(i int) int {
+    return self.getNext(i)
 }
-func (this *LexStream) getNext(i int) int {
+func (self *LexStream) getNext(i int) int {
      i+=1
-     if i < this.streamLength {
+     if i < self.streamLength {
          return  i
      }else{
-        return  this.streamLength
+        return  self.streamLength
      }
 }
-func (this *LexStream) previous(i int) int {
-    return this.getPrevious(i)
+func (self *LexStream) previous(i int) int {
+    return self.getPrevious(i)
 }
-func (this *LexStream) getPrevious(i int) int {
+func (self *LexStream) getPrevious(i int) int {
     if i <= 0 {
         return 0
     }else {
        return i - 1
     }
 }
-func (this *LexStream) getName(i int) string {
-    if i >= this.getStreamLength() {
+func (self *LexStream) getName(i int) string {
+    if i >= self.getStreamLength() {
         return ""
     }else{
-        return  "" + this.getCharValue(i)
+        return  "" + self.getCharValue(i)
     }
 }
-func (this *LexStream) peek() int {
-    return this.getNext(this.index)
+func (self *LexStream) peek() int {
+    return self.getNext(self.index)
 }
-func (this *LexStream) resetTo(i int)  {
-    this.index = i - 1
+func (self *LexStream) resetTo(i int)  {
+    self.index = i - 1
 }
-func (this *LexStream) reset()  {
-    this.index = -1
+func (self *LexStream) reset()  {
+    self.index = -1
 }
 
-func (this *LexStream) badToken() int {
+func (self *LexStream) badToken() int {
     return 0
 }
-func (this *LexStream) getLine(i int) int {
-    return this.getLineNumberOfCharAt(i)
+func (self *LexStream) getLine(i int) int {
+    return self.getLineNumberOfCharAt(i)
 }
 
-func (this *LexStream) getColumn(i int) int {
-    return this.getColumnOfCharAt(i)
+func (self *LexStream) getColumn(i int) int {
+    return self.getColumnOfCharAt(i)
 }
-func (this *LexStream) getEndLine(i int) int {
-    return this.getLine(i)
+func (self *LexStream) getEndLine(i int) int {
+    return self.getLine(i)
 }
-func (this *LexStream) getEndColumn(i int) int {
-    return this.getColumnOfCharAt(i)
+func (self *LexStream) getEndColumn(i int) int {
+    return self.getColumnOfCharAt(i)
 }
-func (this *LexStream) afterEol(i int) bool {
+func (self *LexStream) afterEol(i int) bool {
     if i < 1 {
         return  true
     } else{
-        return this.getLineNumberOfCharAt(i - 1) < this.getLineNumberOfCharAt(i)
+        return self.getLineNumberOfCharAt(i - 1) < self.getLineNumberOfCharAt(i)
     }
 }
-func (this *LexStream) getFirstErrorToken(i int) int {
-    return this.getFirstRealToken(i)
+func (self *LexStream) getFirstErrorToken(i int) int {
+    return self.getFirstRealToken(i)
 }
-func (this *LexStream) getFirstRealToken(i int) int {
+func (self *LexStream) getFirstRealToken(i int) int {
     return i
 }
-func (this *LexStream) getLastErrorToken(i int) int {
-    return this.getLastRealToken(i)
+func (self *LexStream) getLastErrorToken(i int) int {
+    return self.getLastRealToken(i)
 }
-func (this *LexStream) getLastRealToken(i int) int {
+func (self *LexStream) getLastRealToken(i int) int {
     return i
 }
-func (this *LexStream) setMessageHandler(errMsg IMessageHandler)  {
-    this.errMsg = errMsg
+
+//
+// Here is where we report errors.  The default method is simply to print the error message to the console.
+// However, the user may supply an error message handler to process error messages.  To support that
+// a message handler interface is provided that has a single method handleMessage().  The user has his
+// error message handler class implement the IMessageHandler interface and provides an object of this type
+// to the runtime using the setMessageHandler(errorMsg) method. If the message handler object is set,
+// the reportError methods will invoke its handleMessage() method.
+//
+func (self *LexStream) setMessageHandler(errMsg IMessageHandler)  {
+    self.errMsg = errMsg
 }
-func (this *LexStream) getMessageHandler() IMessageHandler {
-    return this.errMsg
+func (self *LexStream) getMessageHandler() IMessageHandler {
+    return self.errMsg
 }
-func (this *LexStream) makeToken(startLoc int, endLoc int, kind int)  {
-    if this.prsStream == nil {
-        this.prsStream.makeToken(startLoc, endLoc, kind)
+func (self *LexStream) makeToken(startLoc int, endLoc int, kind int)  {
+    if self.prsStream == nil {
+        self.prsStream.makeToken(startLoc, endLoc, kind)
     } else {
-        this.reportLexicalError(startLoc, endLoc,0,0,0,nil)
+        self.reportLexicalErrorPosition(startLoc, endLoc)// make it a lexical error
     }
 }
 
-func (this *LexStream) getLocation(left_loc int, right_loc int) []int {
-    var end_loc int
-    if right_loc < this.streamLength {
-        end_loc = right_loc
+func (self *LexStream) getLocation(leftLoc int, rightLoc int) []int {
+    var endLoc int
+    if rightLoc < self.streamLength {
+        endLoc = rightLoc
     }else{
-        end_loc=this.streamLength - 1
+        endLoc =self.streamLength - 1
     }
-    var length int = end_loc - left_loc + 1
+    var length int = endLoc - leftLoc + 1
 
-    return []int{left_loc, length, this.getLineNumberOfCharAt(left_loc), this.getColumnOfCharAt(left_loc),
-        this.getLineNumberOfCharAt(right_loc), this.getColumnOfCharAt(right_loc)}
+    return []int{leftLoc,
+                 length,
+                 self.getLineNumberOfCharAt(leftLoc),
+                 self.getColumnOfCharAt(leftLoc),
+                 self.getLineNumberOfCharAt(rightLoc),
+                 self.getColumnOfCharAt(rightLoc)}
 }
-func (this *LexStream) reportLexicalError(left_loc int, right_loc int, errorCode int, error_left_loc int,
-    error_right_loc int, errorInfo  []string)  {
+func (self *LexStream) reportLexicalErrorPosition(leftLoc int, rightLoc int) {
 
-    if NIL_CODE == errorCode && errorInfo == nil {
-
-            if right_loc >= this.streamLength {
-                errorCode =EOF_CODE
-            } else{
-                if  left_loc == right_loc{
-                    errorCode=LEX_ERROR_CODE
-                }else{
-                    errorCode=INVALID_TOKEN_CODE
-                }
-            }
-            var tokenText string
-            if errorCode == EOF_CODE {
-                tokenText = "End-of-file "
+        var errorCode int
+        if rightLoc >= self.streamLength {
+            errorCode =EOF_CODE
+        } else{
+            if  leftLoc == rightLoc {
+                errorCode=LEX_ERROR_CODE
             }else{
-                if   errorCode == INVALID_TOKEN_CODE{
-                    tokenText= "\"" + this.toString(left_loc,  right_loc  + 1) + "\" "
-                }else{
-                    tokenText = "\"" + this.getCharValue(left_loc) + "\" ";
-                }
+                errorCode=INVALID_TOKEN_CODE
             }
-        error_left_loc = 0
-        error_right_loc = 0
-        errorInfo = []string{tokenText}
-    }
+        }
+        var tokenText string
+        if errorCode == EOF_CODE {
+            tokenText = "End-of-file "
+        }else{
+            if   errorCode == INVALID_TOKEN_CODE{
+                tokenText= "\"" + self.toString(leftLoc,  rightLoc+ 1) + "\" "
+            }else{
+                tokenText = "\"" + self.getCharValue(leftLoc) + "\" ";
+            }
+        }
+        var errorLeftLoc = 0
+        var errorRightLoc = 0
+        var errorInfo = []string{tokenText}
+        self.reportLexicalError(errorCode, leftLoc, rightLoc, errorLeftLoc, errorRightLoc, errorInfo);
 
+}
+func (self *LexStream) reportLexicalError(leftLoc int, rightLoc int, errorCode int, errorLeftLoc int,
+    errorRightLoc int, errorInfo  []string)  {
 
-    if nil == this.errMsg {
-       var locationInfo =fmt.Sprintf("%s : %d : %d : %d : %d : %d : %d : %d",this.getFileName(),this.getLineNumberOfCharAt(left_loc),
-            this.getColumnOfCharAt(left_loc),this.getLineNumberOfCharAt(right_loc),this.getColumnOfCharAt(right_loc),
-            error_left_loc,error_right_loc,errorCode)
+    if nil == self.errMsg {
+       var locationInfo =fmt.Sprintf("%s : %d : %d : %d : %d : %d : %d : %d",
+            self.getFileName(),
+            self.getLineNumberOfCharAt(leftLoc),
+            self.getColumnOfCharAt(leftLoc),
+            self.getLineNumberOfCharAt(rightLoc),
+            self.getColumnOfCharAt(rightLoc),
+            errorLeftLoc,
+            errorRightLoc,
+            errorCode)
 
         print("****Error " + locationInfo)
         var i int = 0
-            for  ;i < len(errorInfo); i++ {
-                print(errorInfo[i] + " ")
-            }
+        for ;i < len(errorInfo); i++ {
+            print(errorInfo[i] + " ")
+        }
 
         println(errorMsgText[errorCode])
     } else {
-        this.errMsg.handleMessage(errorCode, this.getLocation(left_loc, right_loc), this.getLocation(error_left_loc, error_right_loc), this.getFileName(), errorInfo)
+        /**
+         * This is the only method in the IMessageHandler interface
+         * It is called with the following arguments:
+         */
+        self.errMsg.handleMessage(errorCode,
+                                  self.getLocation(leftLoc, rightLoc),
+                                  self.getLocation(errorLeftLoc, errorRightLoc),
+                                  self.getFileName(),
+                                  errorInfo)
     }
 }
 
-func (this *LexStream) reportError(errorCode int, leftToken int, rightToken int, errorInfo []string, errorToken int)  {
-    this.reportLexicalError(leftToken, rightToken, errorCode,  errorToken,errorToken, errorInfo)
+func (self *LexStream) reportError(errorCode int, leftToken int, rightToken int, errorInfo []string, errorToken int)  {
+    self.reportLexicalError(leftToken, rightToken, errorCode,  errorToken,errorToken, errorInfo)
 }
 
-func (this *LexStream) toString(startOffset int, endOffset int) string {
+func (self *LexStream) toString(startOffset int, endOffset int) string {
     var length int = endOffset - startOffset + 1
-    if endOffset >= len(this.inputChars) {
+    if endOffset >= len(self.inputChars) {
         return "$EOF"
     } else{
         if length <= 0 {
             return ""
         } else{
-            return string(this.inputChars[startOffset : startOffset+ length])
+            return string(self.inputChars[startOffset :endOffset])
         }
     }
 }

@@ -1,282 +1,283 @@
 package lpg2
 
-
-type RecoveryParser struct   {
-	 *DiagnoseParser
-     parser *BacktrackingParser
-     action *IntSegmentedTuple
-     tokens *IntTuple
-     actionStack []int
-     scope_repair *PrimaryRepairInfo
- }
-//
-// maxErrors is the maximum int of errors to be repaired
-// maxTime is the maximum amount of time allowed for diagnosing
-// but at least one error must be diagnosed 
-//
-func  NewRecoveryParser(parser *BacktrackingParser, action *IntSegmentedTuple, tokens *IntTuple, tokStream IPrsStream,
-		prs ParseTable, maxErrors int, maxTime int,monitor Monitor ) *RecoveryParser{
-	    t := new(RecoveryParser)
-	    t.DiagnoseParser=NewDiagnoseParser(tokStream,prs,maxErrors,maxTime,monitor)
-		t.parser = parser
-		t.action = action
-		t.tokens = tokens
-		return t
+type RecoveryParser struct {
+	*DiagnoseParser
+	parser       *BacktrackingParser
+	action       *IntSegmentedTuple
+	tokens       *IntTuple
+	actionStack  []int
+	scope_repair *PrimaryRepairInfo
 }
 
-func (this *RecoveryParser) reallocateStacks() {
-	this.DiagnoseParser.reallocateStacks()
-	if len(this.actionStack) == 0 {
-		this.actionStack = make([]int,len(this.stateStack))
+// NewRecoveryParser
+// maxErrors is the maximum int of errors to be repaired
+// maxTime is the maximum amount of time allowed for diagnosing
+// but at least one error must be diagnosed
+//
+func NewRecoveryParser(parser *BacktrackingParser, action *IntSegmentedTuple, tokens *IntTuple, tokStream IPrsStream,
+	prs ParseTable, maxErrors int, maxTime int, monitor Monitor) *RecoveryParser {
+	t := new(RecoveryParser)
+	t.DiagnoseParser = NewDiagnoseParser(tokStream, prs, maxErrors, maxTime, monitor)
+	t.parser = parser
+	t.action = action
+	t.tokens = tokens
+	return t
+}
+
+func (self *RecoveryParser) reallocateStacks() {
+	self.DiagnoseParser.reallocateStacks()
+	if len(self.actionStack) == 0 {
+		self.actionStack = make([]int, len(self.stateStack))
 	} else {
-		var old_stack_length int = len(this.actionStack)
-		this.actionStack =arraycopy(this.actionStack, 0,  make([]int,len(this.stateStack)), 0, old_stack_length)
+		var old_stack_length int = len(self.actionStack)
+		self.actionStack = arraycopy(self.actionStack, 0, make([]int, len(self.stateStack)), 0, old_stack_length)
 	}
 	return
 }
-func (this *RecoveryParser) reportError(scope_index int, error_token int) {
+func (self *RecoveryParser) reportError(scope_index int, error_token int) {
 	var text string = "\""
-	var i int = this.scopeSuffix(scope_index)
-	for ; this.scopeRhs(i) != 0 ;i++{
-		if !this.isNullable(this.scopeRhs(i)) {
+	var i int = self.scopeSuffix(scope_index)
+	for ; self.scopeRhs(i) != 0; i++ {
+		if !self.isNullable(self.scopeRhs(i)) {
 
 			var symbol_index int
-			if this.scopeRhs(i) > this.NT_OFFSET{
-				symbol_index = this.nonterminalIndex(this.scopeRhs(i) - this.NT_OFFSET)
-			}else{
-				symbol_index =this.terminalIndex(this.scopeRhs(i))
+			if self.scopeRhs(i) > self.NT_OFFSET {
+				symbol_index = self.nonterminalIndex(self.scopeRhs(i) - self.NT_OFFSET)
+			} else {
+				symbol_index = self.terminalIndex(self.scopeRhs(i))
 			}
 
-			if len(this.name(symbol_index)) > 0 {
+			if len(self.name(symbol_index)) > 0 {
 				if len(text) > 1 { // Not just starting quote?
-					text += " "// add a space separator
+					text += " " // add a space separator
 				}
-				text += this.name(symbol_index)
+				text += self.name(symbol_index)
 			}
 		}
 	}
 	text += "\""
-	this.tokStream.reportError(SCOPE_CODE, error_token, error_token,[]string{text},0)
+	self.tokStream.reportError(SCOPE_CODE, error_token, error_token, []string{text}, 0)
 	return
 }
-func (this *RecoveryParser) recover(marker_token int, error_token int) (int,error) {
-	if len(this.stateStack) == 0 {
-		this.reallocateStacks()
+func (self *RecoveryParser) recover(marker_token int, error_token int) (int, error) {
+	if len(self.stateStack) == 0 {
+		self.reallocateStacks()
 	}
 
-	this.tokens.reset()
-	this.tokStream.reset()
-	this.tokens.add(this.tokStream.getPrevious(this.tokStream.peek()))
+	self.tokens.reset()
+	self.tokStream.reset()
+	self.tokens.add(self.tokStream.getPrevious(self.tokStream.peek()))
 	var restart_token int
 	if marker_token != 0 {
-		restart_token=marker_token
-	}else{
-		restart_token= this.tokStream.getToken()
+		restart_token = marker_token
+	} else {
+		restart_token = self.tokStream.getToken()
 	}
 
-	var	old_action_size int = 0
-	this.stateStackTop = 0
-	this.stateStack[this.stateStackTop] = this.START_STATE
-	for;; {
-		this.action.resetTo(old_action_size)
-		if !this.fixError(restart_token, error_token) {
+	var old_action_size int = 0
+	self.stateStackTop = 0
+	self.stateStack[self.stateStackTop] = self.START_STATE
+	for {
+		self.action.resetTo(old_action_size)
+		if !self.fixError(restart_token, error_token) {
 			return -1, NewBadParseException(error_token)
 		}
 		//
 		// if the parser needs to stop processing,
 		// it may do so here.
 		//
-		if nil == this.monitor  && this.monitor.isCancelled() {
+		if nil != self.monitor && self.monitor.isCancelled() {
 			break
 		}
 		//
-		// At this stage, we have a recovery configuration. See how
+		// At self stage, we have a recovery configuration. See how
 		// far we can go with it.
 		//
 		restart_token = error_token
-		this.tokStream.resetTo(error_token)
-		old_action_size = this.action.size()// save the old size in case we encounter a new error
-		error_token = this.parser.backtrackParse(this.stateStack, this.stateStackTop, this.action, 0)
-		this.tokStream.resetTo(this.tokStream.getNext(restart_token))
+		self.tokStream.resetTo(error_token)
+		old_action_size = self.action.size() // save the old size in case we encounter a new error
+		error_token = self.parser.backtrackParse(self.stateStack, self.stateStackTop, self.action, 0)
+		self.tokStream.resetTo(self.tokStream.getNext(restart_token))
 		if error_token != 0 {
 			continue
-		}else{
+		} else {
 			break
 		}
 	} // no error found
-	return restart_token,nil
+	return restart_token, nil
 }
+
 //
 // Given the configuration consisting of the states in stateStack
 // and the sequence of tokens (current_kind, followed by the tokens
 // in tokStream), fixError parses up to error_token in the tokStream
 // recovers, if possible, from that error and returns the result.
-// While doing this, it also computes the location_stack information
+// While doing self, it also computes the location_stack information
 // and the sequence of actions that matches up with the result that
 // it returns.
 //
-func (this *RecoveryParser) fixError(start_token int, error_token int) bool {
+func (self *RecoveryParser) fixError(start_token int, error_token int) bool {
 	//
 	// Save information about the current configuration.
 	//
 	var curtok int = start_token
-	var	current_kind int = this.tokStream.getKind(curtok)
-	var	first_stream_token int = this.tokStream.peek()
+	var current_kind int = self.tokStream.getKind(curtok)
+	var first_stream_token int = self.tokStream.peek()
 
-	this.buffer[1] = error_token
-	this.buffer[0] = this.tokStream.getPrevious(this.buffer[1])
+	self.buffer[1] = error_token
+	self.buffer[0] = self.tokStream.getPrevious(self.buffer[1])
 	var k int = 2
-	for ;k < BUFF_SIZE; k++ {
-		this.buffer[k] = this.tokStream.getNext(this.buffer[k - 1])
+	for ; k < BUFF_SIZE; k++ {
+		self.buffer[k] = self.tokStream.getNext(self.buffer[k-1])
 	}
 
-	this.scope_repair.distance = 0
-	this.scope_repair.misspellIndex = 0
-	this.scope_repair.bufferPosition = 1
+	self.scope_repair.distance = 0
+	self.scope_repair.misspellIndex = 0
+	self.scope_repair.bufferPosition = 1
 
 	//
 	// Clear the configuration stack.
 	//
-	this.main_configuration_stack = NewConfigurationStack(this.prs)
+	self.main_configuration_stack = NewConfigurationStack(self.prs)
 
 	//
 	// Keep parsing until we reach the end of file and succeed or
 	// an error is encountered. The list of actions executed will
 	// be stored in the "action" tuple.
 	//
-	this.locationStack[this.stateStackTop] = curtok
-	this.actionStack[this.stateStackTop] = this.action.size()
-	var act int = this.tAction(this.stateStack[this.stateStackTop], current_kind)
-	for ;; {
+	self.locationStack[self.stateStackTop] = curtok
+	self.actionStack[self.stateStackTop] = self.action.size()
+	var act int = self.tAction(self.stateStack[self.stateStackTop], current_kind)
+	for {
 		//
 		// if the parser needs to stop processing,
 		// it may do so here.
 		//
-		if nil == this.monitor  && this.monitor.isCancelled() {
+		if nil != self.monitor && self.monitor.isCancelled() {
 			return true
 		}
-		if act <= this.NUM_RULES {
-			this.action.add(act)// save this reduce action
-			this.stateStackTop--
+		if act <= self.NUM_RULES {
+			self.action.add(act) // save self reduce action
+			self.stateStackTop--
 
-			for;; {
-				this.stateStackTop -= (this.rhs(act) - 1)
-				act = this.ntAction(this.stateStack[this.stateStackTop], this.lhs(act))
-				if act <= this.NUM_RULES {
+			for {
+				self.stateStackTop -= (self.rhs(act) - 1)
+				act = self.ntAction(self.stateStack[self.stateStackTop], self.lhs(act))
+				if act <= self.NUM_RULES {
 					continue
-				}else {
+				} else {
 					break
 				}
 			}
-			this.stateStackTop+=1
-			if this.stateStackTop >= len(this.stateStack) {
-				this.reallocateStacks()
+			self.stateStackTop += 1
+			if self.stateStackTop >= len(self.stateStack) {
+				self.reallocateStacks()
 			}
-			this.stateStack[this.stateStackTop] = act
-		
-			this.locationStack[this.stateStackTop] = curtok
-			this.actionStack[this.stateStackTop] = this.action.size()
-			act = this.tAction(act, current_kind)
+			self.stateStack[self.stateStackTop] = act
+
+			self.locationStack[self.stateStackTop] = curtok
+			self.actionStack[self.stateStackTop] = self.action.size()
+			act = self.tAction(act, current_kind)
 			continue
-		}else{
-			if act == this.ERROR_ACTION {
-				if curtok != error_token || this.main_configuration_stack.size() > 0 {
-					var configuration = this.main_configuration_stack.pop()
+		} else {
+			if act == self.ERROR_ACTION {
+				if curtok != error_token || self.main_configuration_stack.size() > 0 {
+					var configuration = self.main_configuration_stack.pop()
 					if configuration == nil {
-						act = this.ERROR_ACTION
+						act = self.ERROR_ACTION
 					} else {
-						this.stateStackTop = configuration.stack_top
-						configuration.retrieveStack(this.stateStack)
+						self.stateStackTop = configuration.stack_top
+						configuration.retrieveStack(self.stateStack)
 						act = configuration.act
 						curtok = configuration.curtok
-						this.action.resetTo(configuration.action_length)
-						current_kind = this.tokStream.getKind(curtok)
-						this.tokStream.resetTo(this.tokStream.getNext(curtok))
+						self.action.resetTo(configuration.action_length)
+						current_kind = self.tokStream.getKind(curtok)
+						self.tokStream.resetTo(self.tokStream.getNext(curtok))
 						continue
 					}
 				}
 				break
-			}else {
-				if act > this.ACCEPT_ACTION && act < this.ERROR_ACTION {
-					if this.main_configuration_stack.findConfiguration(this.stateStack, this.stateStackTop, curtok) {
-						act = this.ERROR_ACTION
+			} else {
+				if act > self.ACCEPT_ACTION && act < self.ERROR_ACTION {
+					if self.main_configuration_stack.findConfiguration(self.stateStack, self.stateStackTop, curtok) {
+						act = self.ERROR_ACTION
 					} else {
-						this.main_configuration_stack.push(this.stateStack, this.stateStackTop, act + 1, curtok, this.action.size())
-						act = this.baseAction(act)
+						self.main_configuration_stack.push(self.stateStack, self.stateStackTop, act+1, curtok, self.action.size())
+						act = self.baseAction(act)
 					}
 					continue
-				} else{
-					if act < this.ACCEPT_ACTION {
-						this.action.add(act)// save this shift action
-						curtok = this.tokStream.getToken()
-						current_kind = this.tokStream.getKind(curtok)
-					}else{ 
-						if act > this.ERROR_ACTION {
-							this.action.add(act)// save this shift-reduce action
-							curtok = this.tokStream.getToken()
-							current_kind = this.tokStream.getKind(curtok)
-							act -= this.ERROR_ACTION
-							for;; {
-								this.stateStackTop -= (this.rhs(act) - 1)
-								act = this.ntAction(this.stateStack[this.stateStackTop], this.lhs(act))
-								if act <= this.NUM_RULES {
+				} else {
+					if act < self.ACCEPT_ACTION {
+						self.action.add(act) // save self shift action
+						curtok = self.tokStream.getToken()
+						current_kind = self.tokStream.getKind(curtok)
+					} else {
+						if act > self.ERROR_ACTION {
+							self.action.add(act) // save self shift-reduce action
+							curtok = self.tokStream.getToken()
+							current_kind = self.tokStream.getKind(curtok)
+							act -= self.ERROR_ACTION
+							for {
+								self.stateStackTop -= (self.rhs(act) - 1)
+								act = self.ntAction(self.stateStack[self.stateStackTop], self.lhs(act))
+								if act <= self.NUM_RULES {
 									continue
-								}else {
+								} else {
 									break
 								}
 							}
-						} else{
-							break// assert(act == ACCEPT_ACTION)  THIS IS NOT SUPPOSED TO HAPPEN!!!
+						} else {
+							break // assert(act == ACCEPT_ACTION)  THIS IS NOT SUPPOSED TO HAPPEN!!!
 						}
 					}
-					this.stateStackTop +=1
-					if this.stateStackTop >= len(this.stateStack) {
-						this.reallocateStacks()
+					self.stateStackTop += 1
+					if self.stateStackTop >= len(self.stateStack) {
+						self.reallocateStacks()
 					}
-					this.stateStack[this.stateStackTop] = act
-			
-					if curtok == error_token {
-						this.scopeTrial(this.scope_repair, this.stateStack, this.stateStackTop)
-						if this.scope_repair.distance >= MIN_DISTANCE {
+					self.stateStack[self.stateStackTop] = act
 
-							this.tokens.add(start_token)
+					if curtok == error_token {
+						self.scopeTrial(self.scope_repair, self.stateStack, self.stateStackTop)
+						if self.scope_repair.distance >= MIN_DISTANCE {
+
+							self.tokens.add(start_token)
 							var token int = first_stream_token
-							for ; token != error_token; token = this.tokStream.getNext(token) {
-								this.tokens.add(token)
+							for ; token != error_token; token = self.tokStream.getNext(token) {
+								self.tokens.add(token)
 							}
-							this.acceptRecovery(error_token)
+							self.acceptRecovery(error_token)
 							break
 						}
 					}
-					this.locationStack[this.stateStackTop] = curtok
-					this.actionStack[this.stateStackTop] = this.action.size()
-					act = this.tAction(act, current_kind)
+					self.locationStack[self.stateStackTop] = curtok
+					self.actionStack[self.stateStackTop] = self.action.size()
+					act = self.tAction(act, current_kind)
 				}
-			}		
+			}
 		}
 	}
-	return act != this.ERROR_ACTION
+	return act != self.ERROR_ACTION
 }
-func (this *RecoveryParser) cast() IPrsStream{
-	t, _ := this.tokStream.(IPrsStream)
-	return  t
+func (self *RecoveryParser) cast() IPrsStream {
+	t, _ := self.tokStream.(IPrsStream)
+	return t
 }
-func (this *RecoveryParser) acceptRecovery(error_token int) {
+func (self *RecoveryParser) acceptRecovery(error_token int) {
 	//
 	//
 	//
 	// int action_size = action.size()
 
 	//
-	// Simulate parsing actions required for this sequence of scope
+	// Simulate parsing actions required for self sequence of scope
 	// recoveries.
 	// TODO need to add action and fix the location_stack?
 	//
-	var recovery_action  = NewIntTuple()
+	var recovery_action = NewIntTuple()
 	var k int = 0
-	for  ;k <= this.scopeStackTop ;k++ {
-		var scope_index int = this.scopeIndex[k]
-		var la int = this.scopeLa(scope_index)
+	for ; k <= self.scopeStackTop; k++ {
+		var scope_index int = self.scopeIndex[k]
+		var la int = self.scopeLa(scope_index)
 
 		//
 		// Compute the action (or set of actions in case of conflicts) that
@@ -284,14 +285,14 @@ func (this *RecoveryParser) acceptRecovery(error_token int) {
 		// in the action tuple.
 		//
 		recovery_action.reset()
-		var act int = this.tAction(this.stateStack[this.stateStackTop], la)
-		if act > this.ACCEPT_ACTION && act < this.ERROR_ACTION { // conflicting actions?
-			for;; {
-				recovery_action.add(this.baseAction(act))
+		var act int = self.tAction(self.stateStack[self.stateStackTop], la)
+		if act > self.ACCEPT_ACTION && act < self.ERROR_ACTION { // conflicting actions?
+			for {
+				recovery_action.add(self.baseAction(act))
 				act++
-				if this.baseAction(act) != 0 {
+				if self.baseAction(act) != 0 {
 					continue
-				}else {
+				} else {
 					break
 				}
 			}
@@ -303,54 +304,53 @@ func (this *RecoveryParser) acceptRecovery(error_token int) {
 		// For each action defined on the scope lookahead symbol,
 		// try scope recovery. At least one action should succeed!
 		//
-		var start_action_size int = this.action.size()
+		var start_action_size int = self.action.size()
 		var index int
-		for index = 0; index < recovery_action.size(); index++{
+		for index = 0; index < recovery_action.size(); index++ {
 			//
-			// Reset the action tuple each time through this loop
+			// Reset the action tuple each time through self loop
 			// to clear previous actions that may have been added
 			// because of a failed call to completeScope.
 			//
-			this.action.resetTo(start_action_size)
-			this.tokStream.resetTo(error_token)
-			this.tempStackTop = this.stateStackTop - 1
-			var max_pos int = this.stateStackTop
+			self.action.resetTo(start_action_size)
+			self.tokStream.resetTo(error_token)
+			self.tempStackTop = self.stateStackTop - 1
+			var max_pos int = self.stateStackTop
 
 			act = recovery_action.get(index)
-			for; act <= this.NUM_RULES; {
-				this.action.add(act)// save this reduce action
+			for act <= self.NUM_RULES {
+				self.action.add(act) // save self reduce action
 				//
 				// ... Process all goto-reduce actions following
 				// reduction, until a goto action is computed ...
 				//
-				for;; {
-					var lhs_symbol int = this.lhs(act)
-					this.tempStackTop -= (this.rhs(act) - 1)
+				for {
+					var lhs_symbol int = self.lhs(act)
+					self.tempStackTop -= (self.rhs(act) - 1)
 
-						if this.tempStackTop > max_pos{
-							act =this.tempStack[this.tempStackTop]
-						}else{
-							act =this.stateStack[this.tempStackTop]
-						}
+					if self.tempStackTop > max_pos {
+						act = self.tempStack[self.tempStackTop]
+					} else {
+						act = self.stateStack[self.tempStackTop]
+					}
 
-					act = this.ntAction(act, lhs_symbol)
-					if act <= this.NUM_RULES {
+					act = self.ntAction(act, lhs_symbol)
+					if act <= self.NUM_RULES {
 						continue
-					}else {
+					} else {
 						break
 					}
 				}
-				if this.tempStackTop + 1 >= len(this.stateStack) {
-					this.reallocateStacks()
+				if self.tempStackTop+1 >= len(self.stateStack) {
+					self.reallocateStacks()
 				}
-				if !(max_pos < this.tempStackTop){
-					max_pos= this.tempStackTop
+				if !(max_pos < self.tempStackTop) {
+					max_pos = self.tempStackTop
 				}
 
-				this.tempStack[this.tempStackTop + 1] = act
-				act = this.tAction(act, la)
+				self.tempStack[self.tempStackTop+1] = act
+				act = self.tAction(act, la)
 			}
-
 
 			//
 			// If the lookahead symbol is parsable, then we check
@@ -358,12 +358,12 @@ func (this *RecoveryParser) acceptRecovery(error_token int) {
 			// prefix and the transition symbols corresponding to
 			// the states on top of the stack.
 			//
-			if (act != this.ERROR_ACTION) {
-				this.tempStackTop+=1
-				this.nextStackTop = this.tempStackTop
+			if act != self.ERROR_ACTION {
+				self.tempStackTop += 1
+				self.nextStackTop = self.tempStackTop
 				var i int = 0
-				for  ;i <= max_pos ;i++ {
-					this.nextStack[i] = this.stateStack[i]
+				for ; i <= max_pos; i++ {
+					self.nextStack[i] = self.stateStack[i]
 				}
 
 				//
@@ -372,123 +372,123 @@ func (this *RecoveryParser) acceptRecovery(error_token int) {
 				// these scopes are reduced, all these states will be popped
 				// from the stack.
 				//
-				i  = max_pos + 1
-				for ; i <= this.tempStackTop; i++ {
-					this.nextStack[i] = this.tempStack[i]
+				i = max_pos + 1
+				for ; i <= self.tempStackTop; i++ {
+					self.nextStack[i] = self.tempStack[i]
 				}
-				if this.completeScope(this.action, this.scopeSuffix(scope_index)) {
-					var i int = this.scopeSuffix(this.scopeIndex[k])
-					for ; this.scopeRhs(i) != 0 ;i++{
+				if self.completeScope(self.action, self.scopeSuffix(scope_index)) {
+					var i int = self.scopeSuffix(self.scopeIndex[k])
+					for ; self.scopeRhs(i) != 0; i++ {
 
-						this.tokens.add( this.cast().makeErrorToken(error_token,
-								this.tokStream.getPrevious(error_token),
-								error_token, this.scopeRhs(i)))
+						self.tokens.add(self.cast().makeErrorToken(error_token,
+							self.tokStream.getPrevious(error_token),
+							error_token, self.scopeRhs(i)))
 					}
-					this.reportError(this.scopeIndex[k], this.tokStream.getPrevious(error_token))
+					self.reportError(self.scopeIndex[k], self.tokStream.getPrevious(error_token))
 					break
 				}
 			}
 		}
 		// assert (index < recovery_action.size()) // sanity check!
-		this.stateStackTop = this.nextStackTop
-		arraycopy(this.nextStack, 0, this.stateStack, 0, this.stateStackTop + 1)
+		self.stateStackTop = self.nextStackTop
+		arraycopy(self.nextStack, 0, self.stateStack, 0, self.stateStackTop+1)
 	}
 	return
 }
-func (this *RecoveryParser) completeScope(action *IntSegmentedTuple, scope_rhs_index int) bool {
-	var kind int = this.scopeRhs(scope_rhs_index)
-	if (kind == 0) {
+func (self *RecoveryParser) completeScope(action *IntSegmentedTuple, scope_rhs_index int) bool {
+	var kind int = self.scopeRhs(scope_rhs_index)
+	if kind == 0 {
 		return true
 	}
 
-	var act int = this.nextStack[this.nextStackTop]
+	var act int = self.nextStack[self.nextStackTop]
 
-	if kind > this.NT_OFFSET {
-		var lhs_symbol int = kind - this.NT_OFFSET
-		if this.baseCheck(act + lhs_symbol) != lhs_symbol {
+	if kind > self.NT_OFFSET {
+		var lhs_symbol int = kind - self.NT_OFFSET
+		if self.baseCheck(act+lhs_symbol) != lhs_symbol {
 			// is there a valid
 			// action defined on
 			// lhs_symbol?
 			return false
 		}
-		act = this.ntAction(act, lhs_symbol)
+		act = self.ntAction(act, lhs_symbol)
 
 		//
 		// if action is a goto-reduce action, save it as a shift-reduce
 		// action.
 		//
 		var temp int
-		if act <= this.NUM_RULES {
-			temp = act + this.ERROR_ACTION
-		}else {
+		if act <= self.NUM_RULES {
+			temp = act + self.ERROR_ACTION
+		} else {
 			temp = act
 		}
 		action.add(temp)
-		for;act <= this.NUM_RULES; {
-			this.nextStackTop -= (this.rhs(act) - 1)
-			act = this.ntAction(this.nextStack[this.nextStackTop], this.lhs(act))
+		for act <= self.NUM_RULES {
+			self.nextStackTop -= (self.rhs(act) - 1)
+			act = self.ntAction(self.nextStack[self.nextStackTop], self.lhs(act))
 		}
-		this.nextStackTop++
-		this.nextStack[this.nextStackTop] = act
-		return this.completeScope(action, scope_rhs_index + 1)
+		self.nextStackTop++
+		self.nextStack[self.nextStackTop] = act
+		return self.completeScope(action, scope_rhs_index+1)
 	}
 
 	//
 	// Processing a terminal
 	//
-	act = this.tAction(act, kind)
-	action.add(act)// save this terminal action
-	if act < this.ACCEPT_ACTION {
-		this.nextStackTop++
-		this.nextStack[this.nextStackTop] = act
-		return this.completeScope(action, scope_rhs_index + 1)
-	}else {
-		if act > this.ERROR_ACTION{
-				act -= this.ERROR_ACTION
-				for;; {
-					this.nextStackTop -= (this.rhs(act) - 1)
-					act = this.ntAction(this.nextStack[this.nextStackTop], this.lhs(act))
-					if act <= this.NUM_RULES{
-						continue
-					}else {
-						break
-					}
+	act = self.tAction(act, kind)
+	action.add(act) // save self terminal action
+	if act < self.ACCEPT_ACTION {
+		self.nextStackTop++
+		self.nextStack[self.nextStackTop] = act
+		return self.completeScope(action, scope_rhs_index+1)
+	} else {
+		if act > self.ERROR_ACTION {
+			act -= self.ERROR_ACTION
+			for {
+				self.nextStackTop -= (self.rhs(act) - 1)
+				act = self.ntAction(self.nextStack[self.nextStackTop], self.lhs(act))
+				if act <= self.NUM_RULES {
+					continue
+				} else {
+					break
 				}
-				this.nextStackTop++
-				this.nextStack[this.nextStackTop] = act
-				return true
-		}else {
-			if act > this.ACCEPT_ACTION && act < this.ERROR_ACTION { // conflicting actions?
+			}
+			self.nextStackTop++
+			self.nextStack[self.nextStackTop] = act
+			return true
+		} else {
+			if act > self.ACCEPT_ACTION && act < self.ERROR_ACTION { // conflicting actions?
 
 				var save_action_size int = action.size()
 				var i int = act
-				for ; this.baseAction(i) != 0 ;i++{// consider only shift and shift-reduce actions
-				
+				for ; self.baseAction(i) != 0; i++ { // consider only shift and shift-reduce actions
+
 					action.resetTo(save_action_size)
-					act = this.baseAction(i)
-					action.add(act)// save this terminal action
-					if act <= this.NUM_RULES {
+					act = self.baseAction(i)
+					action.add(act) // save self terminal action
+					if act <= self.NUM_RULES {
 					} else {
-						if act < this.ACCEPT_ACTION {
-							this.nextStackTop++
-							this.nextStack[this.nextStackTop] = act
-							if this.completeScope(action, scope_rhs_index+1) {
+						if act < self.ACCEPT_ACTION {
+							self.nextStackTop++
+							self.nextStack[self.nextStackTop] = act
+							if self.completeScope(action, scope_rhs_index+1) {
 								return true
 							}
 						} else {
-							if act > this.ERROR_ACTION {
-								act -= this.ERROR_ACTION
-								for ; ; {
-									this.nextStackTop -= (this.rhs(act) - 1)
-									act = this.ntAction(this.nextStack[this.nextStackTop], this.lhs(act))
-									if act <= this.NUM_RULES {
+							if act > self.ERROR_ACTION {
+								act -= self.ERROR_ACTION
+								for {
+									self.nextStackTop -= (self.rhs(act) - 1)
+									act = self.ntAction(self.nextStack[self.nextStackTop], self.lhs(act))
+									if act <= self.NUM_RULES {
 										continue
 									} else {
 										break
 									}
 								}
-								this.nextStackTop++
-								this.nextStack[this.nextStackTop] = act
+								self.nextStackTop++
+								self.nextStack[self.nextStackTop] = act
 								return true
 							}
 						}
@@ -499,5 +499,3 @@ func (this *RecoveryParser) completeScope(action *IntSegmentedTuple, scope_rhs_i
 	}
 	return false
 }
-
-

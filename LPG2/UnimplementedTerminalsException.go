@@ -1,9 +1,9 @@
 package lpg2
 type UnimplementedTerminalsException struct {
     wrap error
-    symbols IntArrayList
+    symbols *IntArrayList
 }
-func  NewUnimplementedTerminalsException(symbols IntArrayList) *UnimplementedTerminalsException{
+func  NewUnimplementedTerminalsException(symbols *IntArrayList) *UnimplementedTerminalsException{
     t := new(UnimplementedTerminalsException)
     t.wrap = NewErr("UnimplementedTerminalsException")
     t.symbols = symbols
@@ -21,7 +21,7 @@ func (a *UnimplementedTerminalsException) Error() string {
 
 
 
-func (a *UnimplementedTerminalsException) getSymbols()  IntArrayList{
+func (a *UnimplementedTerminalsException) getSymbols()  *IntArrayList{
     return a.symbols
 }
 
