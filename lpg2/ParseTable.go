@@ -67,9 +67,9 @@ type ParseTable interface {
 
 	GetNumStates() int
 
-	GetNtOffSet() int
+	GetNtOffset() int
 
-	GetLaStateOffSet() int
+	GetLaStateOffset() int
 
 	GetMaxLa() int
 

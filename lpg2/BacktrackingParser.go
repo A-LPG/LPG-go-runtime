@@ -34,16 +34,16 @@ type BacktrackingParser struct {
 }
 
 func NewBacktrackingParser(tokStream TokenStream, prs ParseTable,
-	ra RuleAction, monitor Monitor) *BacktrackingParser {
+	ra RuleAction, monitor Monitor) (*BacktrackingParser,error) {
 	a := new(BacktrackingParser)
 	a.skipTokens = false
 	a.Stacks = NewStacks()
 	a.action = NewIntSegmentedTuple(10, 1024)
 	err := a.Reset(tokStream, prs, ra, monitor)
 	if err != nil {
-		return nil
+		return nil,err
 	}
-	return a
+	return a,nil
 }
 //
 // A starting marker indicates that we are dealing with an entry point
@@ -120,8 +120,8 @@ func (my *BacktrackingParser) Reset(tokStream TokenStream, prs ParseTable, ra Ru
 		my.prs = prs
 		my.START_STATE = prs.GetStartState()
 		my.NUM_RULES = prs.GetNumRules()
-		my.NT_OFFSET = prs.GetNtOffSet()
-		my.LA_STATE_OFFSET = prs.GetLaStateOffSet()
+		my.NT_OFFSET = prs.GetNtOffset()
+		my.LA_STATE_OFFSET = prs.GetLaStateOffset()
 		my.EOFT_SYMBOL = prs.GetEoftSymbol()
 		my.ERROR_SYMBOL = prs.GetErrorSymbol()
 		my.ACCEPT_ACTION = prs.GetAcceptAction()
@@ -171,13 +171,15 @@ func (my *BacktrackingParser) ReallocateOtherStacks(startTokenIndex int) {
 	}
 	return
 }
-//
+
+// FuzzyParse
 // Always attempt to recover
 //
 func (my *BacktrackingParser) FuzzyParse() (interface{}, error) {
     return my.FuzzyParseEntry(0, math.MaxInt32)
 }
-//
+
+// FuzzyParseWithErrorCount
 // Recover up to max_error_count times and then quit
 //
 func (my *BacktrackingParser) FuzzyParseWithErrorCount(max_error_count int) (interface{}, error) {

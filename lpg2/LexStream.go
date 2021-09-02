@@ -29,7 +29,7 @@ type LexStream struct {
 
 
 
-func NewLexStream(fileName string, inputChars *string, tab int, lineOffSets *IntSegmentedTuple) (*LexStream,error){
+func NewLexStream(fileName string, inputChars []rune, tab int, lineOffSets *IntSegmentedTuple) (*LexStream,error){
     my := new(LexStream)
     my.DEFAULT_TAB  = 1
     my.index  = -1
@@ -63,20 +63,20 @@ func (my *LexStream) GetFileString(fileName string) (*string, error) {
     return &s, nil
 
 }
-func (my *LexStream) initialize(fileName string, inputChars *string, lineOffSets *IntSegmentedTuple)  error {
+func (my *LexStream) initialize(fileName string, inputChars []rune, lineOffSets *IntSegmentedTuple)  error {
     if nil == inputChars {
         var str,ex = my.GetFileString(fileName)
         if ex != nil{
             return ex
         }
-        inputChars = str
+        inputChars = []rune(*str)
     }
 
     if nil == inputChars {
         return nil
     }
 
-    my.SetInputChars(*inputChars)
+    my.SetInputChars(inputChars)
     my.SetStreamLength(len(my.inputChars))
     my.SetFileName(fileName)
     if lineOffSets != nil {
@@ -97,8 +97,8 @@ func (my *LexStream) ComputeLineOffSets()  {
         }
     }
 }
-func (my *LexStream) SetInputChars(inputChars string)  {
-    my.inputChars = []rune(inputChars)
+func (my *LexStream) SetInputChars(inputChars []rune)  {
+    my.inputChars = inputChars
     my.index = -1 // Reset the start index to the beginning of the input
 }
 func (my *LexStream) GetInputChars() []rune {

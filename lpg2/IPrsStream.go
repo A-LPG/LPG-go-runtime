@@ -66,7 +66,7 @@ type IPrsStream interface {
 
 	GetTokenText(i int) string
 
-	GetStartOffSet(i int) int
+	GetStartOffset(i int) int
 	
 	GetEndOffSet(i int) int
 

@@ -144,8 +144,8 @@ func NewDiagnoseParser(tokStream TokenStream, prs ParseTable, maxErrors int, max
 	my.ERROR_SYMBOL = prs.GetErrorSymbol()
 	my.SCOPE_SIZE = prs.GetScopeSize()
 	my.MAX_NAME_LENGTH = prs.GetMaxNameLength()
-	my.NT_OFFSET = prs.GetNtOffSet()
-	my.LA_STATE_OFFSET = prs.GetLaStateOffSet()
+	my.NT_OFFSET = prs.GetNtOffset()
+	my.LA_STATE_OFFSET = prs.GetLaStateOffset()
 	my.NUM_RULES = prs.GetNumRules()
 	my.NUM_SYMBOLS = prs.GetNumSymbols()
 	my.START_STATE = prs.GetStartState()
@@ -277,10 +277,10 @@ func (my *DiagnoseParser) ReallocateStacks() {
 }
 
 func (my *DiagnoseParser) Diagnose(error_token int) {
-	my.DiagnoseEntry2(0, error_token)
+	my.DiagnoseEntry(0, error_token)
 }
 
-func (my *DiagnoseParser) DiagnoseEntry1(marker_kind int) {
+func (my *DiagnoseParser) DiagnoseEntryWithMarkerKind(marker_kind int) {
 	my.ReallocateStacks()
 	my.tempStackTop = 0
 	my.tempStack[my.tempStackTop] = my.START_STATE
@@ -300,11 +300,11 @@ func (my *DiagnoseParser) DiagnoseEntry1(marker_kind int) {
 	//
 	var error_token int = my.ParseForError(current_kind)
 	if error_token != 0 {
-		my.DiagnoseEntry2(marker_kind, error_token)
+		my.DiagnoseEntry(marker_kind, error_token)
 	}
 	return
 }
-func (my *DiagnoseParser) DiagnoseEntry2(marker_kind int, error_token int) {
+func (my *DiagnoseParser) DiagnoseEntry(marker_kind int, error_token int) {
 	var action = NewIntTupleWithEstimate(1 << 18)
 	var startTime int = Now()
 	var errorCount int = 0

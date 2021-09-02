@@ -1,12 +1,13 @@
 package lpg2
 type BadParseException struct {
-    wrap error
-    error_token int
+    wrap       error
+    ErrorToken int
+
 }
-func  NewBadParseException(error_token int) *BadParseException{
+func  NewBadParseException(errorToken int) *BadParseException{
     t := new(BadParseException)
     t.wrap = NewErr("BadParseException")
-    t.error_token = error_token
+    t.ErrorToken = errorToken
     return t
 }
 

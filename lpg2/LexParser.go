@@ -27,7 +27,10 @@ type LexParser struct {
 	current_kind  int
 }
 
-func NewLexParser(tokStream ILexStream, prs ParseTable, ra RuleAction) *LexParser {
+func NewLexParser() *LexParser {
+	return NewLexParserAndInit(nil,nil,nil)
+}
+func NewLexParserAndInit(tokStream ILexStream, prs ParseTable, ra RuleAction) *LexParser {
 	my := new(LexParser)
 	my.STACK_INCREMENT = 1024
     my.stackLength=0
@@ -43,7 +46,7 @@ func (my *LexParser) Reset(tokStream ILexStream, prs ParseTable, ra RuleAction) 
 	my.prs = prs
 	my.ra = ra
 	my.START_STATE = prs.GetStartState()
-	my.LA_STATE_OFFSET = prs.GetLaStateOffSet()
+	my.LA_STATE_OFFSET = prs.GetLaStateOffset()
 	my.EOFT_SYMBOL = prs.GetEoftSymbol()
 	my.ACCEPT_ACTION = prs.GetAcceptAction()
 	my.ERROR_ACTION = prs.GetErrorAction()
@@ -84,7 +87,7 @@ func (my *LexParser) ReallocateStacks() {
 // However, note that when ParseActions() is invoked after successfully
 // parsing an input with the incremental parser, then they can be invoked.
 //
-func (my *LexParser) GetFirstTokenAt(i int) (int, error) {
+func (my *LexParser) GetFirstTokenAt(i int) int {
 	return my.GetToken(i)
 }
 func (my *LexParser) GetFirstToken() int {
@@ -93,21 +96,18 @@ func (my *LexParser) GetFirstToken() int {
 func (my *LexParser) GetLastToken() int {
 	return my.lastToken
 }
-func (my *LexParser) GetLastTokenAt(i int) (int, error) {
+func (my *LexParser) GetLastTokenAt(i int) int {
 
 	if my.taking_actions {
 		if i >= my.prs.Rhs(my.currentAction) {
-			return my.lastToken, nil
+			return my.lastToken
 		} else {
-			var index, e = my.GetToken(i + 1)
-			if e != nil {
-				return -1, e
-			}
-			return my.tokStream.GetPrevious(index), nil
+			var index = my.GetToken(i + 1)
+			return my.tokStream.GetPrevious(index)
 		}
 
 	}
-	return -1, NewUnavailableParserInformationException("")
+	return -1
 }
 func (my *LexParser) GetCurrentRule() (int, error) {
 	if my.taking_actions {
@@ -124,15 +124,15 @@ func (my *LexParser) GetCurrentRule() (int, error) {
 // xi => ti w. If xi is a nullable nonterminal, then ti is the first
 //  symbol that immediately follows xi in the input (the Lookahead).
 //
-func (my *LexParser) GetToken(i int) (int, error) {
+func (my *LexParser) GetToken(i int) int {
 	if my.taking_actions {
-		return my.locationStack[my.stateStackTop+(i-1)], nil
+		return my.locationStack[my.stateStackTop+(i-1)]
 	}
-	return -1, NewUnavailableParserInformationException("")
+	return -1
 }
 func (my *LexParser) SetSym1(i int) {}
 func (my *LexParser) GetSym(i int) int {
-	i, _ = my.GetLastTokenAt(i)
+	i = my.GetLastTokenAt(i)
 	return i
 }
 

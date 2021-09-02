@@ -24,17 +24,17 @@ type DeterministicParser struct {
 	ra        RuleAction
 }
 
-func NewDeterministicParser(tokStream TokenStream, prs ParseTable, ra RuleAction, monitor Monitor) *DeterministicParser {
+func NewDeterministicParser(tokStream TokenStream, prs ParseTable, ra RuleAction, monitor Monitor) (*DeterministicParser,error) {
 
 	a := new(DeterministicParser)
 	a.Stacks = NewStacks()
 
 	err := a.Reset(tokStream, prs, ra, monitor)
 	if err != nil {
-		return nil
+		return nil,err
 	}
 
-	return a
+	return a,nil
 }
 
 //
@@ -112,41 +112,41 @@ func (my *DeterministicParser) ProcessReductions() {
 // However, note that when ParseActions() is invoked after successfully
 // parsing an input with the incremental parser, then they can be invoked.
 //
-func (my *DeterministicParser) GetCurrentRule() (int, error) {
+func (my *DeterministicParser) GetCurrentRule() int{
 	if my.taking_actions {
-		return my.currentAction, nil
+		return my.currentAction
 	}
-	return -1, NewUnavailableParserInformationException("")
+	return -1
 }
-func (my *DeterministicParser) GetFirstToken() (int, error) {
+func (my *DeterministicParser) GetFirstToken() int {
 	if my.taking_actions {
-		return my.GetToken(1), nil
+		return my.GetToken(1)
 	}
-	return -1, NewUnavailableParserInformationException("")
+	return -1
 }
-func (my *DeterministicParser) GetFirstTokenAt(i int) (int, error) {
+func (my *DeterministicParser) GetFirstTokenAt(i int) int {
 
 	if my.taking_actions {
-		return my.GetToken(i), nil
+		return my.GetToken(i)
 	}
-	return -1, NewUnavailableParserInformationException("")
+	return -1
 }
-func (my *DeterministicParser) GetLastToken() (int, error) {
+func (my *DeterministicParser) GetLastToken() int{
 	if my.taking_actions {
-		return my.lastToken, nil
+		return my.lastToken
 	}
-	return -1, NewUnavailableParserInformationException("")
+	return -1
 }
-func (my *DeterministicParser) GetLastTokenAt(i int) (int, error) {
+func (my *DeterministicParser) GetLastTokenAt(i int) int {
 
 	if my.taking_actions {
 		if i >= my.prs.Rhs(my.currentAction) {
-			return my.lastToken, nil
+			return my.lastToken
 		} else {
-			return my.tokStream.GetPrevious(my.GetToken(i + 1)), nil
+			return my.tokStream.GetPrevious(my.GetToken(i + 1))
 		}
 	}
-	return -1, NewUnavailableParserInformationException("")
+	return -1
 }
 func (my *DeterministicParser) SetMonitor(monitor Monitor) {
 	my.monitor = monitor
@@ -173,8 +173,8 @@ func (my *DeterministicParser) Reset(tokStream TokenStream, prs ParseTable, ra R
 
 		my.START_STATE = prs.GetStartState()
 		my.NUM_RULES = prs.GetNumRules()
-		my.NT_OFFSET = prs.GetNtOffSet()
-		my.LA_STATE_OFFSET = prs.GetLaStateOffSet()
+		my.NT_OFFSET = prs.GetNtOffset()
+		my.LA_STATE_OFFSET = prs.GetLaStateOffset()
 		my.EOFT_SYMBOL = prs.GetEoftSymbol()
 		my.ERROR_SYMBOL = prs.GetErrorSymbol()
 		my.ACCEPT_ACTION = prs.GetAcceptAction()
@@ -364,7 +364,7 @@ func (my *DeterministicParser) ErrorReset() {
 // proper configuration by initially invoking the method ResetParser
 // prior to invoking my function.
 //
-func (my *DeterministicParser) Parse(sym []int, index int) int {
+func (my *DeterministicParser) Parse(sym []int, index int) (int,error) {
 
 	// assert(sym.length == prs.GetMaxLa())
 
@@ -486,7 +486,7 @@ func (my *DeterministicParser) Parse(sym []int, index int) int {
 			my.action.ReSetTo(save_action_length) // restore original action state.
 		}
 	}
-	return my.currentAction
+	return my.currentAction,nil
 }
 
 //

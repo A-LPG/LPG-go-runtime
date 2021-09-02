@@ -123,7 +123,7 @@ func (my * PrsStream) MakeErrorToken(firsttok int, lasttok int, errortok int, ki
 	var token  = NewErrorToken( my.GetIToken(firsttok),
 								my.GetIToken(lasttok),
 								my.GetIToken(errortok),
-								my.GetStartOffSet(firsttok),
+								my.GetStartOffset(firsttok),
 								my.GetEndOffSet(lasttok),
 								kind)
 
@@ -155,7 +155,7 @@ func (my * PrsStream) GetTokenText(i int) string {
 	var t  = my.tokens.Get(i)
 	return t.ToString()
 }
-func (my * PrsStream) GetStartOffSet(i int) int {
+func (my * PrsStream) GetStartOffset(i int) int {
 	var t =my.tokens.Get(i)
 	return t.GetStartOffSet()
 }
@@ -333,7 +333,7 @@ func (my * PrsStream) DumpTokens()  {
 }
 func (my * PrsStream) DumpToken(i int)  {
 	fmt.Printf(" ( %d )",my.GetKind(i))
-	fmt.Printf(" \t%d" , my.GetStartOffSet(i))
+	fmt.Printf(" \t%d" , my.GetStartOffset(i))
 	fmt.Printf(" \t%d" , my.GetTokenLength(i))
 	fmt.Printf(" \t%d" , my.GetLineNumberOfTokenAt(i))
 	fmt.Printf(" \t%d" , my.GetColumnOfTokenAt(i))
@@ -461,10 +461,10 @@ func (my * PrsStream) GetMessageHandler() IMessageHandler  {
 }
 
 func (my * PrsStream) ReportError(errorCode int, leftToken int, rightToken int, errorInfo []string, errorToken int)  {
-	my.iLexStream.ReportLexicalError( my.GetStartOffSet(leftToken),
+	my.iLexStream.ReportLexicalError( my.GetStartOffset(leftToken),
 										my.GetEndOffSet(rightToken),
 										errorCode,
-										my.GetStartOffSet(errorToken),
+										my.GetStartOffset(errorToken),
 										my.GetEndOffSet(errorToken),
 										errorInfo)
 }
