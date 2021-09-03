@@ -13,9 +13,9 @@ type IAst interface {
 
 	GetFollowingAdjuncts() []IToken
 
-	GetChildren() AstArrayList
+	GetChildren() *ArrayList
 
-	GetAllChildren() AstArrayList
+	GetAllChildren() *ArrayList
 
 	Accept(IAstVisitor)
 }

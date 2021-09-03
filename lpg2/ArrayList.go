@@ -1,40 +1,40 @@
 package lpg2
-type AstArrayList struct {
-	array []IAst
+type ArrayList struct {
+	array []interface{}
 }
-func NewAstArrayListFrom(array []IAst) *AstArrayList {
-	return &AstArrayList{
+func NewArrayListFrom(array []interface{}) *ArrayList {
+	return &ArrayList{
 		array: array,
 	}
 }
-func NewAstArrayListFromCopy(array []IAst) *AstArrayList {
-	newArray := make([]IAst, len(array))
+func NewArrayListFromCopy(array []interface{}) *ArrayList {
+	newArray := make([]interface{}, len(array))
 	copy(newArray, array)
-	return &AstArrayList{
+	return &ArrayList{
 		array: newArray,
 	}
 }
-func NewAstArrayListSize(size int, cap int) *AstArrayList {
-	return &AstArrayList{
-		array: make([]IAst, size, cap),
+func NewArrayListSize(size int, cap int) *ArrayList {
+	return &ArrayList{
+		array: make([]interface{}, size, cap),
 	}
 }
-func NewAstArrayList() *AstArrayList {
-	return NewAstArrayListSize(0,0)
+func NewArrayList() *ArrayList {
+	return NewArrayListSize(0,0)
 }
-func (a *AstArrayList) Clone() *AstArrayList {
-	array := make([]IAst, len(a.array))
+func (a *ArrayList) Clone() *ArrayList {
+	array := make([]interface{}, len(a.array))
 	copy(array, a.array)
-	return NewAstArrayListFrom(array)
+	return NewArrayListFrom(array)
 }
 
-func (a *AstArrayList) Clear() bool{
+func (a *ArrayList) Clear() bool{
 	if len(a.array) > 0 {
-		a.array = make([]IAst, 0)
+		a.array = make([]interface{}, 0)
 	}
 	return  true
 }
-func (a *AstArrayList) RemoveAt(index int)  (value IAst, found bool){
+func (a *ArrayList) RemoveAt(index int)  (value interface{}, found bool){
 	if index < 0 || index >= len(a.array) {
 		return nil, false
 	}
@@ -55,14 +55,14 @@ func (a *AstArrayList) RemoveAt(index int)  (value IAst, found bool){
 	a.array = append(a.array[:index], a.array[index+1:]...)
 	return value, true
 }
-func (a *AstArrayList) Remove(value IAst) bool{
+func (a *ArrayList) Remove(value interface{}) bool{
 	if i := a.Search(value); i != -1 {
 		_, found := a.RemoveAt(i)
 		return found
 	}
 	return false
 }
-func (a *AstArrayList) Search(value IAst) int {
+func (a *ArrayList) Search(value interface{}) int {
 
 	if len(a.array) == 0 {
 		return -1
@@ -77,49 +77,49 @@ func (a *AstArrayList) Search(value IAst) int {
 	return result
 }
 
-func (a *AstArrayList) RemoveAll() bool{
+func (a *ArrayList) RemoveAll() bool{
 	return a.Clear()
 }
 
-func (a *AstArrayList) ToArray() []IAst {
-	array := make([]IAst, len(a.array))
+func (a *ArrayList) ToArray() []interface{} {
+	array := make([]interface{}, len(a.array))
 	copy(array, a.array)
 	return array
 }
 
-func (a *AstArrayList) Size() int {
+func (a *ArrayList) Size() int {
 	return len(a.array)
 }
-func (a *AstArrayList) Add(elem IAst) *AstArrayList {
+func (a *ArrayList) Add(elem interface{}) *ArrayList {
 	a.array = append(a.array, elem)
 	return a
 }
-func (a *AstArrayList) Get(index int) IAst{
+func (a *ArrayList) Get(index int) interface{}{
 	if index < 0 || index >= len(a.array) {
 		return nil
 	}
 	return a.array[index]
 }
-func (a *AstArrayList) At(index int) (value IAst) {
+func (a *ArrayList) At(index int) (value interface{}) {
 	return a.Get(index)
 }
-func (a *AstArrayList) Contains( val IAst) bool{
+func (a *ArrayList) Contains( val interface{}) bool{
 	return a.Search(val) != -1
 }
-func (a *AstArrayList) IsEmpty() bool{
+func (a *ArrayList) IsEmpty() bool{
 	return a.Size() == 0
 }
-func (a *AstArrayList) Set(index int, element IAst) bool {
+func (a *ArrayList) Set(index int, element interface{}) bool {
 	if index < 0 || index >= len(a.array) {
 		return  false
 	}
 	a.array[index] = element
 	return  true
 }
-func (a *AstArrayList) IndexOf(elem IAst) int {
+func (a *ArrayList) IndexOf(elem interface{}) int {
 	return a.Search(elem)
 }
-func (a *AstArrayList) LastIndexOf(  elem IAst ) int{
+func (a *ArrayList) LastIndexOf(  elem interface{} ) int{
 	var size = a.Size()
 	for i:= size; i > 0; i--{
 		if a.array[size - i - 1] == elem{

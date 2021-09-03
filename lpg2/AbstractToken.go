@@ -34,18 +34,18 @@ func (a *AbstractToken) GetKind() int {
 func (a *AbstractToken) SetKind(kind int) {
 	a.kind = kind
 }
-func (a *AbstractToken) GetStartOffSet() int {
+func (a *AbstractToken) GetStartOffset() int {
 	return a.startOffSet
 }
-func (a *AbstractToken) SetStartOffSet(startOffSet int) {
+func (a *AbstractToken) SetStartOffset(startOffSet int) {
 	a.startOffSet = startOffSet
 }
 
-func (a *AbstractToken) GetEndOffSet() int {
+func (a *AbstractToken) GetEndOffset() int {
 	return a.endOffSet
 }
 
-func (a *AbstractToken) SetEndOffSet(endOffSet int) {
+func (a *AbstractToken) SetEndOffset(endOffSet int) {
 	a.endOffSet = endOffSet
 }
 func (a *AbstractToken) GetTokenIndex() int {

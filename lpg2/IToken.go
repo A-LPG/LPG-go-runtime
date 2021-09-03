@@ -7,13 +7,13 @@ type IToken interface {
 
 	SetKind(kind int)
 
-	GetStartOffSet() int
+	GetStartOffset() int
 
-	SetStartOffSet(startOffSet int)
+	SetStartOffset(startOffset int)
 
-	GetEndOffSet() int
+	GetEndOffset() int
 
-	SetEndOffSet(endOffSet int)
+	SetEndOffset(endOffset int)
 
 	GetTokenIndex() int
 

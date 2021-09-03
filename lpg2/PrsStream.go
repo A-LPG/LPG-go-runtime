@@ -157,43 +157,43 @@ func (my * PrsStream) GetTokenText(i int) string {
 }
 func (my * PrsStream) GetStartOffset(i int) int {
 	var t =my.tokens.Get(i)
-	return t.GetStartOffSet()
+	return t.GetStartOffset()
 }
 func (my * PrsStream) GetEndOffSet(i int) int {
 	var t =my.tokens.Get(i)
-	return t.GetEndOffSet()
+	return t.GetEndOffset()
 }
 func (my * PrsStream) GetTokenLength(i int) int {
 	var t =my.tokens.Get(i)
-	return t.GetEndOffSet() - t.GetStartOffSet() + 1
+	return t.GetEndOffset() - t.GetStartOffset() + 1
 }
 func (my * PrsStream) GetLineNumberOfTokenAt(i int) int {
 	if nil == my.iLexStream{ 
 		return 0
 	}
 	var t =my.tokens.Get(i)
-	return my.iLexStream.GetLineNumberOfCharAt(t.GetStartOffSet())
+	return my.iLexStream.GetLineNumberOfCharAt(t.GetStartOffset())
 }
 func (my * PrsStream) GetEndLineNumberOfTokenAt(i int) int {
 	if nil == my.iLexStream{
 		return 0
 	}
 	var t =my.tokens.Get(i)
-	return my.iLexStream.GetLineNumberOfCharAt(t.GetEndOffSet())
+	return my.iLexStream.GetLineNumberOfCharAt(t.GetEndOffset())
 }
 func (my * PrsStream) GetColumnOfTokenAt(i int) int {
 	if nil == my.iLexStream{
 		return 0
 	}
 	var t =my.tokens.Get(i)
-	return my.iLexStream.GetColumnOfCharAt(t.GetStartOffSet())
+	return my.iLexStream.GetColumnOfCharAt(t.GetStartOffset())
 }
 func (my * PrsStream) GetEndColumnOfTokenAt(i int) int {
 	if nil == my.iLexStream{
 		return 0
 	}
 	var t =my.tokens.Get(i)
-	return my.iLexStream.GetColumnOfCharAt(t.GetEndOffSet())
+	return my.iLexStream.GetColumnOfCharAt(t.GetEndOffset())
 }
 func (my * PrsStream) OrderedTerminalSymbols() []string {
 	return nil
@@ -255,7 +255,7 @@ func (my * PrsStream) ToString(t1 IToken, t2 IToken) string {
 	if nil == my.iLexStream{
 		return ""
 	}
-	return my.iLexStream.ToString(t1.GetStartOffSet(), t2.GetEndOffSet())
+	return my.iLexStream.ToString(t1.GetStartOffset(), t2.GetEndOffset())
 }
 func (my * PrsStream) GetSize() int {
 	return my.tokens.Size()
@@ -269,10 +269,10 @@ func (my * PrsStream) GetTokenIndexAtCharacter(offSet int) int {
 	for;high > low; {
 		var mid int = int((high + low) / 2)
 		var mid_element =my.tokens.Get(mid)
-		if offSet >= mid_element.GetStartOffSet() && offSet <= mid_element.GetEndOffSet() {
+		if offSet >= mid_element.GetStartOffset() && offSet <= mid_element.GetEndOffset() {
 			return mid
 		} else {
-			if offSet < mid_element.GetStartOffSet() {
+			if offSet < mid_element.GetStartOffset() {
 				high = mid
 			} else {
 				low = mid + 1
