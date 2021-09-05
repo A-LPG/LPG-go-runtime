@@ -21,7 +21,7 @@ func NewPrsStream(iLexStream ILexStream) *PrsStream{
 	if iLexStream != nil {
 		my.iLexStream = iLexStream
 		iLexStream.SetPrsStream(my)
-		my.ReSetTokenStream()
+		my.ResetTokenStream()
 	}
 	return my
 }
@@ -76,14 +76,14 @@ func (my * PrsStream) MapKind(kind int) int {
 		return  my.kindMap[kind]
 	}
 }
-func (my * PrsStream) ReSetTokenStream()  {
+func (my * PrsStream) ResetTokenStream()  {
 	my.tokens = NewTokenArrayList()
 	my.index = 0
 	my.adjuncts = NewTokenArrayList()
 }
 func (my * PrsStream) SetLexStream(lexStream ILexStream)  {
 	my.iLexStream = lexStream
-	my.ReSetTokenStream()
+	my.ResetTokenStream()
 }
 func (my * PrsStream) ResetLexStream(lexStream ILexStream)  {
 
@@ -307,7 +307,7 @@ func (my * PrsStream) GetStreamLength() int {
 func (my * PrsStream) SetStreamIndex(index int)  {
 	my.index = index
 }
-func (my * PrsStream) ReSetStreamLength()  {
+func (my * PrsStream) ResetStreamLength()  {
 	my.len = my.tokens.Size()
 }
 func (my * PrsStream) SetStreamLength(len int)  {

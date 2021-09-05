@@ -154,6 +154,7 @@ func NewDiagnoseParser(tokStream TokenStream, prs ParseTable, maxErrors int, max
 	my.ACCEPT_ACTION = prs.GetAcceptAction()
 	my.ERROR_ACTION = prs.GetErrorAction()
 	my.list = make([]int, my.NUM_SYMBOLS+1)
+	my.buffer=make([]int, BUFF_SIZE)
 	return my
 }
 
@@ -354,7 +355,7 @@ func (my *DiagnoseParser) DiagnoseEntry(marker_kind int, error_token int) {
 	// Process a terminal
 	//
 	var act int = -1// make it different
-	for act != my.ACCEPT_ACTION {
+	for;;{
 		//
 		// Synchronize state stacks and update the location stack
 		//
@@ -412,7 +413,7 @@ func (my *DiagnoseParser) DiagnoseEntry(marker_kind int, error_token int) {
 		// the highest position in STACK that is still useful after the
 		// reductions are executed.
 		//
-		for act > my.ERROR_ACTION || act < my.ACCEPT_ACTION {
+		for ;act > my.ERROR_ACTION || act < my.ACCEPT_ACTION; {
 
 			//
 			// if the parser needs to stop processing,
@@ -608,6 +609,11 @@ func (my *DiagnoseParser) DiagnoseEntry(marker_kind int, error_token int) {
 				act = my.ACCEPT_ACTION
 			}
 		}
+		if act != my.ACCEPT_ACTION {
+			continue
+		}else {
+			break
+		}
 	}
 	return
 }
@@ -745,7 +751,7 @@ func (my *DiagnoseParser) ParseUpToError(action *IntTuple, current_kind int, err
 	// an error is encountered. The list of actions executed will
 	// be store in the "action" tuple.
 	//
-	action.ReSet()
+	action.Reset()
 	for {
 		if act <= my.NUM_RULES {
 			action.Add(act) // save my reduce action
@@ -793,7 +799,7 @@ func (my *DiagnoseParser) ParseUpToError(action *IntTuple, current_kind int, err
 								configuration.RetrieveStack(my.tempStack)
 								act = configuration.act
 								curtok = configuration.curtok
-								action.ReSetTo(configuration.action_length)
+								action.ResetTo(configuration.action_length)
 								current_kind = my.tokStream.GetKind(curtok)
 								my.tokStream.ResetTo(my.tokStream.GetNext(curtok))
 								continue
@@ -876,8 +882,9 @@ func (my *DiagnoseParser) ParseCheck(stack []int, stack_top int, first_symbol in
 	local_stack[local_stack_top] = act
 
 	act = my.TAction(act, current_kind)
-
+	
 	for {
+	
 		if act <= my.NUM_RULES { // reduce action
 
 			local_stack_top -= my.Rhs(act)
@@ -1924,7 +1931,7 @@ func (my *DiagnoseParser) ScopeTrialCheck(repair *PrimaryRepairInfo, stack []int
 		// can be executed on the scope Lookahead symbol. Save the action(s)
 		// in the action tuple.
 		//
-		action.ReSet()
+		action.Reset()
 		var act int = my.TAction(stack[stack_top], my.ScopeLa(i))
 		if act > my.ACCEPT_ACTION && act < my.ERROR_ACTION {
 			// conflicting actions?

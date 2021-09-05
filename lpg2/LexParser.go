@@ -456,7 +456,7 @@ func (my *LexParser) LexNextToken(end_offSet int) bool {
 	my.stateStackTop = -1
 	my.currentAction = my.START_STATE
 	my.starttok = my.curtok
-	my.action.ReSet()
+	my.action.Reset()
 
 ScanToken:
 	for ; ; {
@@ -631,7 +631,7 @@ Scan:
 	// shift or shift-reduce on the token.
 	//
 	if act == my.ERROR_ACTION {
-		my.action.ReSetTo(action_save)
+		my.action.ResetTo(action_save)
 	} else {
 		my.stateStackTop = tempStackTop + 1
 		var i = pos + 1

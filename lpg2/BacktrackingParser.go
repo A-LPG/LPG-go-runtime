@@ -104,7 +104,7 @@ func (my *BacktrackingParser) SetMonitor(monitor Monitor) {
 	my.monitor = monitor
 }
 func (my *BacktrackingParser) Reset1() error {
-	my.action.ReSet()
+	my.action.Reset()
 	my.skipTokens = false
 	my.markerTokenIndex = 0
 	return nil
@@ -188,7 +188,7 @@ func (my *BacktrackingParser) FuzzyParseWithErrorCount(max_error_count int) (int
 
 func (my *BacktrackingParser) FuzzyParseEntry(marker_kind int, max_error_count int) (interface{}, error) {
 
-	my.action.ReSet()
+	my.action.Reset()
 	my.tokStream.Reset() // Position at first token.
 	my.ReallocateStateStack()
 	my.stateStackTop = 0
@@ -214,7 +214,11 @@ func (my *BacktrackingParser) FuzzyParseEntry(marker_kind int, max_error_count i
 			return nil, NewTokenStreamNotIPrsStreamException("")
 		}
 		var rp = NewRecoveryParser(my, my.action, my.tokens, _stream, my.prs, max_error_count, 0, my.monitor)
-		start_token, _ = rp.Recover(marker_token, error_token)
+		var err error
+		start_token, err = rp.Recover(marker_token, error_token)
+		if nil != err{
+			return nil, err
+		}
 	}
 	if marker_token != 0 && start_token == first_token {
 		my.tokens.Add(marker_token)
@@ -252,7 +256,7 @@ func (my *BacktrackingParser) Parse(max_error_count int) (interface{}, error) {
 // skip tokens.
 //
 func (my *BacktrackingParser) ParseEntry(marker_kind int, max_error_count int) (interface{}, error) {
-	my.action.ReSet()
+	my.action.Reset()
 	my.tokStream.Reset() // Position at first token.
 
 	my.ReallocateStateStack()
@@ -286,7 +290,7 @@ func (my *BacktrackingParser) ParseEntry(marker_kind int, max_error_count int) (
 		if count == max_error_count {
 			return nil, NewBadParseException(initial_error_token)
 		}
-		my.action.ReSetTo(start_action_index)
+		my.action.ResetTo(start_action_index)
 		my.tokStream.ResetTo(start_token_index)
 		my.stateStackTop = len(temp_stack) - 1
 		Arraycopy(temp_stack, 0, my.stateStack, 0, len(temp_stack))
@@ -502,7 +506,7 @@ func (my *BacktrackingParser) backtrackParseInternal(action *IntSegmentedTuple, 
 						if configuration == nil {
 							act = my.ERROR_ACTION
 						} else {
-							action.ReSetTo(configuration.action_length)
+							action.ResetTo(configuration.action_length)
 							act = configuration.act
 							curtok = configuration.curtok
 							current_kind = my.tokStream.GetKind(curtok)
@@ -609,10 +613,10 @@ func (my *BacktrackingParser) BacktrackParseUpToError(initial_token int, error_t
 							if configuration == nil {
 								act = my.ERROR_ACTION
 							} else {
-								my.action.ReSetTo(configuration.action_length)
+								my.action.ResetTo(configuration.action_length)
 								act = configuration.act
 								var next_token_index int = configuration.curtok
-								my.tokens.ReSetTo(next_token_index)
+								my.tokens.ResetTo(next_token_index)
 								curtok = my.tokens.Get(next_token_index - 1)
 								current_kind = my.tokStream.GetKind(curtok)
 								var index int
@@ -821,8 +825,8 @@ func (my *BacktrackingParser) ErrorRepair(stream IPrsStream, recovery_token int,
 	my.stateStackTop = len(temp_stack) - 1
 	Arraycopy(temp_stack, 0, my.stateStack, 0, len(temp_stack))
 	stream.ResetTo(recovery_token)
-	my.tokens.ReSetTo(my.locationStack[my.stateStackTop] - 1)
-	my.action.ReSetTo(my.actionStack[my.stateStackTop])
+	my.tokens.ResetTo(my.locationStack[my.stateStackTop] - 1)
+	my.action.ResetTo(my.actionStack[my.stateStackTop])
 
 	return stream.MakeErrorToken(   my.tokens.Get(my.locationStack[my.stateStackTop]-1),
                                     stream.GetPrevious(recovery_token),

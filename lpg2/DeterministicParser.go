@@ -154,8 +154,8 @@ func (my *DeterministicParser) SetMonitor(monitor Monitor) {
 func (my *DeterministicParser) Reset1() {
 	my.taking_actions = false
 	my.markerKind = 0
-	if my.action == nil {
-		my.action.ReSet()
+	if my.action != nil {
+		my.action.Reset()
 	}
 }
 func (my *DeterministicParser) Reset2(tokStream TokenStream, monitor Monitor) {
@@ -201,7 +201,7 @@ func (my *DeterministicParser) ParseEntry(marker_kind int) (interface{}, error) 
 	//
 	my.taking_actions = true
 	//
-	// ReSet the token stream and Get the first token.
+	// Reset the token stream and Get the first token.
 	//
 	my.tokStream.Reset()
 	my.lastToken = my.tokStream.GetPrevious(my.tokStream.Peek())
@@ -300,7 +300,7 @@ func (my *DeterministicParser) ResetParserEntry(marker_kind int) {
 	if my.action== nil {
 		my.action = NewIntTupleWithEstimate(1 << 20)
 	} else {
-		my.action.ReSet()
+		my.action.Reset()
 	}
 	//
 	// Indicate that we are going to run the incremental parser and that
@@ -327,7 +327,7 @@ func (my *DeterministicParser) RecoverableState(state int) bool {
 }
 
 //
-// ReSet the parser at a point where it can legally process
+// Reset the parser at a point where it can legally process
 // the error token. If we can't do that, Reset it to the beginning.
 //
 func (my *DeterministicParser) ErrorReset() {
@@ -483,7 +483,7 @@ func (my *DeterministicParser) Parse(sym []int, index int) (int,error) {
 		my.stateStack[my.stateStackTop] = my.currentAction
 	} else {
 		if my.currentAction == my.ERROR_ACTION {
-			my.action.ReSetTo(save_action_length) // restore original action state.
+			my.action.ResetTo(save_action_length) // restore original action state.
 		}
 	}
 	return my.currentAction,nil

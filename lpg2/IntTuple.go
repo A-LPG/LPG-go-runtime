@@ -35,10 +35,10 @@ func NewIntTupleWithEstimate(estimate int ) *IntTuple{
 // argument n which indicates the  size or with no argument which
 // indicates that the size should be Reset to 0.
 //
-func(a *IntTuple) ReSetTo( n int ){
+func(a *IntTuple) ResetTo( n int ){
     a.top = n
 }
-func(a *IntTuple) ReSet(){
+func(a *IntTuple) Reset(){
     a.top = 0
 }
 func(a *IntTuple) Capacity() int {

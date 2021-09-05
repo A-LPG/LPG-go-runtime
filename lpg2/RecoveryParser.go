@@ -17,6 +17,7 @@ type RecoveryParser struct {
 func NewRecoveryParser(parser *BacktrackingParser, action *IntSegmentedTuple, tokens *IntTuple, tokStream IPrsStream,
 	prs ParseTable, maxErrors int, maxTime int, monitor Monitor) *RecoveryParser {
 	t := new(RecoveryParser)
+	t.scope_repair = NewPrimaryRepairInfo()
 	t.DiagnoseParser = NewDiagnoseParser(tokStream, prs, maxErrors, maxTime, monitor)
 	t.parser = parser
 	t.action = action
@@ -64,7 +65,7 @@ func (my *RecoveryParser) Recover(marker_token int, error_token int) (int, error
 		my.ReallocateStacks()
 	}
 
-	my.tokens.ReSet()
+	my.tokens.Reset()
 	my.tokStream.Reset()
 	my.tokens.Add(my.tokStream.GetPrevious(my.tokStream.Peek()))
 	var restart_token int
@@ -78,7 +79,7 @@ func (my *RecoveryParser) Recover(marker_token int, error_token int) (int, error
 	my.stateStackTop = 0
 	my.stateStack[my.stateStackTop] = my.START_STATE
 	for {
-		my.action.ReSetTo(old_action_size)
+		my.action.ResetTo(old_action_size)
 		if !my.FixError(restart_token, error_token) {
 			return -1, NewBadParseException(error_token)
 		}
@@ -190,7 +191,7 @@ func (my *RecoveryParser) FixError(start_token int, error_token int) bool {
 						configuration.RetrieveStack(my.stateStack)
 						act = configuration.act
 						curtok = configuration.curtok
-						my.action.ReSetTo(configuration.action_length)
+						my.action.ResetTo(configuration.action_length)
 						current_kind = my.tokStream.GetKind(curtok)
 						my.tokStream.ResetTo(my.tokStream.GetNext(curtok))
 						continue
@@ -284,7 +285,7 @@ func (my *RecoveryParser) AcceptRecovery(error_token int) {
 		// can be executed on the scope Lookahead symbol. Save the action(s)
 		// in the action tuple.
 		//
-		recovery_action.ReSet()
+		recovery_action.Reset()
 		var act int = my.TAction(my.stateStack[my.stateStackTop], la)
 		if act > my.ACCEPT_ACTION && act < my.ERROR_ACTION { // conflicting actions?
 			for {
@@ -308,11 +309,11 @@ func (my *RecoveryParser) AcceptRecovery(error_token int) {
 		var index int
 		for index = 0; index < recovery_action.Size(); index++ {
 			//
-			// ReSet the action tuple each time through my loop
+			// Reset the action tuple each time through my loop
 			// to Clear previous actions that may have been added
 			// because of a failed call to completeScope.
 			//
-			my.action.ReSetTo(start_action_size)
+			my.action.ResetTo(start_action_size)
 			my.tokStream.ResetTo(error_token)
 			my.tempStackTop = my.stateStackTop - 1
 			var max_pos int = my.stateStackTop
@@ -464,7 +465,7 @@ func (my *RecoveryParser) CompleteScope(action *IntSegmentedTuple, scope_rhs_ind
 				var i int = act
 				for ; my.BaseAction(i) != 0; i++ { // consider only shift and shift-reduce actions
 
-					action.ReSetTo(save_action_size)
+					action.ResetTo(save_action_size)
 					act = my.BaseAction(i)
 					action.Add(act) // save my terminal action
 					if act <= my.NUM_RULES {

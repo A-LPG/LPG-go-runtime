@@ -1,7 +1,10 @@
 package lpg2
 
 type IAst interface {
+
 	GetNextAst()IAst
+
+	SetParent(IAst)
 
 	GetParent()IAst
 

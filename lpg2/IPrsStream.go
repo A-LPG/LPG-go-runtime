@@ -39,11 +39,11 @@ type IPrsStream interface {
 
 	MapKind(kind int) int
 
-	ReSetTokenStream()
+	ResetTokenStream()
 
 	GetStreamIndex() int
 
-	ReSetStreamLength()
+	ResetStreamLength()
 	SetStreamIndex(index int)
 
 	SetStreamLength(length int )

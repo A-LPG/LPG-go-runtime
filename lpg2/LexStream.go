@@ -87,7 +87,7 @@ func (my *LexStream) initialize(fileName string, inputChars []rune, lineOffSets 
     return nil
 }
 func (my *LexStream) ComputeLineOffSets()  {
-    my.lineOffSets.ReSet()
+    my.lineOffSets.Reset()
     my.SetLineOffSet(-1)
     var i int = 0
     var size = len(my.inputChars)
@@ -295,7 +295,7 @@ func (my *LexStream) GetMessageHandler() IMessageHandler {
     return my.errMsg
 }
 func (my *LexStream) MakeToken(startLoc int, endLoc int, kind int)  {
-    if my.prsStream == nil {
+    if my.prsStream != nil {
         my.prsStream.MakeToken(startLoc, endLoc, kind)
     } else {
         my.ReportLexicalErrorPosition(startLoc, endLoc)// make it a lexical error
@@ -343,7 +343,7 @@ func (my *LexStream) ReportLexicalErrorPosition(leftLoc int, rightLoc int) {
         var errorLeftLoc = 0
         var errorRightLoc = 0
         var errorInfo = []string{tokenText}
-        my.ReportLexicalError(errorCode, leftLoc, rightLoc, errorLeftLoc, errorRightLoc, errorInfo)
+        my.ReportLexicalError( leftLoc, rightLoc,errorCode, errorLeftLoc, errorRightLoc, errorInfo)
 
 }
 func (my *LexStream) ReportLexicalError(leftLoc int, rightLoc int, errorCode int, errorLeftLoc int,
@@ -392,7 +392,7 @@ func (my *LexStream) ToString(startOffSet int, endOffSet int) string {
         if length <= 0 {
             return ""
         } else{
-            return string(my.inputChars[startOffSet :endOffSet])
+            return string(my.inputChars[startOffSet :endOffSet+1])
         }
     }
 }

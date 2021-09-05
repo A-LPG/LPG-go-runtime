@@ -58,7 +58,7 @@ func (my *ConfigurationStack) FindOrInsertStack(root *StateElement, stack []int,
 				if p.children == nil {
 					return my.MakeStateList(p, stack, index+1, stack_top)
 				} else {
-					my.FindOrInsertStack(p.children, stack, index+1, stack_top)
+					return my.FindOrInsertStack(p.children, stack, index+1, stack_top)
 				}
 			}
 		}
