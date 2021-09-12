@@ -102,6 +102,7 @@ func NewLPGLexer(filename string,  tab int ,input_chars []rune) *LPGLexer {
             return NewNullPointerException("LexStream was not initialized")
         }
         my.lexStream.SetPrsStream(prsStream)
+        prsStream.SetLexStream(my.lexStream)
         prsStream.MakeToken(start_offSet, end_offSet, 0) // Token list must start with a bad token
         return nil
     }
@@ -249,7 +250,7 @@ func (my *LPGLexer) PrintValue(startOffset int, endOffset int){
     print(string(s))
 }
 
-    //#line 280 "LexerTemplateF.gi
+    //#line 281 "LexerTemplateF.gi
 
     func (my *LPGLexer)  RuleAction(ruleNumber int){
         switch ruleNumber {
@@ -1507,7 +1508,7 @@ func (my *LPGLexer) PrintValue(startOffset int, endOffset int){
                   break
             } 
 
-    //#line 284 "LexerTemplateF.gi
+    //#line 285 "LexerTemplateF.gi
 
     
             default:

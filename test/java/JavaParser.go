@@ -43,7 +43,10 @@ func NewJavaParser(lexStream ILexStream) (*JavaParser,error){
     my.btParser,e =  NewBacktrackingParser(nil, my.prsTable,  my,nil) 
     if e == nil{
         if lexStream != nil{
-            my.Reset(lexStream)
+            err := my.Reset(lexStream)
+            if err != nil {
+                return nil, err
+            }
         }
         return  my,nil
     }
@@ -130,8 +133,10 @@ func (my *JavaParser)  GetRhsErrorIToken(i int) *ErrorToken{
 
 func (my *JavaParser)  Reset(lexStream ILexStream ) error{
     my.prsStream = NewPrsStream(lexStream)
-    my.btParser.Reset(my.prsStream,nil,nil,nil)
-
+    err := my.btParser.Reset(my.prsStream,nil,nil,nil)
+    if err != nil {
+        return err
+    }
     var ex = my.prsStream.RemapTerminalSymbols(my.OrderedTerminalSymbols(), my.prsTable.GetEoftSymbol())
     if ex == nil{
         return nil
@@ -248,7 +253,7 @@ func (my *JavaParser)  ParseLPGUserAction(error_repair_count int,monitor Monitor
 
 
     
-    //#line 321 "btParserTemplateF.gi
+    //#line 326 "btParserTemplateF.gi
 
    
     func (my *JavaParser)  RuleAction(ruleNumber int){
@@ -6285,7 +6290,7 @@ func (my *JavaParser)  ParseLPGUserAction(error_repair_count int,monitor Monitor
             //
             case 539:
                 break
-    //#line 325 "btParserTemplateF.gi
+    //#line 330 "btParserTemplateF.gi
 
     
             default:
@@ -6355,11 +6360,7 @@ func (my *Ast)      GetChildren() *ArrayList{
      */
 func (my *Ast)    GetAllChildren() *ArrayList{return nil}
 
- func (my *Ast) AcceptWithVisitor(v Visitor){}
- func (my *Ast)  AcceptWithArg(v  ArgumentVisitor, o interface{}){}
- func (my *Ast) AcceptWithResult(v ResultVisitor) interface{}{return nil}
- func (my *Ast) AcceptWithResultArgument(v  ResultArgumentVisitor, o interface{}) interface{}{return nil}
-func (my *Ast)      Accept(v IAstVisitor) {}
+ func (my *Ast) Accept(v IAstVisitor){}
 
 
 func AnyCastToAst(i interface{}) *Ast {
@@ -6461,10 +6462,17 @@ func (my *AstToken)      ToString()  string  { return my.leftIToken.ToString() }
 func (my *AstToken)        GetAllChildren()  *ArrayList { return nil }
 
 
-func (my *AstToken)      AcceptWithVisitor(v Visitor) { v.VisitAstToken(my)}
-func (my *AstToken)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAstTokenWithArg(my, o) }
-func (my *AstToken)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAstTokenWithResult(my) }
-func (my *AstToken)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAstTokenWithResultArgument(my, o) }
+func (my *AstToken)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AstToken)       Enter(v Visitor){
+        v.VisitAstToken(my)
+        v.EndVisitAstToken(my)
+    }
 
 
 func AnyCastToAstToken(i interface{}) *AstToken {
@@ -6477,10 +6485,7 @@ func AnyCastToAstToken(i interface{}) *AstToken {
 type IRootForJavaParser interface{
      GetLeftIToken()  IToken
      GetRightIToken()  IToken
- AcceptWithVisitor(v Visitor)
-  AcceptWithArg(v  ArgumentVisitor, o interface{})
- AcceptWithResult(v ResultVisitor) interface{}
- AcceptWithResultArgument(v  ResultArgumentVisitor, o interface{}) interface{}
+ Accept(v IAstVisitor)
 }
 
 func CastToAnyForJavaParser(i interface{}) interface{}{return i}
@@ -13166,10 +13171,17 @@ func Newidentifier(environment *JavaParser,token IToken )*identifier{
       return my
     }
 
-func (my *identifier)      AcceptWithVisitor(v Visitor) { v.Visitidentifier(my)}
-func (my *identifier)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitidentifierWithArg(my, o) }
-func (my *identifier)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitidentifierWithResult(my) }
-func (my *identifier)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitidentifierWithResultArgument(my, o) }
+func (my *identifier)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *identifier)       Enter(v Visitor){
+        v.Visitidentifier(my)
+        v.EndVisitidentifier(my)
+    }
 
 
 func AnyCastToidentifier(i interface{}) *identifier {
@@ -13200,10 +13212,17 @@ func NewPrimitiveType(token IToken )*PrimitiveType{
       return my
     }
 
-func (my *PrimitiveType)      AcceptWithVisitor(v Visitor) { v.VisitPrimitiveType(my)}
-func (my *PrimitiveType)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPrimitiveTypeWithArg(my, o) }
-func (my *PrimitiveType)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPrimitiveTypeWithResult(my) }
-func (my *PrimitiveType)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPrimitiveTypeWithResultArgument(my, o) }
+func (my *PrimitiveType)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PrimitiveType)       Enter(v Visitor){
+        v.VisitPrimitiveType(my)
+        v.EndVisitPrimitiveType(my)
+    }
 
 
 func AnyCastToPrimitiveType(i interface{}) *PrimitiveType {
@@ -13260,10 +13279,21 @@ func (my *ClassType)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ClassType)      AcceptWithVisitor(v Visitor) { v.VisitClassType(my)}
-func (my *ClassType)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassTypeWithArg(my, o) }
-func (my *ClassType)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassTypeWithResult(my) }
-func (my *ClassType)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassTypeWithResultArgument(my, o) }
+func (my *ClassType)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassType)       Enter(v Visitor){
+        var checkChildren = v.VisitClassType(my)
+        if checkChildren{
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+        }
+        v.EndVisitClassType(my)
+    }
 
 
 func AnyCastToClassType(i interface{}) *ClassType {
@@ -13320,10 +13350,21 @@ func (my *InterfaceType)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *InterfaceType)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceType(my)}
-func (my *InterfaceType)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceTypeWithArg(my, o) }
-func (my *InterfaceType)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceTypeWithResult(my) }
-func (my *InterfaceType)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceTypeWithResultArgument(my, o) }
+func (my *InterfaceType)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceType)       Enter(v Visitor){
+        var checkChildren = v.VisitInterfaceType(my)
+        if checkChildren{
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+        }
+        v.EndVisitInterfaceType(my)
+    }
 
 
 func AnyCastToInterfaceType(i interface{}) *InterfaceType {
@@ -13391,10 +13432,22 @@ func (my *TypeName)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TypeName)      AcceptWithVisitor(v Visitor) { v.VisitTypeName(my)}
-func (my *TypeName)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeNameWithArg(my, o) }
-func (my *TypeName)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeNameWithResult(my) }
-func (my *TypeName)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeNameWithResultArgument(my, o) }
+func (my *TypeName)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeName)       Enter(v Visitor){
+        var checkChildren = v.VisitTypeName(my)
+        if checkChildren{
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitTypeName(my)
+    }
 
 
 func AnyCastToTypeName(i interface{}) *TypeName {
@@ -13458,10 +13511,22 @@ func (my *ArrayType)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArrayType)      AcceptWithVisitor(v Visitor) { v.VisitArrayType(my)}
-func (my *ArrayType)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArrayTypeWithArg(my, o) }
-func (my *ArrayType)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArrayTypeWithResult(my) }
-func (my *ArrayType)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArrayTypeWithResultArgument(my, o) }
+func (my *ArrayType)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArrayType)       Enter(v Visitor){
+        var checkChildren = v.VisitArrayType(my)
+        if checkChildren{
+            if nil != my._Type{my._Type.Accept(v)}
+            if nil != my._LBRACKET{my._LBRACKET.Accept(v)}
+            if nil != my._RBRACKET{my._RBRACKET.Accept(v)}
+        }
+        v.EndVisitArrayType(my)
+    }
 
 
 func AnyCastToArrayType(i interface{}) *ArrayType {
@@ -13518,10 +13583,21 @@ func (my *TypeParameter)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TypeParameter)      AcceptWithVisitor(v Visitor) { v.VisitTypeParameter(my)}
-func (my *TypeParameter)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeParameterWithArg(my, o) }
-func (my *TypeParameter)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeParameterWithResult(my) }
-func (my *TypeParameter)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeParameterWithResultArgument(my, o) }
+func (my *TypeParameter)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeParameter)       Enter(v Visitor){
+        var checkChildren = v.VisitTypeParameter(my)
+        if checkChildren{
+            if nil != my._TypeVariable{my._TypeVariable.Accept(v)}
+            if nil != my._TypeBoundopt{my._TypeBoundopt.Accept(v)}
+        }
+        v.EndVisitTypeParameter(my)
+    }
 
 
 func AnyCastToTypeParameter(i interface{}) *TypeParameter {
@@ -13588,10 +13664,22 @@ func (my *TypeBound)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TypeBound)      AcceptWithVisitor(v Visitor) { v.VisitTypeBound(my)}
-func (my *TypeBound)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeBoundWithArg(my, o) }
-func (my *TypeBound)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeBoundWithResult(my) }
-func (my *TypeBound)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeBoundWithResultArgument(my, o) }
+func (my *TypeBound)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeBound)       Enter(v Visitor){
+        var checkChildren = v.VisitTypeBound(my)
+        if checkChildren{
+            if nil != my._extends{my._extends.Accept(v)}
+            if nil != my._ClassOrInterfaceType{my._ClassOrInterfaceType.Accept(v)}
+            if nil != my._AdditionalBoundListopt{my._AdditionalBoundListopt.Accept(v)}
+        }
+        v.EndVisitTypeBound(my)
+    }
 
 
 func AnyCastToTypeBound(i interface{}) *TypeBound {
@@ -13649,10 +13737,21 @@ func (my *AdditionalBoundList)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AdditionalBoundList)      AcceptWithVisitor(v Visitor) { v.VisitAdditionalBoundList(my)}
-func (my *AdditionalBoundList)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAdditionalBoundListWithArg(my, o) }
-func (my *AdditionalBoundList)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAdditionalBoundListWithResult(my) }
-func (my *AdditionalBoundList)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAdditionalBoundListWithResultArgument(my, o) }
+func (my *AdditionalBoundList)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AdditionalBoundList)       Enter(v Visitor){
+        var checkChildren = v.VisitAdditionalBoundList(my)
+        if checkChildren{
+            if nil != my._AdditionalBoundList{my._AdditionalBoundList.Accept(v)}
+            if nil != my._AdditionalBound{my._AdditionalBound.Accept(v)}
+        }
+        v.EndVisitAdditionalBoundList(my)
+    }
 
 
 func AnyCastToAdditionalBoundList(i interface{}) *AdditionalBoundList {
@@ -13706,10 +13805,21 @@ func (my *AdditionalBound)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AdditionalBound)      AcceptWithVisitor(v Visitor) { v.VisitAdditionalBound(my)}
-func (my *AdditionalBound)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAdditionalBoundWithArg(my, o) }
-func (my *AdditionalBound)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAdditionalBoundWithResult(my) }
-func (my *AdditionalBound)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAdditionalBoundWithResultArgument(my, o) }
+func (my *AdditionalBound)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AdditionalBound)       Enter(v Visitor){
+        var checkChildren = v.VisitAdditionalBound(my)
+        if checkChildren{
+            if nil != my._AND{my._AND.Accept(v)}
+            if nil != my._InterfaceType{my._InterfaceType.Accept(v)}
+        }
+        v.EndVisitAdditionalBound(my)
+    }
 
 
 func AnyCastToAdditionalBound(i interface{}) *AdditionalBound {
@@ -13773,10 +13883,22 @@ func (my *TypeArguments)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TypeArguments)      AcceptWithVisitor(v Visitor) { v.VisitTypeArguments(my)}
-func (my *TypeArguments)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeArgumentsWithArg(my, o) }
-func (my *TypeArguments)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeArgumentsWithResult(my) }
-func (my *TypeArguments)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeArgumentsWithResultArgument(my, o) }
+func (my *TypeArguments)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeArguments)       Enter(v Visitor){
+        var checkChildren = v.VisitTypeArguments(my)
+        if checkChildren{
+            if nil != my._LESS{my._LESS.Accept(v)}
+            if nil != my._ActualTypeArgumentList{my._ActualTypeArgumentList.Accept(v)}
+            if nil != my._GREATER{my._GREATER.Accept(v)}
+        }
+        v.EndVisitTypeArguments(my)
+    }
 
 
 func AnyCastToTypeArguments(i interface{}) *TypeArguments {
@@ -13844,10 +13966,22 @@ func (my *ActualTypeArgumentList)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ActualTypeArgumentList)      AcceptWithVisitor(v Visitor) { v.VisitActualTypeArgumentList(my)}
-func (my *ActualTypeArgumentList)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitActualTypeArgumentListWithArg(my, o) }
-func (my *ActualTypeArgumentList)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitActualTypeArgumentListWithResult(my) }
-func (my *ActualTypeArgumentList)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitActualTypeArgumentListWithResultArgument(my, o) }
+func (my *ActualTypeArgumentList)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ActualTypeArgumentList)       Enter(v Visitor){
+        var checkChildren = v.VisitActualTypeArgumentList(my)
+        if checkChildren{
+            if nil != my._ActualTypeArgumentList{my._ActualTypeArgumentList.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._ActualTypeArgument{my._ActualTypeArgument.Accept(v)}
+        }
+        v.EndVisitActualTypeArgumentList(my)
+    }
 
 
 func AnyCastToActualTypeArgumentList(i interface{}) *ActualTypeArgumentList {
@@ -13904,10 +14038,21 @@ func (my *Wildcard)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Wildcard)      AcceptWithVisitor(v Visitor) { v.VisitWildcard(my)}
-func (my *Wildcard)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitWildcardWithArg(my, o) }
-func (my *Wildcard)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitWildcardWithResult(my) }
-func (my *Wildcard)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitWildcardWithResultArgument(my, o) }
+func (my *Wildcard)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Wildcard)       Enter(v Visitor){
+        var checkChildren = v.VisitWildcard(my)
+        if checkChildren{
+            if nil != my._QUESTION{my._QUESTION.Accept(v)}
+            if nil != my._WildcardBoundsOpt{my._WildcardBoundsOpt.Accept(v)}
+        }
+        v.EndVisitWildcard(my)
+    }
 
 
 func AnyCastToWildcard(i interface{}) *Wildcard {
@@ -13975,10 +14120,22 @@ func (my *PackageName)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PackageName)      AcceptWithVisitor(v Visitor) { v.VisitPackageName(my)}
-func (my *PackageName)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPackageNameWithArg(my, o) }
-func (my *PackageName)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPackageNameWithResult(my) }
-func (my *PackageName)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPackageNameWithResultArgument(my, o) }
+func (my *PackageName)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PackageName)       Enter(v Visitor){
+        var checkChildren = v.VisitPackageName(my)
+        if checkChildren{
+            if nil != my._PackageName{my._PackageName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitPackageName(my)
+    }
 
 
 func AnyCastToPackageName(i interface{}) *PackageName {
@@ -14046,10 +14203,22 @@ func (my *ExpressionName)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExpressionName)      AcceptWithVisitor(v Visitor) { v.VisitExpressionName(my)}
-func (my *ExpressionName)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExpressionNameWithArg(my, o) }
-func (my *ExpressionName)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExpressionNameWithResult(my) }
-func (my *ExpressionName)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExpressionNameWithResultArgument(my, o) }
+func (my *ExpressionName)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExpressionName)       Enter(v Visitor){
+        var checkChildren = v.VisitExpressionName(my)
+        if checkChildren{
+            if nil != my._AmbiguousName{my._AmbiguousName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitExpressionName(my)
+    }
 
 
 func AnyCastToExpressionName(i interface{}) *ExpressionName {
@@ -14117,10 +14286,22 @@ func (my *MethodName)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodName)      AcceptWithVisitor(v Visitor) { v.VisitMethodName(my)}
-func (my *MethodName)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodNameWithArg(my, o) }
-func (my *MethodName)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodNameWithResult(my) }
-func (my *MethodName)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodNameWithResultArgument(my, o) }
+func (my *MethodName)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodName)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodName(my)
+        if checkChildren{
+            if nil != my._AmbiguousName{my._AmbiguousName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitMethodName(my)
+    }
 
 
 func AnyCastToMethodName(i interface{}) *MethodName {
@@ -14188,10 +14369,22 @@ func (my *PackageOrTypeName)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PackageOrTypeName)      AcceptWithVisitor(v Visitor) { v.VisitPackageOrTypeName(my)}
-func (my *PackageOrTypeName)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPackageOrTypeNameWithArg(my, o) }
-func (my *PackageOrTypeName)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPackageOrTypeNameWithResult(my) }
-func (my *PackageOrTypeName)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPackageOrTypeNameWithResultArgument(my, o) }
+func (my *PackageOrTypeName)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PackageOrTypeName)       Enter(v Visitor){
+        var checkChildren = v.VisitPackageOrTypeName(my)
+        if checkChildren{
+            if nil != my._PackageOrTypeName{my._PackageOrTypeName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitPackageOrTypeName(my)
+    }
 
 
 func AnyCastToPackageOrTypeName(i interface{}) *PackageOrTypeName {
@@ -14259,10 +14452,22 @@ func (my *AmbiguousName)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AmbiguousName)      AcceptWithVisitor(v Visitor) { v.VisitAmbiguousName(my)}
-func (my *AmbiguousName)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAmbiguousNameWithArg(my, o) }
-func (my *AmbiguousName)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAmbiguousNameWithResult(my) }
-func (my *AmbiguousName)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAmbiguousNameWithResultArgument(my, o) }
+func (my *AmbiguousName)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AmbiguousName)       Enter(v Visitor){
+        var checkChildren = v.VisitAmbiguousName(my)
+        if checkChildren{
+            if nil != my._AmbiguousName{my._AmbiguousName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitAmbiguousName(my)
+    }
 
 
 func AnyCastToAmbiguousName(i interface{}) *AmbiguousName {
@@ -14335,10 +14540,22 @@ func (my *CompilationUnit)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *CompilationUnit)      AcceptWithVisitor(v Visitor) { v.VisitCompilationUnit(my)}
-func (my *CompilationUnit)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitCompilationUnitWithArg(my, o) }
-func (my *CompilationUnit)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitCompilationUnitWithResult(my) }
-func (my *CompilationUnit)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitCompilationUnitWithResultArgument(my, o) }
+func (my *CompilationUnit)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *CompilationUnit)       Enter(v Visitor){
+        var checkChildren = v.VisitCompilationUnit(my)
+        if checkChildren{
+            if nil != my._PackageDeclarationopt{my._PackageDeclarationopt.Accept(v)}
+            if nil != my._ImportDeclarationsopt{my._ImportDeclarationsopt.Accept(v)}
+            if nil != my._TypeDeclarationsopt{my._TypeDeclarationsopt.Accept(v)}
+        }
+        v.EndVisitCompilationUnit(my)
+    }
 
 
 func AnyCastToCompilationUnit(i interface{}) *CompilationUnit {
@@ -14396,10 +14613,21 @@ func (my *ImportDeclarations)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ImportDeclarations)      AcceptWithVisitor(v Visitor) { v.VisitImportDeclarations(my)}
-func (my *ImportDeclarations)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitImportDeclarationsWithArg(my, o) }
-func (my *ImportDeclarations)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitImportDeclarationsWithResult(my) }
-func (my *ImportDeclarations)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitImportDeclarationsWithResultArgument(my, o) }
+func (my *ImportDeclarations)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ImportDeclarations)       Enter(v Visitor){
+        var checkChildren = v.VisitImportDeclarations(my)
+        if checkChildren{
+            if nil != my._ImportDeclarations{my._ImportDeclarations.Accept(v)}
+            if nil != my._ImportDeclaration{my._ImportDeclaration.Accept(v)}
+        }
+        v.EndVisitImportDeclarations(my)
+    }
 
 
 func AnyCastToImportDeclarations(i interface{}) *ImportDeclarations {
@@ -14457,10 +14685,21 @@ func (my *TypeDeclarations)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TypeDeclarations)      AcceptWithVisitor(v Visitor) { v.VisitTypeDeclarations(my)}
-func (my *TypeDeclarations)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeDeclarationsWithArg(my, o) }
-func (my *TypeDeclarations)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeDeclarationsWithResult(my) }
-func (my *TypeDeclarations)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeDeclarationsWithResultArgument(my, o) }
+func (my *TypeDeclarations)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeDeclarations)       Enter(v Visitor){
+        var checkChildren = v.VisitTypeDeclarations(my)
+        if checkChildren{
+            if nil != my._TypeDeclarations{my._TypeDeclarations.Accept(v)}
+            if nil != my._TypeDeclaration{my._TypeDeclaration.Accept(v)}
+        }
+        v.EndVisitTypeDeclarations(my)
+    }
 
 
 func AnyCastToTypeDeclarations(i interface{}) *TypeDeclarations {
@@ -14537,10 +14776,23 @@ func (my *PackageDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PackageDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitPackageDeclaration(my)}
-func (my *PackageDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPackageDeclarationWithArg(my, o) }
-func (my *PackageDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPackageDeclarationWithResult(my) }
-func (my *PackageDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPackageDeclarationWithResultArgument(my, o) }
+func (my *PackageDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PackageDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitPackageDeclaration(my)
+        if checkChildren{
+            if nil != my._Annotationsopt{my._Annotationsopt.Accept(v)}
+            if nil != my._package{my._package.Accept(v)}
+            if nil != my._PackageName{my._PackageName.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitPackageDeclaration(my)
+    }
 
 
 func AnyCastToPackageDeclaration(i interface{}) *PackageDeclaration {
@@ -14604,10 +14856,22 @@ func (my *SingleTypeImportDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SingleTypeImportDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitSingleTypeImportDeclaration(my)}
-func (my *SingleTypeImportDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSingleTypeImportDeclarationWithArg(my, o) }
-func (my *SingleTypeImportDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSingleTypeImportDeclarationWithResult(my) }
-func (my *SingleTypeImportDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSingleTypeImportDeclarationWithResultArgument(my, o) }
+func (my *SingleTypeImportDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SingleTypeImportDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitSingleTypeImportDeclaration(my)
+        if checkChildren{
+            if nil != my._import{my._import.Accept(v)}
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitSingleTypeImportDeclaration(my)
+    }
 
 
 func AnyCastToSingleTypeImportDeclaration(i interface{}) *SingleTypeImportDeclaration {
@@ -14691,10 +14955,24 @@ func (my *TypeImportOnDemandDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TypeImportOnDemandDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitTypeImportOnDemandDeclaration(my)}
-func (my *TypeImportOnDemandDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeImportOnDemandDeclarationWithArg(my, o) }
-func (my *TypeImportOnDemandDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeImportOnDemandDeclarationWithResult(my) }
-func (my *TypeImportOnDemandDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeImportOnDemandDeclarationWithResultArgument(my, o) }
+func (my *TypeImportOnDemandDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeImportOnDemandDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitTypeImportOnDemandDeclaration(my)
+        if checkChildren{
+            if nil != my._import{my._import.Accept(v)}
+            if nil != my._PackageOrTypeName{my._PackageOrTypeName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._MULTIPLY{my._MULTIPLY.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitTypeImportOnDemandDeclaration(my)
+    }
 
 
 func AnyCastToTypeImportOnDemandDeclaration(i interface{}) *TypeImportOnDemandDeclaration {
@@ -14788,10 +15066,25 @@ func (my *SingleStaticImportDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SingleStaticImportDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitSingleStaticImportDeclaration(my)}
-func (my *SingleStaticImportDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSingleStaticImportDeclarationWithArg(my, o) }
-func (my *SingleStaticImportDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSingleStaticImportDeclarationWithResult(my) }
-func (my *SingleStaticImportDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSingleStaticImportDeclarationWithResultArgument(my, o) }
+func (my *SingleStaticImportDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SingleStaticImportDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitSingleStaticImportDeclaration(my)
+        if checkChildren{
+            if nil != my._import{my._import.Accept(v)}
+            if nil != my._static{my._static.Accept(v)}
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitSingleStaticImportDeclaration(my)
+    }
 
 
 func AnyCastToSingleStaticImportDeclaration(i interface{}) *SingleStaticImportDeclaration {
@@ -14885,10 +15178,25 @@ func (my *StaticImportOnDemandDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *StaticImportOnDemandDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitStaticImportOnDemandDeclaration(my)}
-func (my *StaticImportOnDemandDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitStaticImportOnDemandDeclarationWithArg(my, o) }
-func (my *StaticImportOnDemandDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitStaticImportOnDemandDeclarationWithResult(my) }
-func (my *StaticImportOnDemandDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitStaticImportOnDemandDeclarationWithResultArgument(my, o) }
+func (my *StaticImportOnDemandDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *StaticImportOnDemandDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitStaticImportOnDemandDeclaration(my)
+        if checkChildren{
+            if nil != my._import{my._import.Accept(v)}
+            if nil != my._static{my._static.Accept(v)}
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._MULTIPLY{my._MULTIPLY.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitStaticImportOnDemandDeclaration(my)
+    }
 
 
 func AnyCastToStaticImportOnDemandDeclaration(i interface{}) *StaticImportOnDemandDeclaration {
@@ -14920,10 +15228,17 @@ func NewTypeDeclaration(token IToken )*TypeDeclaration{
       return my
     }
 
-func (my *TypeDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitTypeDeclaration(my)}
-func (my *TypeDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeDeclarationWithArg(my, o) }
-func (my *TypeDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeDeclarationWithResult(my) }
-func (my *TypeDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeDeclarationWithResultArgument(my, o) }
+func (my *TypeDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeDeclaration)       Enter(v Visitor){
+        v.VisitTypeDeclaration(my)
+        v.EndVisitTypeDeclaration(my)
+    }
 
 
 func AnyCastToTypeDeclaration(i interface{}) *TypeDeclaration {
@@ -15039,10 +15354,26 @@ func (my *NormalClassDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *NormalClassDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitNormalClassDeclaration(my)}
-func (my *NormalClassDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitNormalClassDeclarationWithArg(my, o) }
-func (my *NormalClassDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitNormalClassDeclarationWithResult(my) }
-func (my *NormalClassDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitNormalClassDeclarationWithResultArgument(my, o) }
+func (my *NormalClassDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *NormalClassDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitNormalClassDeclaration(my)
+        if checkChildren{
+            if nil != my._ClassModifiersopt{my._ClassModifiersopt.Accept(v)}
+            if nil != my._class{my._class.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._TypeParametersopt{my._TypeParametersopt.Accept(v)}
+            if nil != my._Superopt{my._Superopt.Accept(v)}
+            if nil != my._Interfacesopt{my._Interfacesopt.Accept(v)}
+            if nil != my._ClassBody{my._ClassBody.Accept(v)}
+        }
+        v.EndVisitNormalClassDeclaration(my)
+    }
 
 
 func AnyCastToNormalClassDeclaration(i interface{}) *NormalClassDeclaration {
@@ -15100,10 +15431,21 @@ func (my *ClassModifiers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ClassModifiers)      AcceptWithVisitor(v Visitor) { v.VisitClassModifiers(my)}
-func (my *ClassModifiers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassModifiersWithArg(my, o) }
-func (my *ClassModifiers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassModifiersWithResult(my) }
-func (my *ClassModifiers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassModifiersWithResultArgument(my, o) }
+func (my *ClassModifiers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassModifiers)       Enter(v Visitor){
+        var checkChildren = v.VisitClassModifiers(my)
+        if checkChildren{
+            if nil != my._ClassModifiers{my._ClassModifiers.Accept(v)}
+            if nil != my._ClassModifier{my._ClassModifier.Accept(v)}
+        }
+        v.EndVisitClassModifiers(my)
+    }
 
 
 func AnyCastToClassModifiers(i interface{}) *ClassModifiers {
@@ -15167,10 +15509,22 @@ func (my *TypeParameters)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TypeParameters)      AcceptWithVisitor(v Visitor) { v.VisitTypeParameters(my)}
-func (my *TypeParameters)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeParametersWithArg(my, o) }
-func (my *TypeParameters)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeParametersWithResult(my) }
-func (my *TypeParameters)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeParametersWithResultArgument(my, o) }
+func (my *TypeParameters)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeParameters)       Enter(v Visitor){
+        var checkChildren = v.VisitTypeParameters(my)
+        if checkChildren{
+            if nil != my._LESS{my._LESS.Accept(v)}
+            if nil != my._TypeParameterList{my._TypeParameterList.Accept(v)}
+            if nil != my._GREATER{my._GREATER.Accept(v)}
+        }
+        v.EndVisitTypeParameters(my)
+    }
 
 
 func AnyCastToTypeParameters(i interface{}) *TypeParameters {
@@ -15238,10 +15592,22 @@ func (my *TypeParameterList)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TypeParameterList)      AcceptWithVisitor(v Visitor) { v.VisitTypeParameterList(my)}
-func (my *TypeParameterList)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTypeParameterListWithArg(my, o) }
-func (my *TypeParameterList)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTypeParameterListWithResult(my) }
-func (my *TypeParameterList)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTypeParameterListWithResultArgument(my, o) }
+func (my *TypeParameterList)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TypeParameterList)       Enter(v Visitor){
+        var checkChildren = v.VisitTypeParameterList(my)
+        if checkChildren{
+            if nil != my._TypeParameterList{my._TypeParameterList.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._TypeParameter{my._TypeParameter.Accept(v)}
+        }
+        v.EndVisitTypeParameterList(my)
+    }
 
 
 func AnyCastToTypeParameterList(i interface{}) *TypeParameterList {
@@ -15295,10 +15661,21 @@ func (my *Super)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Super)      AcceptWithVisitor(v Visitor) { v.VisitSuper(my)}
-func (my *Super)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSuperWithArg(my, o) }
-func (my *Super)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSuperWithResult(my) }
-func (my *Super)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSuperWithResultArgument(my, o) }
+func (my *Super)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Super)       Enter(v Visitor){
+        var checkChildren = v.VisitSuper(my)
+        if checkChildren{
+            if nil != my._extends{my._extends.Accept(v)}
+            if nil != my._ClassType{my._ClassType.Accept(v)}
+        }
+        v.EndVisitSuper(my)
+    }
 
 
 func AnyCastToSuper(i interface{}) *Super {
@@ -15352,10 +15729,21 @@ func (my *Interfaces)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Interfaces)      AcceptWithVisitor(v Visitor) { v.VisitInterfaces(my)}
-func (my *Interfaces)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfacesWithArg(my, o) }
-func (my *Interfaces)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfacesWithResult(my) }
-func (my *Interfaces)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfacesWithResultArgument(my, o) }
+func (my *Interfaces)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Interfaces)       Enter(v Visitor){
+        var checkChildren = v.VisitInterfaces(my)
+        if checkChildren{
+            if nil != my._implements{my._implements.Accept(v)}
+            if nil != my._InterfaceTypeList{my._InterfaceTypeList.Accept(v)}
+        }
+        v.EndVisitInterfaces(my)
+    }
 
 
 func AnyCastToInterfaces(i interface{}) *Interfaces {
@@ -15423,10 +15811,22 @@ func (my *InterfaceTypeList)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *InterfaceTypeList)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceTypeList(my)}
-func (my *InterfaceTypeList)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceTypeListWithArg(my, o) }
-func (my *InterfaceTypeList)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceTypeListWithResult(my) }
-func (my *InterfaceTypeList)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceTypeListWithResultArgument(my, o) }
+func (my *InterfaceTypeList)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceTypeList)       Enter(v Visitor){
+        var checkChildren = v.VisitInterfaceTypeList(my)
+        if checkChildren{
+            if nil != my._InterfaceTypeList{my._InterfaceTypeList.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._InterfaceType{my._InterfaceType.Accept(v)}
+        }
+        v.EndVisitInterfaceTypeList(my)
+    }
 
 
 func AnyCastToInterfaceTypeList(i interface{}) *InterfaceTypeList {
@@ -15493,10 +15893,22 @@ func (my *ClassBody)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ClassBody)      AcceptWithVisitor(v Visitor) { v.VisitClassBody(my)}
-func (my *ClassBody)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassBodyWithArg(my, o) }
-func (my *ClassBody)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassBodyWithResult(my) }
-func (my *ClassBody)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassBodyWithResultArgument(my, o) }
+func (my *ClassBody)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassBody)       Enter(v Visitor){
+        var checkChildren = v.VisitClassBody(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._ClassBodyDeclarationsopt{my._ClassBodyDeclarationsopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitClassBody(my)
+    }
 
 
 func AnyCastToClassBody(i interface{}) *ClassBody {
@@ -15554,10 +15966,21 @@ func (my *ClassBodyDeclarations)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ClassBodyDeclarations)      AcceptWithVisitor(v Visitor) { v.VisitClassBodyDeclarations(my)}
-func (my *ClassBodyDeclarations)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassBodyDeclarationsWithArg(my, o) }
-func (my *ClassBodyDeclarations)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassBodyDeclarationsWithResult(my) }
-func (my *ClassBodyDeclarations)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassBodyDeclarationsWithResultArgument(my, o) }
+func (my *ClassBodyDeclarations)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassBodyDeclarations)       Enter(v Visitor){
+        var checkChildren = v.VisitClassBodyDeclarations(my)
+        if checkChildren{
+            if nil != my._ClassBodyDeclarations{my._ClassBodyDeclarations.Accept(v)}
+            if nil != my._ClassBodyDeclaration{my._ClassBodyDeclaration.Accept(v)}
+        }
+        v.EndVisitClassBodyDeclarations(my)
+    }
 
 
 func AnyCastToClassBodyDeclarations(i interface{}) *ClassBodyDeclarations {
@@ -15591,10 +16014,17 @@ func NewClassMemberDeclaration(token IToken )*ClassMemberDeclaration{
       return my
     }
 
-func (my *ClassMemberDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitClassMemberDeclaration(my)}
-func (my *ClassMemberDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassMemberDeclarationWithArg(my, o) }
-func (my *ClassMemberDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassMemberDeclarationWithResult(my) }
-func (my *ClassMemberDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassMemberDeclarationWithResultArgument(my, o) }
+func (my *ClassMemberDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassMemberDeclaration)       Enter(v Visitor){
+        v.VisitClassMemberDeclaration(my)
+        v.EndVisitClassMemberDeclaration(my)
+    }
 
 
 func AnyCastToClassMemberDeclaration(i interface{}) *ClassMemberDeclaration {
@@ -15671,10 +16101,23 @@ func (my *FieldDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *FieldDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitFieldDeclaration(my)}
-func (my *FieldDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldDeclarationWithArg(my, o) }
-func (my *FieldDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldDeclarationWithResult(my) }
-func (my *FieldDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldDeclarationWithResultArgument(my, o) }
+func (my *FieldDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitFieldDeclaration(my)
+        if checkChildren{
+            if nil != my._FieldModifiersopt{my._FieldModifiersopt.Accept(v)}
+            if nil != my._Type{my._Type.Accept(v)}
+            if nil != my._VariableDeclarators{my._VariableDeclarators.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitFieldDeclaration(my)
+    }
 
 
 func AnyCastToFieldDeclaration(i interface{}) *FieldDeclaration {
@@ -15742,10 +16185,22 @@ func (my *VariableDeclarators)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *VariableDeclarators)      AcceptWithVisitor(v Visitor) { v.VisitVariableDeclarators(my)}
-func (my *VariableDeclarators)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitVariableDeclaratorsWithArg(my, o) }
-func (my *VariableDeclarators)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitVariableDeclaratorsWithResult(my) }
-func (my *VariableDeclarators)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitVariableDeclaratorsWithResultArgument(my, o) }
+func (my *VariableDeclarators)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *VariableDeclarators)       Enter(v Visitor){
+        var checkChildren = v.VisitVariableDeclarators(my)
+        if checkChildren{
+            if nil != my._VariableDeclarators{my._VariableDeclarators.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._VariableDeclarator{my._VariableDeclarator.Accept(v)}
+        }
+        v.EndVisitVariableDeclarators(my)
+    }
 
 
 func AnyCastToVariableDeclarators(i interface{}) *VariableDeclarators {
@@ -15813,10 +16268,22 @@ func (my *VariableDeclarator)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *VariableDeclarator)      AcceptWithVisitor(v Visitor) { v.VisitVariableDeclarator(my)}
-func (my *VariableDeclarator)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitVariableDeclaratorWithArg(my, o) }
-func (my *VariableDeclarator)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitVariableDeclaratorWithResult(my) }
-func (my *VariableDeclarator)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitVariableDeclaratorWithResultArgument(my, o) }
+func (my *VariableDeclarator)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *VariableDeclarator)       Enter(v Visitor){
+        var checkChildren = v.VisitVariableDeclarator(my)
+        if checkChildren{
+            if nil != my._VariableDeclaratorId{my._VariableDeclaratorId.Accept(v)}
+            if nil != my._EQUAL{my._EQUAL.Accept(v)}
+            if nil != my._VariableInitializer{my._VariableInitializer.Accept(v)}
+        }
+        v.EndVisitVariableDeclarator(my)
+    }
 
 
 func AnyCastToVariableDeclarator(i interface{}) *VariableDeclarator {
@@ -15884,10 +16351,22 @@ func (my *VariableDeclaratorId)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *VariableDeclaratorId)      AcceptWithVisitor(v Visitor) { v.VisitVariableDeclaratorId(my)}
-func (my *VariableDeclaratorId)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitVariableDeclaratorIdWithArg(my, o) }
-func (my *VariableDeclaratorId)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitVariableDeclaratorIdWithResult(my) }
-func (my *VariableDeclaratorId)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitVariableDeclaratorIdWithResultArgument(my, o) }
+func (my *VariableDeclaratorId)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *VariableDeclaratorId)       Enter(v Visitor){
+        var checkChildren = v.VisitVariableDeclaratorId(my)
+        if checkChildren{
+            if nil != my._VariableDeclaratorId{my._VariableDeclaratorId.Accept(v)}
+            if nil != my._LBRACKET{my._LBRACKET.Accept(v)}
+            if nil != my._RBRACKET{my._RBRACKET.Accept(v)}
+        }
+        v.EndVisitVariableDeclaratorId(my)
+    }
 
 
 func AnyCastToVariableDeclaratorId(i interface{}) *VariableDeclaratorId {
@@ -15945,10 +16424,21 @@ func (my *FieldModifiers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *FieldModifiers)      AcceptWithVisitor(v Visitor) { v.VisitFieldModifiers(my)}
-func (my *FieldModifiers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldModifiersWithArg(my, o) }
-func (my *FieldModifiers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldModifiersWithResult(my) }
-func (my *FieldModifiers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldModifiersWithResultArgument(my, o) }
+func (my *FieldModifiers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldModifiers)       Enter(v Visitor){
+        var checkChildren = v.VisitFieldModifiers(my)
+        if checkChildren{
+            if nil != my._FieldModifiers{my._FieldModifiers.Accept(v)}
+            if nil != my._FieldModifier{my._FieldModifier.Accept(v)}
+        }
+        v.EndVisitFieldModifiers(my)
+    }
 
 
 func AnyCastToFieldModifiers(i interface{}) *FieldModifiers {
@@ -16002,10 +16492,21 @@ func (my *MethodDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitMethodDeclaration(my)}
-func (my *MethodDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodDeclarationWithArg(my, o) }
-func (my *MethodDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodDeclarationWithResult(my) }
-func (my *MethodDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodDeclarationWithResultArgument(my, o) }
+func (my *MethodDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodDeclaration(my)
+        if checkChildren{
+            if nil != my._MethodHeader{my._MethodHeader.Accept(v)}
+            if nil != my._MethodBody{my._MethodBody.Accept(v)}
+        }
+        v.EndVisitMethodDeclaration(my)
+    }
 
 
 func AnyCastToMethodDeclaration(i interface{}) *MethodDeclaration {
@@ -16098,10 +16599,24 @@ func (my *MethodHeader)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodHeader)      AcceptWithVisitor(v Visitor) { v.VisitMethodHeader(my)}
-func (my *MethodHeader)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodHeaderWithArg(my, o) }
-func (my *MethodHeader)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodHeaderWithResult(my) }
-func (my *MethodHeader)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodHeaderWithResultArgument(my, o) }
+func (my *MethodHeader)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodHeader)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodHeader(my)
+        if checkChildren{
+            if nil != my._MethodModifiersopt{my._MethodModifiersopt.Accept(v)}
+            if nil != my._TypeParametersopt{my._TypeParametersopt.Accept(v)}
+            if nil != my._ResultType{my._ResultType.Accept(v)}
+            if nil != my._MethodDeclarator{my._MethodDeclarator.Accept(v)}
+            if nil != my._Throwsopt{my._Throwsopt.Accept(v)}
+        }
+        v.EndVisitMethodHeader(my)
+    }
 
 
 func AnyCastToMethodHeader(i interface{}) *MethodHeader {
@@ -16132,10 +16647,17 @@ func NewResultType(token IToken )*ResultType{
       return my
     }
 
-func (my *ResultType)      AcceptWithVisitor(v Visitor) { v.VisitResultType(my)}
-func (my *ResultType)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitResultTypeWithArg(my, o) }
-func (my *ResultType)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitResultTypeWithResult(my) }
-func (my *ResultType)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitResultTypeWithResultArgument(my, o) }
+func (my *ResultType)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ResultType)       Enter(v Visitor){
+        v.VisitResultType(my)
+        v.EndVisitResultType(my)
+    }
 
 
 func AnyCastToResultType(i interface{}) *ResultType {
@@ -16203,10 +16725,22 @@ func (my *FormalParameterList)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *FormalParameterList)      AcceptWithVisitor(v Visitor) { v.VisitFormalParameterList(my)}
-func (my *FormalParameterList)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFormalParameterListWithArg(my, o) }
-func (my *FormalParameterList)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFormalParameterListWithResult(my) }
-func (my *FormalParameterList)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFormalParameterListWithResultArgument(my, o) }
+func (my *FormalParameterList)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FormalParameterList)       Enter(v Visitor){
+        var checkChildren = v.VisitFormalParameterList(my)
+        if checkChildren{
+            if nil != my._FormalParameters{my._FormalParameters.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._LastFormalParameter{my._LastFormalParameter.Accept(v)}
+        }
+        v.EndVisitFormalParameterList(my)
+    }
 
 
 func AnyCastToFormalParameterList(i interface{}) *FormalParameterList {
@@ -16274,10 +16808,22 @@ func (my *FormalParameters)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *FormalParameters)      AcceptWithVisitor(v Visitor) { v.VisitFormalParameters(my)}
-func (my *FormalParameters)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFormalParametersWithArg(my, o) }
-func (my *FormalParameters)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFormalParametersWithResult(my) }
-func (my *FormalParameters)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFormalParametersWithResultArgument(my, o) }
+func (my *FormalParameters)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FormalParameters)       Enter(v Visitor){
+        var checkChildren = v.VisitFormalParameters(my)
+        if checkChildren{
+            if nil != my._FormalParameters{my._FormalParameters.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._FormalParameter{my._FormalParameter.Accept(v)}
+        }
+        v.EndVisitFormalParameters(my)
+    }
 
 
 func AnyCastToFormalParameters(i interface{}) *FormalParameters {
@@ -16344,10 +16890,22 @@ func (my *FormalParameter)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *FormalParameter)      AcceptWithVisitor(v Visitor) { v.VisitFormalParameter(my)}
-func (my *FormalParameter)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFormalParameterWithArg(my, o) }
-func (my *FormalParameter)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFormalParameterWithResult(my) }
-func (my *FormalParameter)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFormalParameterWithResultArgument(my, o) }
+func (my *FormalParameter)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FormalParameter)       Enter(v Visitor){
+        var checkChildren = v.VisitFormalParameter(my)
+        if checkChildren{
+            if nil != my._VariableModifiersopt{my._VariableModifiersopt.Accept(v)}
+            if nil != my._Type{my._Type.Accept(v)}
+            if nil != my._VariableDeclaratorId{my._VariableDeclaratorId.Accept(v)}
+        }
+        v.EndVisitFormalParameter(my)
+    }
 
 
 func AnyCastToFormalParameter(i interface{}) *FormalParameter {
@@ -16405,10 +16963,21 @@ func (my *VariableModifiers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *VariableModifiers)      AcceptWithVisitor(v Visitor) { v.VisitVariableModifiers(my)}
-func (my *VariableModifiers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitVariableModifiersWithArg(my, o) }
-func (my *VariableModifiers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitVariableModifiersWithResult(my) }
-func (my *VariableModifiers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitVariableModifiersWithResultArgument(my, o) }
+func (my *VariableModifiers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *VariableModifiers)       Enter(v Visitor){
+        var checkChildren = v.VisitVariableModifiers(my)
+        if checkChildren{
+            if nil != my._VariableModifiers{my._VariableModifiers.Accept(v)}
+            if nil != my._VariableModifier{my._VariableModifier.Accept(v)}
+        }
+        v.EndVisitVariableModifiers(my)
+    }
 
 
 func AnyCastToVariableModifiers(i interface{}) *VariableModifiers {
@@ -16439,10 +17008,17 @@ func NewVariableModifier(token IToken )*VariableModifier{
       return my
     }
 
-func (my *VariableModifier)      AcceptWithVisitor(v Visitor) { v.VisitVariableModifier(my)}
-func (my *VariableModifier)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitVariableModifierWithArg(my, o) }
-func (my *VariableModifier)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitVariableModifierWithResult(my) }
-func (my *VariableModifier)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitVariableModifierWithResultArgument(my, o) }
+func (my *VariableModifier)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *VariableModifier)       Enter(v Visitor){
+        v.VisitVariableModifier(my)
+        v.EndVisitVariableModifier(my)
+    }
 
 
 func AnyCastToVariableModifier(i interface{}) *VariableModifier {
@@ -16522,10 +17098,23 @@ func (my *LastFormalParameter)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *LastFormalParameter)      AcceptWithVisitor(v Visitor) { v.VisitLastFormalParameter(my)}
-func (my *LastFormalParameter)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLastFormalParameterWithArg(my, o) }
-func (my *LastFormalParameter)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLastFormalParameterWithResult(my) }
-func (my *LastFormalParameter)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLastFormalParameterWithResultArgument(my, o) }
+func (my *LastFormalParameter)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LastFormalParameter)       Enter(v Visitor){
+        var checkChildren = v.VisitLastFormalParameter(my)
+        if checkChildren{
+            if nil != my._VariableModifiersopt{my._VariableModifiersopt.Accept(v)}
+            if nil != my._Type{my._Type.Accept(v)}
+            if nil != my._Ellipsisopt{my._Ellipsisopt.Accept(v)}
+            if nil != my._VariableDeclaratorId{my._VariableDeclaratorId.Accept(v)}
+        }
+        v.EndVisitLastFormalParameter(my)
+    }
 
 
 func AnyCastToLastFormalParameter(i interface{}) *LastFormalParameter {
@@ -16583,10 +17172,21 @@ func (my *MethodModifiers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodModifiers)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifiers(my)}
-func (my *MethodModifiers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifiersWithArg(my, o) }
-func (my *MethodModifiers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifiersWithResult(my) }
-func (my *MethodModifiers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifiersWithResultArgument(my, o) }
+func (my *MethodModifiers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifiers)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodModifiers(my)
+        if checkChildren{
+            if nil != my._MethodModifiers{my._MethodModifiers.Accept(v)}
+            if nil != my._MethodModifier{my._MethodModifier.Accept(v)}
+        }
+        v.EndVisitMethodModifiers(my)
+    }
 
 
 func AnyCastToMethodModifiers(i interface{}) *MethodModifiers {
@@ -16640,10 +17240,21 @@ func (my *Throws)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Throws)      AcceptWithVisitor(v Visitor) { v.VisitThrows(my)}
-func (my *Throws)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitThrowsWithArg(my, o) }
-func (my *Throws)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitThrowsWithResult(my) }
-func (my *Throws)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitThrowsWithResultArgument(my, o) }
+func (my *Throws)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Throws)       Enter(v Visitor){
+        var checkChildren = v.VisitThrows(my)
+        if checkChildren{
+            if nil != my._throws{my._throws.Accept(v)}
+            if nil != my._ExceptionTypeList{my._ExceptionTypeList.Accept(v)}
+        }
+        v.EndVisitThrows(my)
+    }
 
 
 func AnyCastToThrows(i interface{}) *Throws {
@@ -16711,10 +17322,22 @@ func (my *ExceptionTypeList)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExceptionTypeList)      AcceptWithVisitor(v Visitor) { v.VisitExceptionTypeList(my)}
-func (my *ExceptionTypeList)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExceptionTypeListWithArg(my, o) }
-func (my *ExceptionTypeList)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExceptionTypeListWithResult(my) }
-func (my *ExceptionTypeList)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExceptionTypeListWithResultArgument(my, o) }
+func (my *ExceptionTypeList)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExceptionTypeList)       Enter(v Visitor){
+        var checkChildren = v.VisitExceptionTypeList(my)
+        if checkChildren{
+            if nil != my._ExceptionTypeList{my._ExceptionTypeList.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._ExceptionType{my._ExceptionType.Accept(v)}
+        }
+        v.EndVisitExceptionTypeList(my)
+    }
 
 
 func AnyCastToExceptionTypeList(i interface{}) *ExceptionTypeList {
@@ -16745,10 +17368,17 @@ func NewMethodBody(token IToken )*MethodBody{
       return my
     }
 
-func (my *MethodBody)      AcceptWithVisitor(v Visitor) { v.VisitMethodBody(my)}
-func (my *MethodBody)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodBodyWithArg(my, o) }
-func (my *MethodBody)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodBodyWithResult(my) }
-func (my *MethodBody)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodBodyWithResultArgument(my, o) }
+func (my *MethodBody)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodBody)       Enter(v Visitor){
+        v.VisitMethodBody(my)
+        v.EndVisitMethodBody(my)
+    }
 
 
 func AnyCastToMethodBody(i interface{}) *MethodBody {
@@ -16802,10 +17432,21 @@ func (my *StaticInitializer)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *StaticInitializer)      AcceptWithVisitor(v Visitor) { v.VisitStaticInitializer(my)}
-func (my *StaticInitializer)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitStaticInitializerWithArg(my, o) }
-func (my *StaticInitializer)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitStaticInitializerWithResult(my) }
-func (my *StaticInitializer)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitStaticInitializerWithResultArgument(my, o) }
+func (my *StaticInitializer)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *StaticInitializer)       Enter(v Visitor){
+        var checkChildren = v.VisitStaticInitializer(my)
+        if checkChildren{
+            if nil != my._static{my._static.Accept(v)}
+            if nil != my._Block{my._Block.Accept(v)}
+        }
+        v.EndVisitStaticInitializer(my)
+    }
 
 
 func AnyCastToStaticInitializer(i interface{}) *StaticInitializer {
@@ -16885,10 +17526,23 @@ func (my *ConstructorDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConstructorDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitConstructorDeclaration(my)}
-func (my *ConstructorDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstructorDeclarationWithArg(my, o) }
-func (my *ConstructorDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstructorDeclarationWithResult(my) }
-func (my *ConstructorDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstructorDeclarationWithResultArgument(my, o) }
+func (my *ConstructorDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstructorDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitConstructorDeclaration(my)
+        if checkChildren{
+            if nil != my._ConstructorModifiersopt{my._ConstructorModifiersopt.Accept(v)}
+            if nil != my._ConstructorDeclarator{my._ConstructorDeclarator.Accept(v)}
+            if nil != my._Throwsopt{my._Throwsopt.Accept(v)}
+            if nil != my._ConstructorBody{my._ConstructorBody.Accept(v)}
+        }
+        v.EndVisitConstructorDeclaration(my)
+    }
 
 
 func AnyCastToConstructorDeclaration(i interface{}) *ConstructorDeclaration {
@@ -16978,10 +17632,24 @@ func (my *ConstructorDeclarator)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConstructorDeclarator)      AcceptWithVisitor(v Visitor) { v.VisitConstructorDeclarator(my)}
-func (my *ConstructorDeclarator)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstructorDeclaratorWithArg(my, o) }
-func (my *ConstructorDeclarator)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstructorDeclaratorWithResult(my) }
-func (my *ConstructorDeclarator)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstructorDeclaratorWithResultArgument(my, o) }
+func (my *ConstructorDeclarator)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstructorDeclarator)       Enter(v Visitor){
+        var checkChildren = v.VisitConstructorDeclarator(my)
+        if checkChildren{
+            if nil != my._TypeParametersopt{my._TypeParametersopt.Accept(v)}
+            if nil != my._SimpleTypeName{my._SimpleTypeName.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._FormalParameterListopt{my._FormalParameterListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitConstructorDeclarator(my)
+    }
 
 
 func AnyCastToConstructorDeclarator(i interface{}) *ConstructorDeclarator {
@@ -17039,10 +17707,21 @@ func (my *ConstructorModifiers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConstructorModifiers)      AcceptWithVisitor(v Visitor) { v.VisitConstructorModifiers(my)}
-func (my *ConstructorModifiers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstructorModifiersWithArg(my, o) }
-func (my *ConstructorModifiers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstructorModifiersWithResult(my) }
-func (my *ConstructorModifiers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstructorModifiersWithResultArgument(my, o) }
+func (my *ConstructorModifiers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstructorModifiers)       Enter(v Visitor){
+        var checkChildren = v.VisitConstructorModifiers(my)
+        if checkChildren{
+            if nil != my._ConstructorModifiers{my._ConstructorModifiers.Accept(v)}
+            if nil != my._ConstructorModifier{my._ConstructorModifier.Accept(v)}
+        }
+        v.EndVisitConstructorModifiers(my)
+    }
 
 
 func AnyCastToConstructorModifiers(i interface{}) *ConstructorModifiers {
@@ -17122,10 +17801,23 @@ func (my *ConstructorBody)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConstructorBody)      AcceptWithVisitor(v Visitor) { v.VisitConstructorBody(my)}
-func (my *ConstructorBody)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstructorBodyWithArg(my, o) }
-func (my *ConstructorBody)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstructorBodyWithResult(my) }
-func (my *ConstructorBody)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstructorBodyWithResultArgument(my, o) }
+func (my *ConstructorBody)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstructorBody)       Enter(v Visitor){
+        var checkChildren = v.VisitConstructorBody(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._ExplicitConstructorInvocationopt{my._ExplicitConstructorInvocationopt.Accept(v)}
+            if nil != my._BlockStatementsopt{my._BlockStatementsopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitConstructorBody(my)
+    }
 
 
 func AnyCastToConstructorBody(i interface{}) *ConstructorBody {
@@ -17215,10 +17907,24 @@ func (my *EnumDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *EnumDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitEnumDeclaration(my)}
-func (my *EnumDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEnumDeclarationWithArg(my, o) }
-func (my *EnumDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEnumDeclarationWithResult(my) }
-func (my *EnumDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEnumDeclarationWithResultArgument(my, o) }
+func (my *EnumDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EnumDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitEnumDeclaration(my)
+        if checkChildren{
+            if nil != my._ClassModifiersopt{my._ClassModifiersopt.Accept(v)}
+            if nil != my._enum{my._enum.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._Interfacesopt{my._Interfacesopt.Accept(v)}
+            if nil != my._EnumBody{my._EnumBody.Accept(v)}
+        }
+        v.EndVisitEnumDeclaration(my)
+    }
 
 
 func AnyCastToEnumDeclaration(i interface{}) *EnumDeclaration {
@@ -17311,10 +18017,24 @@ func (my *EnumBody)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *EnumBody)      AcceptWithVisitor(v Visitor) { v.VisitEnumBody(my)}
-func (my *EnumBody)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEnumBodyWithArg(my, o) }
-func (my *EnumBody)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEnumBodyWithResult(my) }
-func (my *EnumBody)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEnumBodyWithResultArgument(my, o) }
+func (my *EnumBody)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EnumBody)       Enter(v Visitor){
+        var checkChildren = v.VisitEnumBody(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._EnumConstantsopt{my._EnumConstantsopt.Accept(v)}
+            if nil != my._Commaopt{my._Commaopt.Accept(v)}
+            if nil != my._EnumBodyDeclarationsopt{my._EnumBodyDeclarationsopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitEnumBody(my)
+    }
 
 
 func AnyCastToEnumBody(i interface{}) *EnumBody {
@@ -17382,10 +18102,22 @@ func (my *EnumConstants)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *EnumConstants)      AcceptWithVisitor(v Visitor) { v.VisitEnumConstants(my)}
-func (my *EnumConstants)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEnumConstantsWithArg(my, o) }
-func (my *EnumConstants)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEnumConstantsWithResult(my) }
-func (my *EnumConstants)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEnumConstantsWithResultArgument(my, o) }
+func (my *EnumConstants)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EnumConstants)       Enter(v Visitor){
+        var checkChildren = v.VisitEnumConstants(my)
+        if checkChildren{
+            if nil != my._EnumConstants{my._EnumConstants.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._EnumConstant{my._EnumConstant.Accept(v)}
+        }
+        v.EndVisitEnumConstants(my)
+    }
 
 
 func AnyCastToEnumConstants(i interface{}) *EnumConstants {
@@ -17472,10 +18204,23 @@ func (my *EnumConstant)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *EnumConstant)      AcceptWithVisitor(v Visitor) { v.VisitEnumConstant(my)}
-func (my *EnumConstant)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEnumConstantWithArg(my, o) }
-func (my *EnumConstant)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEnumConstantWithResult(my) }
-func (my *EnumConstant)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEnumConstantWithResultArgument(my, o) }
+func (my *EnumConstant)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EnumConstant)       Enter(v Visitor){
+        var checkChildren = v.VisitEnumConstant(my)
+        if checkChildren{
+            if nil != my._Annotationsopt{my._Annotationsopt.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._Argumentsopt{my._Argumentsopt.Accept(v)}
+            if nil != my._ClassBodyopt{my._ClassBodyopt.Accept(v)}
+        }
+        v.EndVisitEnumConstant(my)
+    }
 
 
 func AnyCastToEnumConstant(i interface{}) *EnumConstant {
@@ -17542,10 +18287,22 @@ func (my *Arguments)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Arguments)      AcceptWithVisitor(v Visitor) { v.VisitArguments(my)}
-func (my *Arguments)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArgumentsWithArg(my, o) }
-func (my *Arguments)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArgumentsWithResult(my) }
-func (my *Arguments)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArgumentsWithResultArgument(my, o) }
+func (my *Arguments)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Arguments)       Enter(v Visitor){
+        var checkChildren = v.VisitArguments(my)
+        if checkChildren{
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitArguments(my)
+    }
 
 
 func AnyCastToArguments(i interface{}) *Arguments {
@@ -17602,10 +18359,21 @@ func (my *EnumBodyDeclarations)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *EnumBodyDeclarations)      AcceptWithVisitor(v Visitor) { v.VisitEnumBodyDeclarations(my)}
-func (my *EnumBodyDeclarations)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEnumBodyDeclarationsWithArg(my, o) }
-func (my *EnumBodyDeclarations)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEnumBodyDeclarationsWithResult(my) }
-func (my *EnumBodyDeclarations)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEnumBodyDeclarationsWithResultArgument(my, o) }
+func (my *EnumBodyDeclarations)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EnumBodyDeclarations)       Enter(v Visitor){
+        var checkChildren = v.VisitEnumBodyDeclarations(my)
+        if checkChildren{
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+            if nil != my._ClassBodyDeclarationsopt{my._ClassBodyDeclarationsopt.Accept(v)}
+        }
+        v.EndVisitEnumBodyDeclarations(my)
+    }
 
 
 func AnyCastToEnumBodyDeclarations(i interface{}) *EnumBodyDeclarations {
@@ -17708,10 +18476,25 @@ func (my *NormalInterfaceDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *NormalInterfaceDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitNormalInterfaceDeclaration(my)}
-func (my *NormalInterfaceDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitNormalInterfaceDeclarationWithArg(my, o) }
-func (my *NormalInterfaceDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitNormalInterfaceDeclarationWithResult(my) }
-func (my *NormalInterfaceDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitNormalInterfaceDeclarationWithResultArgument(my, o) }
+func (my *NormalInterfaceDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *NormalInterfaceDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitNormalInterfaceDeclaration(my)
+        if checkChildren{
+            if nil != my._InterfaceModifiersopt{my._InterfaceModifiersopt.Accept(v)}
+            if nil != my._interface{my._interface.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._TypeParametersopt{my._TypeParametersopt.Accept(v)}
+            if nil != my._ExtendsInterfacesopt{my._ExtendsInterfacesopt.Accept(v)}
+            if nil != my._InterfaceBody{my._InterfaceBody.Accept(v)}
+        }
+        v.EndVisitNormalInterfaceDeclaration(my)
+    }
 
 
 func AnyCastToNormalInterfaceDeclaration(i interface{}) *NormalInterfaceDeclaration {
@@ -17769,10 +18552,21 @@ func (my *InterfaceModifiers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *InterfaceModifiers)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceModifiers(my)}
-func (my *InterfaceModifiers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceModifiersWithArg(my, o) }
-func (my *InterfaceModifiers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceModifiersWithResult(my) }
-func (my *InterfaceModifiers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceModifiersWithResultArgument(my, o) }
+func (my *InterfaceModifiers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceModifiers)       Enter(v Visitor){
+        var checkChildren = v.VisitInterfaceModifiers(my)
+        if checkChildren{
+            if nil != my._InterfaceModifiers{my._InterfaceModifiers.Accept(v)}
+            if nil != my._InterfaceModifier{my._InterfaceModifier.Accept(v)}
+        }
+        v.EndVisitInterfaceModifiers(my)
+    }
 
 
 func AnyCastToInterfaceModifiers(i interface{}) *InterfaceModifiers {
@@ -17839,10 +18633,22 @@ func (my *InterfaceBody)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *InterfaceBody)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceBody(my)}
-func (my *InterfaceBody)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceBodyWithArg(my, o) }
-func (my *InterfaceBody)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceBodyWithResult(my) }
-func (my *InterfaceBody)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceBodyWithResultArgument(my, o) }
+func (my *InterfaceBody)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceBody)       Enter(v Visitor){
+        var checkChildren = v.VisitInterfaceBody(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._InterfaceMemberDeclarationsopt{my._InterfaceMemberDeclarationsopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitInterfaceBody(my)
+    }
 
 
 func AnyCastToInterfaceBody(i interface{}) *InterfaceBody {
@@ -17900,10 +18706,21 @@ func (my *InterfaceMemberDeclarations)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *InterfaceMemberDeclarations)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceMemberDeclarations(my)}
-func (my *InterfaceMemberDeclarations)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceMemberDeclarationsWithArg(my, o) }
-func (my *InterfaceMemberDeclarations)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceMemberDeclarationsWithResult(my) }
-func (my *InterfaceMemberDeclarations)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceMemberDeclarationsWithResultArgument(my, o) }
+func (my *InterfaceMemberDeclarations)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceMemberDeclarations)       Enter(v Visitor){
+        var checkChildren = v.VisitInterfaceMemberDeclarations(my)
+        if checkChildren{
+            if nil != my._InterfaceMemberDeclarations{my._InterfaceMemberDeclarations.Accept(v)}
+            if nil != my._InterfaceMemberDeclaration{my._InterfaceMemberDeclaration.Accept(v)}
+        }
+        v.EndVisitInterfaceMemberDeclarations(my)
+    }
 
 
 func AnyCastToInterfaceMemberDeclarations(i interface{}) *InterfaceMemberDeclarations {
@@ -17937,10 +18754,17 @@ func NewInterfaceMemberDeclaration(token IToken )*InterfaceMemberDeclaration{
       return my
     }
 
-func (my *InterfaceMemberDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceMemberDeclaration(my)}
-func (my *InterfaceMemberDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceMemberDeclarationWithArg(my, o) }
-func (my *InterfaceMemberDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceMemberDeclarationWithResult(my) }
-func (my *InterfaceMemberDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceMemberDeclarationWithResultArgument(my, o) }
+func (my *InterfaceMemberDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceMemberDeclaration)       Enter(v Visitor){
+        v.VisitInterfaceMemberDeclaration(my)
+        v.EndVisitInterfaceMemberDeclaration(my)
+    }
 
 
 func AnyCastToInterfaceMemberDeclaration(i interface{}) *InterfaceMemberDeclaration {
@@ -18007,10 +18831,22 @@ func (my *ConstantDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConstantDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitConstantDeclaration(my)}
-func (my *ConstantDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstantDeclarationWithArg(my, o) }
-func (my *ConstantDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstantDeclarationWithResult(my) }
-func (my *ConstantDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstantDeclarationWithResultArgument(my, o) }
+func (my *ConstantDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstantDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitConstantDeclaration(my)
+        if checkChildren{
+            if nil != my._ConstantModifiersopt{my._ConstantModifiersopt.Accept(v)}
+            if nil != my._Type{my._Type.Accept(v)}
+            if nil != my._VariableDeclarators{my._VariableDeclarators.Accept(v)}
+        }
+        v.EndVisitConstantDeclaration(my)
+    }
 
 
 func AnyCastToConstantDeclaration(i interface{}) *ConstantDeclaration {
@@ -18068,10 +18904,21 @@ func (my *ConstantModifiers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConstantModifiers)      AcceptWithVisitor(v Visitor) { v.VisitConstantModifiers(my)}
-func (my *ConstantModifiers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstantModifiersWithArg(my, o) }
-func (my *ConstantModifiers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstantModifiersWithResult(my) }
-func (my *ConstantModifiers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstantModifiersWithResultArgument(my, o) }
+func (my *ConstantModifiers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstantModifiers)       Enter(v Visitor){
+        var checkChildren = v.VisitConstantModifiers(my)
+        if checkChildren{
+            if nil != my._ConstantModifiers{my._ConstantModifiers.Accept(v)}
+            if nil != my._ConstantModifier{my._ConstantModifier.Accept(v)}
+        }
+        v.EndVisitConstantModifiers(my)
+    }
 
 
 func AnyCastToConstantModifiers(i interface{}) *ConstantModifiers {
@@ -18174,10 +19021,25 @@ func (my *AbstractMethodDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AbstractMethodDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitAbstractMethodDeclaration(my)}
-func (my *AbstractMethodDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAbstractMethodDeclarationWithArg(my, o) }
-func (my *AbstractMethodDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAbstractMethodDeclarationWithResult(my) }
-func (my *AbstractMethodDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAbstractMethodDeclarationWithResultArgument(my, o) }
+func (my *AbstractMethodDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AbstractMethodDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitAbstractMethodDeclaration(my)
+        if checkChildren{
+            if nil != my._AbstractMethodModifiersopt{my._AbstractMethodModifiersopt.Accept(v)}
+            if nil != my._TypeParametersopt{my._TypeParametersopt.Accept(v)}
+            if nil != my._ResultType{my._ResultType.Accept(v)}
+            if nil != my._MethodDeclarator{my._MethodDeclarator.Accept(v)}
+            if nil != my._Throwsopt{my._Throwsopt.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitAbstractMethodDeclaration(my)
+    }
 
 
 func AnyCastToAbstractMethodDeclaration(i interface{}) *AbstractMethodDeclaration {
@@ -18235,10 +19097,21 @@ func (my *AbstractMethodModifiers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AbstractMethodModifiers)      AcceptWithVisitor(v Visitor) { v.VisitAbstractMethodModifiers(my)}
-func (my *AbstractMethodModifiers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAbstractMethodModifiersWithArg(my, o) }
-func (my *AbstractMethodModifiers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAbstractMethodModifiersWithResult(my) }
-func (my *AbstractMethodModifiers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAbstractMethodModifiersWithResultArgument(my, o) }
+func (my *AbstractMethodModifiers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AbstractMethodModifiers)       Enter(v Visitor){
+        var checkChildren = v.VisitAbstractMethodModifiers(my)
+        if checkChildren{
+            if nil != my._AbstractMethodModifiers{my._AbstractMethodModifiers.Accept(v)}
+            if nil != my._AbstractMethodModifier{my._AbstractMethodModifier.Accept(v)}
+        }
+        v.EndVisitAbstractMethodModifiers(my)
+    }
 
 
 func AnyCastToAbstractMethodModifiers(i interface{}) *AbstractMethodModifiers {
@@ -18325,10 +19198,24 @@ func (my *AnnotationTypeDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AnnotationTypeDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitAnnotationTypeDeclaration(my)}
-func (my *AnnotationTypeDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAnnotationTypeDeclarationWithArg(my, o) }
-func (my *AnnotationTypeDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAnnotationTypeDeclarationWithResult(my) }
-func (my *AnnotationTypeDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAnnotationTypeDeclarationWithResultArgument(my, o) }
+func (my *AnnotationTypeDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AnnotationTypeDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitAnnotationTypeDeclaration(my)
+        if checkChildren{
+            if nil != my._InterfaceModifiersopt{my._InterfaceModifiersopt.Accept(v)}
+            if nil != my._AT{my._AT.Accept(v)}
+            if nil != my._interface{my._interface.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._AnnotationTypeBody{my._AnnotationTypeBody.Accept(v)}
+        }
+        v.EndVisitAnnotationTypeDeclaration(my)
+    }
 
 
 func AnyCastToAnnotationTypeDeclaration(i interface{}) *AnnotationTypeDeclaration {
@@ -18395,10 +19282,22 @@ func (my *AnnotationTypeBody)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AnnotationTypeBody)      AcceptWithVisitor(v Visitor) { v.VisitAnnotationTypeBody(my)}
-func (my *AnnotationTypeBody)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAnnotationTypeBodyWithArg(my, o) }
-func (my *AnnotationTypeBody)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAnnotationTypeBodyWithResult(my) }
-func (my *AnnotationTypeBody)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAnnotationTypeBodyWithResultArgument(my, o) }
+func (my *AnnotationTypeBody)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AnnotationTypeBody)       Enter(v Visitor){
+        var checkChildren = v.VisitAnnotationTypeBody(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._AnnotationTypeElementDeclarationsopt{my._AnnotationTypeElementDeclarationsopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitAnnotationTypeBody(my)
+    }
 
 
 func AnyCastToAnnotationTypeBody(i interface{}) *AnnotationTypeBody {
@@ -18456,10 +19355,21 @@ func (my *AnnotationTypeElementDeclarations)        GetAllChildren() * ArrayList
         return list
     }
 
-func (my *AnnotationTypeElementDeclarations)      AcceptWithVisitor(v Visitor) { v.VisitAnnotationTypeElementDeclarations(my)}
-func (my *AnnotationTypeElementDeclarations)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAnnotationTypeElementDeclarationsWithArg(my, o) }
-func (my *AnnotationTypeElementDeclarations)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAnnotationTypeElementDeclarationsWithResult(my) }
-func (my *AnnotationTypeElementDeclarations)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAnnotationTypeElementDeclarationsWithResultArgument(my, o) }
+func (my *AnnotationTypeElementDeclarations)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AnnotationTypeElementDeclarations)       Enter(v Visitor){
+        var checkChildren = v.VisitAnnotationTypeElementDeclarations(my)
+        if checkChildren{
+            if nil != my._AnnotationTypeElementDeclarations{my._AnnotationTypeElementDeclarations.Accept(v)}
+            if nil != my._AnnotationTypeElementDeclaration{my._AnnotationTypeElementDeclaration.Accept(v)}
+        }
+        v.EndVisitAnnotationTypeElementDeclarations(my)
+    }
 
 
 func AnyCastToAnnotationTypeElementDeclarations(i interface{}) *AnnotationTypeElementDeclarations {
@@ -18513,10 +19423,21 @@ func (my *DefaultValue)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *DefaultValue)      AcceptWithVisitor(v Visitor) { v.VisitDefaultValue(my)}
-func (my *DefaultValue)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitDefaultValueWithArg(my, o) }
-func (my *DefaultValue)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitDefaultValueWithResult(my) }
-func (my *DefaultValue)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitDefaultValueWithResultArgument(my, o) }
+func (my *DefaultValue)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *DefaultValue)       Enter(v Visitor){
+        var checkChildren = v.VisitDefaultValue(my)
+        if checkChildren{
+            if nil != my._default{my._default.Accept(v)}
+            if nil != my._ElementValue{my._ElementValue.Accept(v)}
+        }
+        v.EndVisitDefaultValue(my)
+    }
 
 
 func AnyCastToDefaultValue(i interface{}) *DefaultValue {
@@ -18574,10 +19495,21 @@ func (my *Annotations)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Annotations)      AcceptWithVisitor(v Visitor) { v.VisitAnnotations(my)}
-func (my *Annotations)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAnnotationsWithArg(my, o) }
-func (my *Annotations)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAnnotationsWithResult(my) }
-func (my *Annotations)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAnnotationsWithResultArgument(my, o) }
+func (my *Annotations)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Annotations)       Enter(v Visitor){
+        var checkChildren = v.VisitAnnotations(my)
+        if checkChildren{
+            if nil != my._Annotations{my._Annotations.Accept(v)}
+            if nil != my._Annotation{my._Annotation.Accept(v)}
+        }
+        v.EndVisitAnnotations(my)
+    }
 
 
 func AnyCastToAnnotations(i interface{}) *Annotations {
@@ -18664,10 +19596,24 @@ func (my *NormalAnnotation)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *NormalAnnotation)      AcceptWithVisitor(v Visitor) { v.VisitNormalAnnotation(my)}
-func (my *NormalAnnotation)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitNormalAnnotationWithArg(my, o) }
-func (my *NormalAnnotation)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitNormalAnnotationWithResult(my) }
-func (my *NormalAnnotation)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitNormalAnnotationWithResultArgument(my, o) }
+func (my *NormalAnnotation)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *NormalAnnotation)       Enter(v Visitor){
+        var checkChildren = v.VisitNormalAnnotation(my)
+        if checkChildren{
+            if nil != my._AT{my._AT.Accept(v)}
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ElementValuePairsopt{my._ElementValuePairsopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitNormalAnnotation(my)
+    }
 
 
 func AnyCastToNormalAnnotation(i interface{}) *NormalAnnotation {
@@ -18735,10 +19681,22 @@ func (my *ElementValuePairs)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ElementValuePairs)      AcceptWithVisitor(v Visitor) { v.VisitElementValuePairs(my)}
-func (my *ElementValuePairs)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitElementValuePairsWithArg(my, o) }
-func (my *ElementValuePairs)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitElementValuePairsWithResult(my) }
-func (my *ElementValuePairs)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitElementValuePairsWithResultArgument(my, o) }
+func (my *ElementValuePairs)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ElementValuePairs)       Enter(v Visitor){
+        var checkChildren = v.VisitElementValuePairs(my)
+        if checkChildren{
+            if nil != my._ElementValuePairs{my._ElementValuePairs.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._ElementValuePair{my._ElementValuePair.Accept(v)}
+        }
+        v.EndVisitElementValuePairs(my)
+    }
 
 
 func AnyCastToElementValuePairs(i interface{}) *ElementValuePairs {
@@ -18802,10 +19760,22 @@ func (my *ElementValuePair)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ElementValuePair)      AcceptWithVisitor(v Visitor) { v.VisitElementValuePair(my)}
-func (my *ElementValuePair)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitElementValuePairWithArg(my, o) }
-func (my *ElementValuePair)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitElementValuePairWithResult(my) }
-func (my *ElementValuePair)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitElementValuePairWithResultArgument(my, o) }
+func (my *ElementValuePair)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ElementValuePair)       Enter(v Visitor){
+        var checkChildren = v.VisitElementValuePair(my)
+        if checkChildren{
+            if nil != my._SimpleName{my._SimpleName.Accept(v)}
+            if nil != my._EQUAL{my._EQUAL.Accept(v)}
+            if nil != my._ElementValue{my._ElementValue.Accept(v)}
+        }
+        v.EndVisitElementValuePair(my)
+    }
 
 
 func AnyCastToElementValuePair(i interface{}) *ElementValuePair {
@@ -18885,10 +19855,23 @@ func (my *ElementValueArrayInitializer)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ElementValueArrayInitializer)      AcceptWithVisitor(v Visitor) { v.VisitElementValueArrayInitializer(my)}
-func (my *ElementValueArrayInitializer)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitElementValueArrayInitializerWithArg(my, o) }
-func (my *ElementValueArrayInitializer)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitElementValueArrayInitializerWithResult(my) }
-func (my *ElementValueArrayInitializer)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitElementValueArrayInitializerWithResultArgument(my, o) }
+func (my *ElementValueArrayInitializer)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ElementValueArrayInitializer)       Enter(v Visitor){
+        var checkChildren = v.VisitElementValueArrayInitializer(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._ElementValuesopt{my._ElementValuesopt.Accept(v)}
+            if nil != my._Commaopt{my._Commaopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitElementValueArrayInitializer(my)
+    }
 
 
 func AnyCastToElementValueArrayInitializer(i interface{}) *ElementValueArrayInitializer {
@@ -18956,10 +19939,22 @@ func (my *ElementValues)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ElementValues)      AcceptWithVisitor(v Visitor) { v.VisitElementValues(my)}
-func (my *ElementValues)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitElementValuesWithArg(my, o) }
-func (my *ElementValues)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitElementValuesWithResult(my) }
-func (my *ElementValues)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitElementValuesWithResultArgument(my, o) }
+func (my *ElementValues)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ElementValues)       Enter(v Visitor){
+        var checkChildren = v.VisitElementValues(my)
+        if checkChildren{
+            if nil != my._ElementValues{my._ElementValues.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._ElementValue{my._ElementValue.Accept(v)}
+        }
+        v.EndVisitElementValues(my)
+    }
 
 
 func AnyCastToElementValues(i interface{}) *ElementValues {
@@ -19013,10 +20008,21 @@ func (my *MarkerAnnotation)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MarkerAnnotation)      AcceptWithVisitor(v Visitor) { v.VisitMarkerAnnotation(my)}
-func (my *MarkerAnnotation)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMarkerAnnotationWithArg(my, o) }
-func (my *MarkerAnnotation)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMarkerAnnotationWithResult(my) }
-func (my *MarkerAnnotation)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMarkerAnnotationWithResultArgument(my, o) }
+func (my *MarkerAnnotation)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MarkerAnnotation)       Enter(v Visitor){
+        var checkChildren = v.VisitMarkerAnnotation(my)
+        if checkChildren{
+            if nil != my._AT{my._AT.Accept(v)}
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+        }
+        v.EndVisitMarkerAnnotation(my)
+    }
 
 
 func AnyCastToMarkerAnnotation(i interface{}) *MarkerAnnotation {
@@ -19100,10 +20106,24 @@ func (my *SingleElementAnnotation)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SingleElementAnnotation)      AcceptWithVisitor(v Visitor) { v.VisitSingleElementAnnotation(my)}
-func (my *SingleElementAnnotation)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSingleElementAnnotationWithArg(my, o) }
-func (my *SingleElementAnnotation)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSingleElementAnnotationWithResult(my) }
-func (my *SingleElementAnnotation)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSingleElementAnnotationWithResultArgument(my, o) }
+func (my *SingleElementAnnotation)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SingleElementAnnotation)       Enter(v Visitor){
+        var checkChildren = v.VisitSingleElementAnnotation(my)
+        if checkChildren{
+            if nil != my._AT{my._AT.Accept(v)}
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ElementValue{my._ElementValue.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitSingleElementAnnotation(my)
+    }
 
 
 func AnyCastToSingleElementAnnotation(i interface{}) *SingleElementAnnotation {
@@ -19183,10 +20203,23 @@ func (my *ArrayInitializer)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArrayInitializer)      AcceptWithVisitor(v Visitor) { v.VisitArrayInitializer(my)}
-func (my *ArrayInitializer)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArrayInitializerWithArg(my, o) }
-func (my *ArrayInitializer)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArrayInitializerWithResult(my) }
-func (my *ArrayInitializer)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArrayInitializerWithResultArgument(my, o) }
+func (my *ArrayInitializer)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArrayInitializer)       Enter(v Visitor){
+        var checkChildren = v.VisitArrayInitializer(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._VariableInitializersopt{my._VariableInitializersopt.Accept(v)}
+            if nil != my._Commaopt{my._Commaopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitArrayInitializer(my)
+    }
 
 
 func AnyCastToArrayInitializer(i interface{}) *ArrayInitializer {
@@ -19254,10 +20287,22 @@ func (my *VariableInitializers)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *VariableInitializers)      AcceptWithVisitor(v Visitor) { v.VisitVariableInitializers(my)}
-func (my *VariableInitializers)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitVariableInitializersWithArg(my, o) }
-func (my *VariableInitializers)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitVariableInitializersWithResult(my) }
-func (my *VariableInitializers)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitVariableInitializersWithResultArgument(my, o) }
+func (my *VariableInitializers)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *VariableInitializers)       Enter(v Visitor){
+        var checkChildren = v.VisitVariableInitializers(my)
+        if checkChildren{
+            if nil != my._VariableInitializers{my._VariableInitializers.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._VariableInitializer{my._VariableInitializer.Accept(v)}
+        }
+        v.EndVisitVariableInitializers(my)
+    }
 
 
 func AnyCastToVariableInitializers(i interface{}) *VariableInitializers {
@@ -19324,10 +20369,22 @@ func (my *Block)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Block)      AcceptWithVisitor(v Visitor) { v.VisitBlock(my)}
-func (my *Block)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitBlockWithArg(my, o) }
-func (my *Block)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitBlockWithResult(my) }
-func (my *Block)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitBlockWithResultArgument(my, o) }
+func (my *Block)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Block)       Enter(v Visitor){
+        var checkChildren = v.VisitBlock(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._BlockStatementsopt{my._BlockStatementsopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitBlock(my)
+    }
 
 
 func AnyCastToBlock(i interface{}) *Block {
@@ -19385,10 +20442,21 @@ func (my *BlockStatements)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *BlockStatements)      AcceptWithVisitor(v Visitor) { v.VisitBlockStatements(my)}
-func (my *BlockStatements)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitBlockStatementsWithArg(my, o) }
-func (my *BlockStatements)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitBlockStatementsWithResult(my) }
-func (my *BlockStatements)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitBlockStatementsWithResultArgument(my, o) }
+func (my *BlockStatements)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *BlockStatements)       Enter(v Visitor){
+        var checkChildren = v.VisitBlockStatements(my)
+        if checkChildren{
+            if nil != my._BlockStatements{my._BlockStatements.Accept(v)}
+            if nil != my._BlockStatement{my._BlockStatement.Accept(v)}
+        }
+        v.EndVisitBlockStatements(my)
+    }
 
 
 func AnyCastToBlockStatements(i interface{}) *BlockStatements {
@@ -19442,10 +20510,21 @@ func (my *LocalVariableDeclarationStatement)        GetAllChildren() * ArrayList
         return list
     }
 
-func (my *LocalVariableDeclarationStatement)      AcceptWithVisitor(v Visitor) { v.VisitLocalVariableDeclarationStatement(my)}
-func (my *LocalVariableDeclarationStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLocalVariableDeclarationStatementWithArg(my, o) }
-func (my *LocalVariableDeclarationStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLocalVariableDeclarationStatementWithResult(my) }
-func (my *LocalVariableDeclarationStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLocalVariableDeclarationStatementWithResultArgument(my, o) }
+func (my *LocalVariableDeclarationStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LocalVariableDeclarationStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitLocalVariableDeclarationStatement(my)
+        if checkChildren{
+            if nil != my._LocalVariableDeclaration{my._LocalVariableDeclaration.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitLocalVariableDeclarationStatement(my)
+    }
 
 
 func AnyCastToLocalVariableDeclarationStatement(i interface{}) *LocalVariableDeclarationStatement {
@@ -19512,10 +20591,22 @@ func (my *LocalVariableDeclaration)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *LocalVariableDeclaration)      AcceptWithVisitor(v Visitor) { v.VisitLocalVariableDeclaration(my)}
-func (my *LocalVariableDeclaration)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLocalVariableDeclarationWithArg(my, o) }
-func (my *LocalVariableDeclaration)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLocalVariableDeclarationWithResult(my) }
-func (my *LocalVariableDeclaration)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLocalVariableDeclarationWithResultArgument(my, o) }
+func (my *LocalVariableDeclaration)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LocalVariableDeclaration)       Enter(v Visitor){
+        var checkChildren = v.VisitLocalVariableDeclaration(my)
+        if checkChildren{
+            if nil != my._VariableModifiersopt{my._VariableModifiersopt.Accept(v)}
+            if nil != my._Type{my._Type.Accept(v)}
+            if nil != my._VariableDeclarators{my._VariableDeclarators.Accept(v)}
+        }
+        v.EndVisitLocalVariableDeclaration(my)
+    }
 
 
 func AnyCastToLocalVariableDeclaration(i interface{}) *LocalVariableDeclaration {
@@ -19599,10 +20690,24 @@ func (my *IfThenStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *IfThenStatement)      AcceptWithVisitor(v Visitor) { v.VisitIfThenStatement(my)}
-func (my *IfThenStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitIfThenStatementWithArg(my, o) }
-func (my *IfThenStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitIfThenStatementWithResult(my) }
-func (my *IfThenStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitIfThenStatementWithResultArgument(my, o) }
+func (my *IfThenStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *IfThenStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitIfThenStatement(my)
+        if checkChildren{
+            if nil != my._if{my._if.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._Statement{my._Statement.Accept(v)}
+        }
+        v.EndVisitIfThenStatement(my)
+    }
 
 
 func AnyCastToIfThenStatement(i interface{}) *IfThenStatement {
@@ -19706,10 +20811,26 @@ func (my *IfThenElseStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *IfThenElseStatement)      AcceptWithVisitor(v Visitor) { v.VisitIfThenElseStatement(my)}
-func (my *IfThenElseStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitIfThenElseStatementWithArg(my, o) }
-func (my *IfThenElseStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitIfThenElseStatementWithResult(my) }
-func (my *IfThenElseStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitIfThenElseStatementWithResultArgument(my, o) }
+func (my *IfThenElseStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *IfThenElseStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitIfThenElseStatement(my)
+        if checkChildren{
+            if nil != my._if{my._if.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._StatementNoShortIf{my._StatementNoShortIf.Accept(v)}
+            if nil != my._else{my._else.Accept(v)}
+            if nil != my._Statement{my._Statement.Accept(v)}
+        }
+        v.EndVisitIfThenElseStatement(my)
+    }
 
 
 func AnyCastToIfThenElseStatement(i interface{}) *IfThenElseStatement {
@@ -19813,10 +20934,26 @@ func (my *IfThenElseStatementNoShortIf)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *IfThenElseStatementNoShortIf)      AcceptWithVisitor(v Visitor) { v.VisitIfThenElseStatementNoShortIf(my)}
-func (my *IfThenElseStatementNoShortIf)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitIfThenElseStatementNoShortIfWithArg(my, o) }
-func (my *IfThenElseStatementNoShortIf)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitIfThenElseStatementNoShortIfWithResult(my) }
-func (my *IfThenElseStatementNoShortIf)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitIfThenElseStatementNoShortIfWithResultArgument(my, o) }
+func (my *IfThenElseStatementNoShortIf)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *IfThenElseStatementNoShortIf)       Enter(v Visitor){
+        var checkChildren = v.VisitIfThenElseStatementNoShortIf(my)
+        if checkChildren{
+            if nil != my._if{my._if.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._StatementNoShortIf{my._StatementNoShortIf.Accept(v)}
+            if nil != my._else{my._else.Accept(v)}
+            if nil != my._StatementNoShortIf7{my._StatementNoShortIf7.Accept(v)}
+        }
+        v.EndVisitIfThenElseStatementNoShortIf(my)
+    }
 
 
 func AnyCastToIfThenElseStatementNoShortIf(i interface{}) *IfThenElseStatementNoShortIf {
@@ -19843,10 +20980,17 @@ func NewEmptyStatement(token IToken )*EmptyStatement{
       return my
     }
 
-func (my *EmptyStatement)      AcceptWithVisitor(v Visitor) { v.VisitEmptyStatement(my)}
-func (my *EmptyStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEmptyStatementWithArg(my, o) }
-func (my *EmptyStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEmptyStatementWithResult(my) }
-func (my *EmptyStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEmptyStatementWithResultArgument(my, o) }
+func (my *EmptyStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EmptyStatement)       Enter(v Visitor){
+        v.VisitEmptyStatement(my)
+        v.EndVisitEmptyStatement(my)
+    }
 
 
 func AnyCastToEmptyStatement(i interface{}) *EmptyStatement {
@@ -19910,10 +21054,22 @@ func (my *LabeledStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *LabeledStatement)      AcceptWithVisitor(v Visitor) { v.VisitLabeledStatement(my)}
-func (my *LabeledStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLabeledStatementWithArg(my, o) }
-func (my *LabeledStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLabeledStatementWithResult(my) }
-func (my *LabeledStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLabeledStatementWithResultArgument(my, o) }
+func (my *LabeledStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LabeledStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitLabeledStatement(my)
+        if checkChildren{
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._COLON{my._COLON.Accept(v)}
+            if nil != my._Statement{my._Statement.Accept(v)}
+        }
+        v.EndVisitLabeledStatement(my)
+    }
 
 
 func AnyCastToLabeledStatement(i interface{}) *LabeledStatement {
@@ -19977,10 +21133,22 @@ func (my *LabeledStatementNoShortIf)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *LabeledStatementNoShortIf)      AcceptWithVisitor(v Visitor) { v.VisitLabeledStatementNoShortIf(my)}
-func (my *LabeledStatementNoShortIf)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLabeledStatementNoShortIfWithArg(my, o) }
-func (my *LabeledStatementNoShortIf)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLabeledStatementNoShortIfWithResult(my) }
-func (my *LabeledStatementNoShortIf)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLabeledStatementNoShortIfWithResultArgument(my, o) }
+func (my *LabeledStatementNoShortIf)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LabeledStatementNoShortIf)       Enter(v Visitor){
+        var checkChildren = v.VisitLabeledStatementNoShortIf(my)
+        if checkChildren{
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._COLON{my._COLON.Accept(v)}
+            if nil != my._StatementNoShortIf{my._StatementNoShortIf.Accept(v)}
+        }
+        v.EndVisitLabeledStatementNoShortIf(my)
+    }
 
 
 func AnyCastToLabeledStatementNoShortIf(i interface{}) *LabeledStatementNoShortIf {
@@ -20034,10 +21202,21 @@ func (my *ExpressionStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExpressionStatement)      AcceptWithVisitor(v Visitor) { v.VisitExpressionStatement(my)}
-func (my *ExpressionStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExpressionStatementWithArg(my, o) }
-func (my *ExpressionStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExpressionStatementWithResult(my) }
-func (my *ExpressionStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExpressionStatementWithResultArgument(my, o) }
+func (my *ExpressionStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExpressionStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitExpressionStatement(my)
+        if checkChildren{
+            if nil != my._StatementExpression{my._StatementExpression.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitExpressionStatement(my)
+    }
 
 
 func AnyCastToExpressionStatement(i interface{}) *ExpressionStatement {
@@ -20121,10 +21300,24 @@ func (my *SwitchStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SwitchStatement)      AcceptWithVisitor(v Visitor) { v.VisitSwitchStatement(my)}
-func (my *SwitchStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSwitchStatementWithArg(my, o) }
-func (my *SwitchStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSwitchStatementWithResult(my) }
-func (my *SwitchStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSwitchStatementWithResultArgument(my, o) }
+func (my *SwitchStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SwitchStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitSwitchStatement(my)
+        if checkChildren{
+            if nil != my._switch{my._switch.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._SwitchBlock{my._SwitchBlock.Accept(v)}
+        }
+        v.EndVisitSwitchStatement(my)
+    }
 
 
 func AnyCastToSwitchStatement(i interface{}) *SwitchStatement {
@@ -20204,10 +21397,23 @@ func (my *SwitchBlock)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SwitchBlock)      AcceptWithVisitor(v Visitor) { v.VisitSwitchBlock(my)}
-func (my *SwitchBlock)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSwitchBlockWithArg(my, o) }
-func (my *SwitchBlock)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSwitchBlockWithResult(my) }
-func (my *SwitchBlock)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSwitchBlockWithResultArgument(my, o) }
+func (my *SwitchBlock)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SwitchBlock)       Enter(v Visitor){
+        var checkChildren = v.VisitSwitchBlock(my)
+        if checkChildren{
+            if nil != my._LBRACE{my._LBRACE.Accept(v)}
+            if nil != my._SwitchBlockStatementGroupsopt{my._SwitchBlockStatementGroupsopt.Accept(v)}
+            if nil != my._SwitchLabelsopt{my._SwitchLabelsopt.Accept(v)}
+            if nil != my._RBRACE{my._RBRACE.Accept(v)}
+        }
+        v.EndVisitSwitchBlock(my)
+    }
 
 
 func AnyCastToSwitchBlock(i interface{}) *SwitchBlock {
@@ -20265,10 +21471,21 @@ func (my *SwitchBlockStatementGroups)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SwitchBlockStatementGroups)      AcceptWithVisitor(v Visitor) { v.VisitSwitchBlockStatementGroups(my)}
-func (my *SwitchBlockStatementGroups)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSwitchBlockStatementGroupsWithArg(my, o) }
-func (my *SwitchBlockStatementGroups)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSwitchBlockStatementGroupsWithResult(my) }
-func (my *SwitchBlockStatementGroups)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSwitchBlockStatementGroupsWithResultArgument(my, o) }
+func (my *SwitchBlockStatementGroups)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SwitchBlockStatementGroups)       Enter(v Visitor){
+        var checkChildren = v.VisitSwitchBlockStatementGroups(my)
+        if checkChildren{
+            if nil != my._SwitchBlockStatementGroups{my._SwitchBlockStatementGroups.Accept(v)}
+            if nil != my._SwitchBlockStatementGroup{my._SwitchBlockStatementGroup.Accept(v)}
+        }
+        v.EndVisitSwitchBlockStatementGroups(my)
+    }
 
 
 func AnyCastToSwitchBlockStatementGroups(i interface{}) *SwitchBlockStatementGroups {
@@ -20322,10 +21539,21 @@ func (my *SwitchBlockStatementGroup)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SwitchBlockStatementGroup)      AcceptWithVisitor(v Visitor) { v.VisitSwitchBlockStatementGroup(my)}
-func (my *SwitchBlockStatementGroup)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSwitchBlockStatementGroupWithArg(my, o) }
-func (my *SwitchBlockStatementGroup)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSwitchBlockStatementGroupWithResult(my) }
-func (my *SwitchBlockStatementGroup)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSwitchBlockStatementGroupWithResultArgument(my, o) }
+func (my *SwitchBlockStatementGroup)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SwitchBlockStatementGroup)       Enter(v Visitor){
+        var checkChildren = v.VisitSwitchBlockStatementGroup(my)
+        if checkChildren{
+            if nil != my._SwitchLabels{my._SwitchLabels.Accept(v)}
+            if nil != my._BlockStatements{my._BlockStatements.Accept(v)}
+        }
+        v.EndVisitSwitchBlockStatementGroup(my)
+    }
 
 
 func AnyCastToSwitchBlockStatementGroup(i interface{}) *SwitchBlockStatementGroup {
@@ -20383,10 +21611,21 @@ func (my *SwitchLabels)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SwitchLabels)      AcceptWithVisitor(v Visitor) { v.VisitSwitchLabels(my)}
-func (my *SwitchLabels)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSwitchLabelsWithArg(my, o) }
-func (my *SwitchLabels)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSwitchLabelsWithResult(my) }
-func (my *SwitchLabels)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSwitchLabelsWithResultArgument(my, o) }
+func (my *SwitchLabels)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SwitchLabels)       Enter(v Visitor){
+        var checkChildren = v.VisitSwitchLabels(my)
+        if checkChildren{
+            if nil != my._SwitchLabels{my._SwitchLabels.Accept(v)}
+            if nil != my._SwitchLabel{my._SwitchLabel.Accept(v)}
+        }
+        v.EndVisitSwitchLabels(my)
+    }
 
 
 func AnyCastToSwitchLabels(i interface{}) *SwitchLabels {
@@ -20470,10 +21709,24 @@ func (my *WhileStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *WhileStatement)      AcceptWithVisitor(v Visitor) { v.VisitWhileStatement(my)}
-func (my *WhileStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitWhileStatementWithArg(my, o) }
-func (my *WhileStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitWhileStatementWithResult(my) }
-func (my *WhileStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitWhileStatementWithResultArgument(my, o) }
+func (my *WhileStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *WhileStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitWhileStatement(my)
+        if checkChildren{
+            if nil != my._while{my._while.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._Statement{my._Statement.Accept(v)}
+        }
+        v.EndVisitWhileStatement(my)
+    }
 
 
 func AnyCastToWhileStatement(i interface{}) *WhileStatement {
@@ -20557,10 +21810,24 @@ func (my *WhileStatementNoShortIf)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *WhileStatementNoShortIf)      AcceptWithVisitor(v Visitor) { v.VisitWhileStatementNoShortIf(my)}
-func (my *WhileStatementNoShortIf)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitWhileStatementNoShortIfWithArg(my, o) }
-func (my *WhileStatementNoShortIf)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitWhileStatementNoShortIfWithResult(my) }
-func (my *WhileStatementNoShortIf)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitWhileStatementNoShortIfWithResultArgument(my, o) }
+func (my *WhileStatementNoShortIf)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *WhileStatementNoShortIf)       Enter(v Visitor){
+        var checkChildren = v.VisitWhileStatementNoShortIf(my)
+        if checkChildren{
+            if nil != my._while{my._while.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._StatementNoShortIf{my._StatementNoShortIf.Accept(v)}
+        }
+        v.EndVisitWhileStatementNoShortIf(my)
+    }
 
 
 func AnyCastToWhileStatementNoShortIf(i interface{}) *WhileStatementNoShortIf {
@@ -20664,10 +21931,26 @@ func (my *DoStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *DoStatement)      AcceptWithVisitor(v Visitor) { v.VisitDoStatement(my)}
-func (my *DoStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitDoStatementWithArg(my, o) }
-func (my *DoStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitDoStatementWithResult(my) }
-func (my *DoStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitDoStatementWithResultArgument(my, o) }
+func (my *DoStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *DoStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitDoStatement(my)
+        if checkChildren{
+            if nil != my._do{my._do.Accept(v)}
+            if nil != my._Statement{my._Statement.Accept(v)}
+            if nil != my._while{my._while.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitDoStatement(my)
+    }
 
 
 func AnyCastToDoStatement(i interface{}) *DoStatement {
@@ -20800,10 +22083,28 @@ func (my *BasicForStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *BasicForStatement)      AcceptWithVisitor(v Visitor) { v.VisitBasicForStatement(my)}
-func (my *BasicForStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitBasicForStatementWithArg(my, o) }
-func (my *BasicForStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitBasicForStatementWithResult(my) }
-func (my *BasicForStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitBasicForStatementWithResultArgument(my, o) }
+func (my *BasicForStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *BasicForStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitBasicForStatement(my)
+        if checkChildren{
+            if nil != my._for{my._for.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ForInitopt{my._ForInitopt.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+            if nil != my._Expressionopt{my._Expressionopt.Accept(v)}
+            if nil != my._SEMICOLON6{my._SEMICOLON6.Accept(v)}
+            if nil != my._ForUpdateopt{my._ForUpdateopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._Statement{my._Statement.Accept(v)}
+        }
+        v.EndVisitBasicForStatement(my)
+    }
 
 
 func AnyCastToBasicForStatement(i interface{}) *BasicForStatement {
@@ -20936,10 +22237,28 @@ func (my *ForStatementNoShortIf)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ForStatementNoShortIf)      AcceptWithVisitor(v Visitor) { v.VisitForStatementNoShortIf(my)}
-func (my *ForStatementNoShortIf)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitForStatementNoShortIfWithArg(my, o) }
-func (my *ForStatementNoShortIf)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitForStatementNoShortIfWithResult(my) }
-func (my *ForStatementNoShortIf)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitForStatementNoShortIfWithResultArgument(my, o) }
+func (my *ForStatementNoShortIf)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ForStatementNoShortIf)       Enter(v Visitor){
+        var checkChildren = v.VisitForStatementNoShortIf(my)
+        if checkChildren{
+            if nil != my._for{my._for.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ForInitopt{my._ForInitopt.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+            if nil != my._Expressionopt{my._Expressionopt.Accept(v)}
+            if nil != my._SEMICOLON6{my._SEMICOLON6.Accept(v)}
+            if nil != my._ForUpdateopt{my._ForUpdateopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._StatementNoShortIf{my._StatementNoShortIf.Accept(v)}
+        }
+        v.EndVisitForStatementNoShortIf(my)
+    }
 
 
 func AnyCastToForStatementNoShortIf(i interface{}) *ForStatementNoShortIf {
@@ -21007,10 +22326,22 @@ func (my *StatementExpressionList)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *StatementExpressionList)      AcceptWithVisitor(v Visitor) { v.VisitStatementExpressionList(my)}
-func (my *StatementExpressionList)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitStatementExpressionListWithArg(my, o) }
-func (my *StatementExpressionList)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitStatementExpressionListWithResult(my) }
-func (my *StatementExpressionList)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitStatementExpressionListWithResultArgument(my, o) }
+func (my *StatementExpressionList)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *StatementExpressionList)       Enter(v Visitor){
+        var checkChildren = v.VisitStatementExpressionList(my)
+        if checkChildren{
+            if nil != my._StatementExpressionList{my._StatementExpressionList.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._StatementExpression{my._StatementExpression.Accept(v)}
+        }
+        v.EndVisitStatementExpressionList(my)
+    }
 
 
 func AnyCastToStatementExpressionList(i interface{}) *StatementExpressionList {
@@ -21114,10 +22445,26 @@ func (my *EnhancedForStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *EnhancedForStatement)      AcceptWithVisitor(v Visitor) { v.VisitEnhancedForStatement(my)}
-func (my *EnhancedForStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEnhancedForStatementWithArg(my, o) }
-func (my *EnhancedForStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEnhancedForStatementWithResult(my) }
-func (my *EnhancedForStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEnhancedForStatementWithResultArgument(my, o) }
+func (my *EnhancedForStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EnhancedForStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitEnhancedForStatement(my)
+        if checkChildren{
+            if nil != my._for{my._for.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._FormalParameter{my._FormalParameter.Accept(v)}
+            if nil != my._COLON{my._COLON.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._Statement{my._Statement.Accept(v)}
+        }
+        v.EndVisitEnhancedForStatement(my)
+    }
 
 
 func AnyCastToEnhancedForStatement(i interface{}) *EnhancedForStatement {
@@ -21184,10 +22531,22 @@ func (my *BreakStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *BreakStatement)      AcceptWithVisitor(v Visitor) { v.VisitBreakStatement(my)}
-func (my *BreakStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitBreakStatementWithArg(my, o) }
-func (my *BreakStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitBreakStatementWithResult(my) }
-func (my *BreakStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitBreakStatementWithResultArgument(my, o) }
+func (my *BreakStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *BreakStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitBreakStatement(my)
+        if checkChildren{
+            if nil != my._break{my._break.Accept(v)}
+            if nil != my._identifieropt{my._identifieropt.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitBreakStatement(my)
+    }
 
 
 func AnyCastToBreakStatement(i interface{}) *BreakStatement {
@@ -21254,10 +22613,22 @@ func (my *ContinueStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ContinueStatement)      AcceptWithVisitor(v Visitor) { v.VisitContinueStatement(my)}
-func (my *ContinueStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitContinueStatementWithArg(my, o) }
-func (my *ContinueStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitContinueStatementWithResult(my) }
-func (my *ContinueStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitContinueStatementWithResultArgument(my, o) }
+func (my *ContinueStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ContinueStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitContinueStatement(my)
+        if checkChildren{
+            if nil != my._continue{my._continue.Accept(v)}
+            if nil != my._identifieropt{my._identifieropt.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitContinueStatement(my)
+    }
 
 
 func AnyCastToContinueStatement(i interface{}) *ContinueStatement {
@@ -21324,10 +22695,22 @@ func (my *ReturnStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ReturnStatement)      AcceptWithVisitor(v Visitor) { v.VisitReturnStatement(my)}
-func (my *ReturnStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitReturnStatementWithArg(my, o) }
-func (my *ReturnStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitReturnStatementWithResult(my) }
-func (my *ReturnStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitReturnStatementWithResultArgument(my, o) }
+func (my *ReturnStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ReturnStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitReturnStatement(my)
+        if checkChildren{
+            if nil != my._return{my._return.Accept(v)}
+            if nil != my._Expressionopt{my._Expressionopt.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitReturnStatement(my)
+    }
 
 
 func AnyCastToReturnStatement(i interface{}) *ReturnStatement {
@@ -21391,10 +22774,22 @@ func (my *ThrowStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ThrowStatement)      AcceptWithVisitor(v Visitor) { v.VisitThrowStatement(my)}
-func (my *ThrowStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitThrowStatementWithArg(my, o) }
-func (my *ThrowStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitThrowStatementWithResult(my) }
-func (my *ThrowStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitThrowStatementWithResultArgument(my, o) }
+func (my *ThrowStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ThrowStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitThrowStatement(my)
+        if checkChildren{
+            if nil != my._throw{my._throw.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitThrowStatement(my)
+    }
 
 
 func AnyCastToThrowStatement(i interface{}) *ThrowStatement {
@@ -21478,10 +22873,24 @@ func (my *SynchronizedStatement)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SynchronizedStatement)      AcceptWithVisitor(v Visitor) { v.VisitSynchronizedStatement(my)}
-func (my *SynchronizedStatement)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSynchronizedStatementWithArg(my, o) }
-func (my *SynchronizedStatement)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSynchronizedStatementWithResult(my) }
-func (my *SynchronizedStatement)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSynchronizedStatementWithResultArgument(my, o) }
+func (my *SynchronizedStatement)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SynchronizedStatement)       Enter(v Visitor){
+        var checkChildren = v.VisitSynchronizedStatement(my)
+        if checkChildren{
+            if nil != my._synchronized{my._synchronized.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._Block{my._Block.Accept(v)}
+        }
+        v.EndVisitSynchronizedStatement(my)
+    }
 
 
 func AnyCastToSynchronizedStatement(i interface{}) *SynchronizedStatement {
@@ -21539,10 +22948,21 @@ func (my *Catches)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Catches)      AcceptWithVisitor(v Visitor) { v.VisitCatches(my)}
-func (my *Catches)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitCatchesWithArg(my, o) }
-func (my *Catches)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitCatchesWithResult(my) }
-func (my *Catches)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitCatchesWithResultArgument(my, o) }
+func (my *Catches)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Catches)       Enter(v Visitor){
+        var checkChildren = v.VisitCatches(my)
+        if checkChildren{
+            if nil != my._Catches{my._Catches.Accept(v)}
+            if nil != my._CatchClause{my._CatchClause.Accept(v)}
+        }
+        v.EndVisitCatches(my)
+    }
 
 
 func AnyCastToCatches(i interface{}) *Catches {
@@ -21626,10 +23046,24 @@ func (my *CatchClause)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *CatchClause)      AcceptWithVisitor(v Visitor) { v.VisitCatchClause(my)}
-func (my *CatchClause)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitCatchClauseWithArg(my, o) }
-func (my *CatchClause)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitCatchClauseWithResult(my) }
-func (my *CatchClause)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitCatchClauseWithResultArgument(my, o) }
+func (my *CatchClause)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *CatchClause)       Enter(v Visitor){
+        var checkChildren = v.VisitCatchClause(my)
+        if checkChildren{
+            if nil != my._catch{my._catch.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._FormalParameter{my._FormalParameter.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._Block{my._Block.Accept(v)}
+        }
+        v.EndVisitCatchClause(my)
+    }
 
 
 func AnyCastToCatchClause(i interface{}) *CatchClause {
@@ -21683,10 +23117,21 @@ func (my *Finally)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Finally)      AcceptWithVisitor(v Visitor) { v.VisitFinally(my)}
-func (my *Finally)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFinallyWithArg(my, o) }
-func (my *Finally)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFinallyWithResult(my) }
-func (my *Finally)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFinallyWithResultArgument(my, o) }
+func (my *Finally)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Finally)       Enter(v Visitor){
+        var checkChildren = v.VisitFinally(my)
+        if checkChildren{
+            if nil != my._finally{my._finally.Accept(v)}
+            if nil != my._Block{my._Block.Accept(v)}
+        }
+        v.EndVisitFinally(my)
+    }
 
 
 func AnyCastToFinally(i interface{}) *Finally {
@@ -21754,10 +23199,22 @@ func (my *ArgumentList)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArgumentList)      AcceptWithVisitor(v Visitor) { v.VisitArgumentList(my)}
-func (my *ArgumentList)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArgumentListWithArg(my, o) }
-func (my *ArgumentList)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArgumentListWithResult(my) }
-func (my *ArgumentList)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArgumentListWithResultArgument(my, o) }
+func (my *ArgumentList)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArgumentList)       Enter(v Visitor){
+        var checkChildren = v.VisitArgumentList(my)
+        if checkChildren{
+            if nil != my._ArgumentList{my._ArgumentList.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+        }
+        v.EndVisitArgumentList(my)
+    }
 
 
 func AnyCastToArgumentList(i interface{}) *ArgumentList {
@@ -21815,10 +23272,21 @@ func (my *DimExprs)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *DimExprs)      AcceptWithVisitor(v Visitor) { v.VisitDimExprs(my)}
-func (my *DimExprs)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitDimExprsWithArg(my, o) }
-func (my *DimExprs)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitDimExprsWithResult(my) }
-func (my *DimExprs)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitDimExprsWithResultArgument(my, o) }
+func (my *DimExprs)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *DimExprs)       Enter(v Visitor){
+        var checkChildren = v.VisitDimExprs(my)
+        if checkChildren{
+            if nil != my._DimExprs{my._DimExprs.Accept(v)}
+            if nil != my._DimExpr{my._DimExpr.Accept(v)}
+        }
+        v.EndVisitDimExprs(my)
+    }
 
 
 func AnyCastToDimExprs(i interface{}) *DimExprs {
@@ -21882,10 +23350,22 @@ func (my *DimExpr)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *DimExpr)      AcceptWithVisitor(v Visitor) { v.VisitDimExpr(my)}
-func (my *DimExpr)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitDimExprWithArg(my, o) }
-func (my *DimExpr)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitDimExprWithResult(my) }
-func (my *DimExpr)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitDimExprWithResultArgument(my, o) }
+func (my *DimExpr)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *DimExpr)       Enter(v Visitor){
+        var checkChildren = v.VisitDimExpr(my)
+        if checkChildren{
+            if nil != my._LBRACKET{my._LBRACKET.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RBRACKET{my._RBRACKET.Accept(v)}
+        }
+        v.EndVisitDimExpr(my)
+    }
 
 
 func AnyCastToDimExpr(i interface{}) *DimExpr {
@@ -21939,10 +23419,21 @@ func (my *PostIncrementExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PostIncrementExpression)      AcceptWithVisitor(v Visitor) { v.VisitPostIncrementExpression(my)}
-func (my *PostIncrementExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPostIncrementExpressionWithArg(my, o) }
-func (my *PostIncrementExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPostIncrementExpressionWithResult(my) }
-func (my *PostIncrementExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPostIncrementExpressionWithResultArgument(my, o) }
+func (my *PostIncrementExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PostIncrementExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitPostIncrementExpression(my)
+        if checkChildren{
+            if nil != my._PostfixExpression{my._PostfixExpression.Accept(v)}
+            if nil != my._PLUS_PLUS{my._PLUS_PLUS.Accept(v)}
+        }
+        v.EndVisitPostIncrementExpression(my)
+    }
 
 
 func AnyCastToPostIncrementExpression(i interface{}) *PostIncrementExpression {
@@ -21996,10 +23487,21 @@ func (my *PostDecrementExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PostDecrementExpression)      AcceptWithVisitor(v Visitor) { v.VisitPostDecrementExpression(my)}
-func (my *PostDecrementExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPostDecrementExpressionWithArg(my, o) }
-func (my *PostDecrementExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPostDecrementExpressionWithResult(my) }
-func (my *PostDecrementExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPostDecrementExpressionWithResultArgument(my, o) }
+func (my *PostDecrementExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PostDecrementExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitPostDecrementExpression(my)
+        if checkChildren{
+            if nil != my._PostfixExpression{my._PostfixExpression.Accept(v)}
+            if nil != my._MINUS_MINUS{my._MINUS_MINUS.Accept(v)}
+        }
+        v.EndVisitPostDecrementExpression(my)
+    }
 
 
 func AnyCastToPostDecrementExpression(i interface{}) *PostDecrementExpression {
@@ -22053,10 +23555,21 @@ func (my *PreIncrementExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PreIncrementExpression)      AcceptWithVisitor(v Visitor) { v.VisitPreIncrementExpression(my)}
-func (my *PreIncrementExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPreIncrementExpressionWithArg(my, o) }
-func (my *PreIncrementExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPreIncrementExpressionWithResult(my) }
-func (my *PreIncrementExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPreIncrementExpressionWithResultArgument(my, o) }
+func (my *PreIncrementExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PreIncrementExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitPreIncrementExpression(my)
+        if checkChildren{
+            if nil != my._PLUS_PLUS{my._PLUS_PLUS.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitPreIncrementExpression(my)
+    }
 
 
 func AnyCastToPreIncrementExpression(i interface{}) *PreIncrementExpression {
@@ -22110,10 +23623,21 @@ func (my *PreDecrementExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PreDecrementExpression)      AcceptWithVisitor(v Visitor) { v.VisitPreDecrementExpression(my)}
-func (my *PreDecrementExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPreDecrementExpressionWithArg(my, o) }
-func (my *PreDecrementExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPreDecrementExpressionWithResult(my) }
-func (my *PreDecrementExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPreDecrementExpressionWithResultArgument(my, o) }
+func (my *PreDecrementExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PreDecrementExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitPreDecrementExpression(my)
+        if checkChildren{
+            if nil != my._MINUS_MINUS{my._MINUS_MINUS.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitPreDecrementExpression(my)
+    }
 
 
 func AnyCastToPreDecrementExpression(i interface{}) *PreDecrementExpression {
@@ -22181,10 +23705,22 @@ func (my *AndExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AndExpression)      AcceptWithVisitor(v Visitor) { v.VisitAndExpression(my)}
-func (my *AndExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAndExpressionWithArg(my, o) }
-func (my *AndExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAndExpressionWithResult(my) }
-func (my *AndExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAndExpressionWithResultArgument(my, o) }
+func (my *AndExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AndExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitAndExpression(my)
+        if checkChildren{
+            if nil != my._AndExpression{my._AndExpression.Accept(v)}
+            if nil != my._AND{my._AND.Accept(v)}
+            if nil != my._EqualityExpression{my._EqualityExpression.Accept(v)}
+        }
+        v.EndVisitAndExpression(my)
+    }
 
 
 func AnyCastToAndExpression(i interface{}) *AndExpression {
@@ -22252,10 +23788,22 @@ func (my *ExclusiveOrExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExclusiveOrExpression)      AcceptWithVisitor(v Visitor) { v.VisitExclusiveOrExpression(my)}
-func (my *ExclusiveOrExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExclusiveOrExpressionWithArg(my, o) }
-func (my *ExclusiveOrExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExclusiveOrExpressionWithResult(my) }
-func (my *ExclusiveOrExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExclusiveOrExpressionWithResultArgument(my, o) }
+func (my *ExclusiveOrExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExclusiveOrExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitExclusiveOrExpression(my)
+        if checkChildren{
+            if nil != my._ExclusiveOrExpression{my._ExclusiveOrExpression.Accept(v)}
+            if nil != my._XOR{my._XOR.Accept(v)}
+            if nil != my._AndExpression{my._AndExpression.Accept(v)}
+        }
+        v.EndVisitExclusiveOrExpression(my)
+    }
 
 
 func AnyCastToExclusiveOrExpression(i interface{}) *ExclusiveOrExpression {
@@ -22323,10 +23871,22 @@ func (my *InclusiveOrExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *InclusiveOrExpression)      AcceptWithVisitor(v Visitor) { v.VisitInclusiveOrExpression(my)}
-func (my *InclusiveOrExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInclusiveOrExpressionWithArg(my, o) }
-func (my *InclusiveOrExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInclusiveOrExpressionWithResult(my) }
-func (my *InclusiveOrExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInclusiveOrExpressionWithResultArgument(my, o) }
+func (my *InclusiveOrExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InclusiveOrExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitInclusiveOrExpression(my)
+        if checkChildren{
+            if nil != my._InclusiveOrExpression{my._InclusiveOrExpression.Accept(v)}
+            if nil != my._OR{my._OR.Accept(v)}
+            if nil != my._ExclusiveOrExpression{my._ExclusiveOrExpression.Accept(v)}
+        }
+        v.EndVisitInclusiveOrExpression(my)
+    }
 
 
 func AnyCastToInclusiveOrExpression(i interface{}) *InclusiveOrExpression {
@@ -22394,10 +23954,22 @@ func (my *ConditionalAndExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConditionalAndExpression)      AcceptWithVisitor(v Visitor) { v.VisitConditionalAndExpression(my)}
-func (my *ConditionalAndExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConditionalAndExpressionWithArg(my, o) }
-func (my *ConditionalAndExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConditionalAndExpressionWithResult(my) }
-func (my *ConditionalAndExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConditionalAndExpressionWithResultArgument(my, o) }
+func (my *ConditionalAndExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConditionalAndExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitConditionalAndExpression(my)
+        if checkChildren{
+            if nil != my._ConditionalAndExpression{my._ConditionalAndExpression.Accept(v)}
+            if nil != my._AND_AND{my._AND_AND.Accept(v)}
+            if nil != my._InclusiveOrExpression{my._InclusiveOrExpression.Accept(v)}
+        }
+        v.EndVisitConditionalAndExpression(my)
+    }
 
 
 func AnyCastToConditionalAndExpression(i interface{}) *ConditionalAndExpression {
@@ -22465,10 +24037,22 @@ func (my *ConditionalOrExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConditionalOrExpression)      AcceptWithVisitor(v Visitor) { v.VisitConditionalOrExpression(my)}
-func (my *ConditionalOrExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConditionalOrExpressionWithArg(my, o) }
-func (my *ConditionalOrExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConditionalOrExpressionWithResult(my) }
-func (my *ConditionalOrExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConditionalOrExpressionWithResultArgument(my, o) }
+func (my *ConditionalOrExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConditionalOrExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitConditionalOrExpression(my)
+        if checkChildren{
+            if nil != my._ConditionalOrExpression{my._ConditionalOrExpression.Accept(v)}
+            if nil != my._OR_OR{my._OR_OR.Accept(v)}
+            if nil != my._ConditionalAndExpression{my._ConditionalAndExpression.Accept(v)}
+        }
+        v.EndVisitConditionalOrExpression(my)
+    }
 
 
 func AnyCastToConditionalOrExpression(i interface{}) *ConditionalOrExpression {
@@ -22556,10 +24140,24 @@ func (my *ConditionalExpression)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ConditionalExpression)      AcceptWithVisitor(v Visitor) { v.VisitConditionalExpression(my)}
-func (my *ConditionalExpression)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConditionalExpressionWithArg(my, o) }
-func (my *ConditionalExpression)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConditionalExpressionWithResult(my) }
-func (my *ConditionalExpression)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConditionalExpressionWithResultArgument(my, o) }
+func (my *ConditionalExpression)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConditionalExpression)       Enter(v Visitor){
+        var checkChildren = v.VisitConditionalExpression(my)
+        if checkChildren{
+            if nil != my._ConditionalOrExpression{my._ConditionalOrExpression.Accept(v)}
+            if nil != my._QUESTION{my._QUESTION.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._COLON{my._COLON.Accept(v)}
+            if nil != my._ConditionalExpression{my._ConditionalExpression.Accept(v)}
+        }
+        v.EndVisitConditionalExpression(my)
+    }
 
 
 func AnyCastToConditionalExpression(i interface{}) *ConditionalExpression {
@@ -22623,10 +24221,22 @@ func (my *Assignment)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Assignment)      AcceptWithVisitor(v Visitor) { v.VisitAssignment(my)}
-func (my *Assignment)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentWithArg(my, o) }
-func (my *Assignment)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentWithResult(my) }
-func (my *Assignment)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentWithResultArgument(my, o) }
+func (my *Assignment)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Assignment)       Enter(v Visitor){
+        var checkChildren = v.VisitAssignment(my)
+        if checkChildren{
+            if nil != my._LeftHandSide{my._LeftHandSide.Accept(v)}
+            if nil != my._AssignmentOperator{my._AssignmentOperator.Accept(v)}
+            if nil != my._AssignmentExpression{my._AssignmentExpression.Accept(v)}
+        }
+        v.EndVisitAssignment(my)
+    }
 
 
 func AnyCastToAssignment(i interface{}) *Assignment {
@@ -22657,10 +24267,17 @@ func NewCommaopt(token IToken )*Commaopt{
       return my
     }
 
-func (my *Commaopt)      AcceptWithVisitor(v Visitor) { v.VisitCommaopt(my)}
-func (my *Commaopt)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitCommaoptWithArg(my, o) }
-func (my *Commaopt)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitCommaoptWithResult(my) }
-func (my *Commaopt)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitCommaoptWithResultArgument(my, o) }
+func (my *Commaopt)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Commaopt)       Enter(v Visitor){
+        v.VisitCommaopt(my)
+        v.EndVisitCommaopt(my)
+    }
 
 
 func AnyCastToCommaopt(i interface{}) *Commaopt {
@@ -22691,10 +24308,17 @@ func NewEllipsisopt(token IToken )*Ellipsisopt{
       return my
     }
 
-func (my *Ellipsisopt)      AcceptWithVisitor(v Visitor) { v.VisitEllipsisopt(my)}
-func (my *Ellipsisopt)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEllipsisoptWithArg(my, o) }
-func (my *Ellipsisopt)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEllipsisoptWithResult(my) }
-func (my *Ellipsisopt)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEllipsisoptWithResultArgument(my, o) }
+func (my *Ellipsisopt)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Ellipsisopt)       Enter(v Visitor){
+        v.VisitEllipsisopt(my)
+        v.EndVisitEllipsisopt(my)
+    }
 
 
 func AnyCastToEllipsisopt(i interface{}) *Ellipsisopt {
@@ -22761,10 +24385,22 @@ func (my *LPGUserAction0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *LPGUserAction0)      AcceptWithVisitor(v Visitor) { v.VisitLPGUserAction0(my)}
-func (my *LPGUserAction0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLPGUserAction0WithArg(my, o) }
-func (my *LPGUserAction0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLPGUserAction0WithResult(my) }
-func (my *LPGUserAction0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLPGUserAction0WithResultArgument(my, o) }
+func (my *LPGUserAction0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LPGUserAction0)       Enter(v Visitor){
+        var checkChildren = v.VisitLPGUserAction0(my)
+        if checkChildren{
+            if nil != my._BeginAction{my._BeginAction.Accept(v)}
+            if nil != my._BlockStatementsopt{my._BlockStatementsopt.Accept(v)}
+            if nil != my._EndAction{my._EndAction.Accept(v)}
+        }
+        v.EndVisitLPGUserAction0(my)
+    }
 
 
 func AnyCastToLPGUserAction0(i interface{}) *LPGUserAction0 {
@@ -22831,10 +24467,22 @@ func (my *LPGUserAction1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *LPGUserAction1)      AcceptWithVisitor(v Visitor) { v.VisitLPGUserAction1(my)}
-func (my *LPGUserAction1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLPGUserAction1WithArg(my, o) }
-func (my *LPGUserAction1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLPGUserAction1WithResult(my) }
-func (my *LPGUserAction1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLPGUserAction1WithResultArgument(my, o) }
+func (my *LPGUserAction1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LPGUserAction1)       Enter(v Visitor){
+        var checkChildren = v.VisitLPGUserAction1(my)
+        if checkChildren{
+            if nil != my._BeginJava{my._BeginJava.Accept(v)}
+            if nil != my._BlockStatementsopt{my._BlockStatementsopt.Accept(v)}
+            if nil != my._EndJava{my._EndJava.Accept(v)}
+        }
+        v.EndVisitLPGUserAction1(my)
+    }
 
 
 func AnyCastToLPGUserAction1(i interface{}) *LPGUserAction1 {
@@ -22861,10 +24509,17 @@ func NewLPGUserAction2(token IToken )*LPGUserAction2{
       return my
     }
 
-func (my *LPGUserAction2)      AcceptWithVisitor(v Visitor) { v.VisitLPGUserAction2(my)}
-func (my *LPGUserAction2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLPGUserAction2WithArg(my, o) }
-func (my *LPGUserAction2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLPGUserAction2WithResult(my) }
-func (my *LPGUserAction2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLPGUserAction2WithResultArgument(my, o) }
+func (my *LPGUserAction2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LPGUserAction2)       Enter(v Visitor){
+        v.VisitLPGUserAction2(my)
+        v.EndVisitLPGUserAction2(my)
+    }
 
 
 func AnyCastToLPGUserAction2(i interface{}) *LPGUserAction2 {
@@ -22891,10 +24546,17 @@ func NewLPGUserAction3(token IToken )*LPGUserAction3{
       return my
     }
 
-func (my *LPGUserAction3)      AcceptWithVisitor(v Visitor) { v.VisitLPGUserAction3(my)}
-func (my *LPGUserAction3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLPGUserAction3WithArg(my, o) }
-func (my *LPGUserAction3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLPGUserAction3WithResult(my) }
-func (my *LPGUserAction3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLPGUserAction3WithResultArgument(my, o) }
+func (my *LPGUserAction3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LPGUserAction3)       Enter(v Visitor){
+        v.VisitLPGUserAction3(my)
+        v.EndVisitLPGUserAction3(my)
+    }
 
 
 func AnyCastToLPGUserAction3(i interface{}) *LPGUserAction3 {
@@ -22921,10 +24583,17 @@ func NewLPGUserAction4(token IToken )*LPGUserAction4{
       return my
     }
 
-func (my *LPGUserAction4)      AcceptWithVisitor(v Visitor) { v.VisitLPGUserAction4(my)}
-func (my *LPGUserAction4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLPGUserAction4WithArg(my, o) }
-func (my *LPGUserAction4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLPGUserAction4WithResult(my) }
-func (my *LPGUserAction4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLPGUserAction4WithResultArgument(my, o) }
+func (my *LPGUserAction4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *LPGUserAction4)       Enter(v Visitor){
+        v.VisitLPGUserAction4(my)
+        v.EndVisitLPGUserAction4(my)
+    }
 
 
 func AnyCastToLPGUserAction4(i interface{}) *LPGUserAction4 {
@@ -22951,10 +24620,17 @@ func NewIntegralType0(token IToken )*IntegralType0{
       return my
     }
 
-func (my *IntegralType0)      AcceptWithVisitor(v Visitor) { v.VisitIntegralType0(my)}
-func (my *IntegralType0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitIntegralType0WithArg(my, o) }
-func (my *IntegralType0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitIntegralType0WithResult(my) }
-func (my *IntegralType0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitIntegralType0WithResultArgument(my, o) }
+func (my *IntegralType0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *IntegralType0)       Enter(v Visitor){
+        v.VisitIntegralType0(my)
+        v.EndVisitIntegralType0(my)
+    }
 
 
 func AnyCastToIntegralType0(i interface{}) *IntegralType0 {
@@ -22981,10 +24657,17 @@ func NewIntegralType1(token IToken )*IntegralType1{
       return my
     }
 
-func (my *IntegralType1)      AcceptWithVisitor(v Visitor) { v.VisitIntegralType1(my)}
-func (my *IntegralType1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitIntegralType1WithArg(my, o) }
-func (my *IntegralType1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitIntegralType1WithResult(my) }
-func (my *IntegralType1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitIntegralType1WithResultArgument(my, o) }
+func (my *IntegralType1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *IntegralType1)       Enter(v Visitor){
+        v.VisitIntegralType1(my)
+        v.EndVisitIntegralType1(my)
+    }
 
 
 func AnyCastToIntegralType1(i interface{}) *IntegralType1 {
@@ -23011,10 +24694,17 @@ func NewIntegralType2(token IToken )*IntegralType2{
       return my
     }
 
-func (my *IntegralType2)      AcceptWithVisitor(v Visitor) { v.VisitIntegralType2(my)}
-func (my *IntegralType2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitIntegralType2WithArg(my, o) }
-func (my *IntegralType2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitIntegralType2WithResult(my) }
-func (my *IntegralType2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitIntegralType2WithResultArgument(my, o) }
+func (my *IntegralType2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *IntegralType2)       Enter(v Visitor){
+        v.VisitIntegralType2(my)
+        v.EndVisitIntegralType2(my)
+    }
 
 
 func AnyCastToIntegralType2(i interface{}) *IntegralType2 {
@@ -23041,10 +24731,17 @@ func NewIntegralType3(token IToken )*IntegralType3{
       return my
     }
 
-func (my *IntegralType3)      AcceptWithVisitor(v Visitor) { v.VisitIntegralType3(my)}
-func (my *IntegralType3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitIntegralType3WithArg(my, o) }
-func (my *IntegralType3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitIntegralType3WithResult(my) }
-func (my *IntegralType3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitIntegralType3WithResultArgument(my, o) }
+func (my *IntegralType3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *IntegralType3)       Enter(v Visitor){
+        v.VisitIntegralType3(my)
+        v.EndVisitIntegralType3(my)
+    }
 
 
 func AnyCastToIntegralType3(i interface{}) *IntegralType3 {
@@ -23071,10 +24768,17 @@ func NewIntegralType4(token IToken )*IntegralType4{
       return my
     }
 
-func (my *IntegralType4)      AcceptWithVisitor(v Visitor) { v.VisitIntegralType4(my)}
-func (my *IntegralType4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitIntegralType4WithArg(my, o) }
-func (my *IntegralType4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitIntegralType4WithResult(my) }
-func (my *IntegralType4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitIntegralType4WithResultArgument(my, o) }
+func (my *IntegralType4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *IntegralType4)       Enter(v Visitor){
+        v.VisitIntegralType4(my)
+        v.EndVisitIntegralType4(my)
+    }
 
 
 func AnyCastToIntegralType4(i interface{}) *IntegralType4 {
@@ -23101,10 +24805,17 @@ func NewFloatingPointType0(token IToken )*FloatingPointType0{
       return my
     }
 
-func (my *FloatingPointType0)      AcceptWithVisitor(v Visitor) { v.VisitFloatingPointType0(my)}
-func (my *FloatingPointType0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFloatingPointType0WithArg(my, o) }
-func (my *FloatingPointType0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFloatingPointType0WithResult(my) }
-func (my *FloatingPointType0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFloatingPointType0WithResultArgument(my, o) }
+func (my *FloatingPointType0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FloatingPointType0)       Enter(v Visitor){
+        v.VisitFloatingPointType0(my)
+        v.EndVisitFloatingPointType0(my)
+    }
 
 
 func AnyCastToFloatingPointType0(i interface{}) *FloatingPointType0 {
@@ -23131,10 +24842,17 @@ func NewFloatingPointType1(token IToken )*FloatingPointType1{
       return my
     }
 
-func (my *FloatingPointType1)      AcceptWithVisitor(v Visitor) { v.VisitFloatingPointType1(my)}
-func (my *FloatingPointType1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFloatingPointType1WithArg(my, o) }
-func (my *FloatingPointType1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFloatingPointType1WithResult(my) }
-func (my *FloatingPointType1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFloatingPointType1WithResultArgument(my, o) }
+func (my *FloatingPointType1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FloatingPointType1)       Enter(v Visitor){
+        v.VisitFloatingPointType1(my)
+        v.EndVisitFloatingPointType1(my)
+    }
 
 
 func AnyCastToFloatingPointType1(i interface{}) *FloatingPointType1 {
@@ -23188,10 +24906,21 @@ func (my *WildcardBounds0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *WildcardBounds0)      AcceptWithVisitor(v Visitor) { v.VisitWildcardBounds0(my)}
-func (my *WildcardBounds0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitWildcardBounds0WithArg(my, o) }
-func (my *WildcardBounds0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitWildcardBounds0WithResult(my) }
-func (my *WildcardBounds0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitWildcardBounds0WithResultArgument(my, o) }
+func (my *WildcardBounds0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *WildcardBounds0)       Enter(v Visitor){
+        var checkChildren = v.VisitWildcardBounds0(my)
+        if checkChildren{
+            if nil != my._extends{my._extends.Accept(v)}
+            if nil != my._ReferenceType{my._ReferenceType.Accept(v)}
+        }
+        v.EndVisitWildcardBounds0(my)
+    }
 
 
 func AnyCastToWildcardBounds0(i interface{}) *WildcardBounds0 {
@@ -23245,10 +24974,21 @@ func (my *WildcardBounds1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *WildcardBounds1)      AcceptWithVisitor(v Visitor) { v.VisitWildcardBounds1(my)}
-func (my *WildcardBounds1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitWildcardBounds1WithArg(my, o) }
-func (my *WildcardBounds1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitWildcardBounds1WithResult(my) }
-func (my *WildcardBounds1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitWildcardBounds1WithResultArgument(my, o) }
+func (my *WildcardBounds1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *WildcardBounds1)       Enter(v Visitor){
+        var checkChildren = v.VisitWildcardBounds1(my)
+        if checkChildren{
+            if nil != my._super{my._super.Accept(v)}
+            if nil != my._ReferenceType{my._ReferenceType.Accept(v)}
+        }
+        v.EndVisitWildcardBounds1(my)
+    }
 
 
 func AnyCastToWildcardBounds1(i interface{}) *WildcardBounds1 {
@@ -23275,10 +25015,17 @@ func NewClassModifier0(token IToken )*ClassModifier0{
       return my
     }
 
-func (my *ClassModifier0)      AcceptWithVisitor(v Visitor) { v.VisitClassModifier0(my)}
-func (my *ClassModifier0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassModifier0WithArg(my, o) }
-func (my *ClassModifier0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassModifier0WithResult(my) }
-func (my *ClassModifier0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassModifier0WithResultArgument(my, o) }
+func (my *ClassModifier0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassModifier0)       Enter(v Visitor){
+        v.VisitClassModifier0(my)
+        v.EndVisitClassModifier0(my)
+    }
 
 
 func AnyCastToClassModifier0(i interface{}) *ClassModifier0 {
@@ -23305,10 +25052,17 @@ func NewClassModifier1(token IToken )*ClassModifier1{
       return my
     }
 
-func (my *ClassModifier1)      AcceptWithVisitor(v Visitor) { v.VisitClassModifier1(my)}
-func (my *ClassModifier1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassModifier1WithArg(my, o) }
-func (my *ClassModifier1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassModifier1WithResult(my) }
-func (my *ClassModifier1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassModifier1WithResultArgument(my, o) }
+func (my *ClassModifier1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassModifier1)       Enter(v Visitor){
+        v.VisitClassModifier1(my)
+        v.EndVisitClassModifier1(my)
+    }
 
 
 func AnyCastToClassModifier1(i interface{}) *ClassModifier1 {
@@ -23335,10 +25089,17 @@ func NewClassModifier2(token IToken )*ClassModifier2{
       return my
     }
 
-func (my *ClassModifier2)      AcceptWithVisitor(v Visitor) { v.VisitClassModifier2(my)}
-func (my *ClassModifier2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassModifier2WithArg(my, o) }
-func (my *ClassModifier2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassModifier2WithResult(my) }
-func (my *ClassModifier2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassModifier2WithResultArgument(my, o) }
+func (my *ClassModifier2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassModifier2)       Enter(v Visitor){
+        v.VisitClassModifier2(my)
+        v.EndVisitClassModifier2(my)
+    }
 
 
 func AnyCastToClassModifier2(i interface{}) *ClassModifier2 {
@@ -23365,10 +25126,17 @@ func NewClassModifier3(token IToken )*ClassModifier3{
       return my
     }
 
-func (my *ClassModifier3)      AcceptWithVisitor(v Visitor) { v.VisitClassModifier3(my)}
-func (my *ClassModifier3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassModifier3WithArg(my, o) }
-func (my *ClassModifier3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassModifier3WithResult(my) }
-func (my *ClassModifier3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassModifier3WithResultArgument(my, o) }
+func (my *ClassModifier3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassModifier3)       Enter(v Visitor){
+        v.VisitClassModifier3(my)
+        v.EndVisitClassModifier3(my)
+    }
 
 
 func AnyCastToClassModifier3(i interface{}) *ClassModifier3 {
@@ -23395,10 +25163,17 @@ func NewClassModifier4(token IToken )*ClassModifier4{
       return my
     }
 
-func (my *ClassModifier4)      AcceptWithVisitor(v Visitor) { v.VisitClassModifier4(my)}
-func (my *ClassModifier4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassModifier4WithArg(my, o) }
-func (my *ClassModifier4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassModifier4WithResult(my) }
-func (my *ClassModifier4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassModifier4WithResultArgument(my, o) }
+func (my *ClassModifier4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassModifier4)       Enter(v Visitor){
+        v.VisitClassModifier4(my)
+        v.EndVisitClassModifier4(my)
+    }
 
 
 func AnyCastToClassModifier4(i interface{}) *ClassModifier4 {
@@ -23425,10 +25200,17 @@ func NewClassModifier5(token IToken )*ClassModifier5{
       return my
     }
 
-func (my *ClassModifier5)      AcceptWithVisitor(v Visitor) { v.VisitClassModifier5(my)}
-func (my *ClassModifier5)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassModifier5WithArg(my, o) }
-func (my *ClassModifier5)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassModifier5WithResult(my) }
-func (my *ClassModifier5)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassModifier5WithResultArgument(my, o) }
+func (my *ClassModifier5)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassModifier5)       Enter(v Visitor){
+        v.VisitClassModifier5(my)
+        v.EndVisitClassModifier5(my)
+    }
 
 
 func AnyCastToClassModifier5(i interface{}) *ClassModifier5 {
@@ -23455,10 +25237,17 @@ func NewClassModifier6(token IToken )*ClassModifier6{
       return my
     }
 
-func (my *ClassModifier6)      AcceptWithVisitor(v Visitor) { v.VisitClassModifier6(my)}
-func (my *ClassModifier6)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassModifier6WithArg(my, o) }
-func (my *ClassModifier6)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassModifier6WithResult(my) }
-func (my *ClassModifier6)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassModifier6WithResultArgument(my, o) }
+func (my *ClassModifier6)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassModifier6)       Enter(v Visitor){
+        v.VisitClassModifier6(my)
+        v.EndVisitClassModifier6(my)
+    }
 
 
 func AnyCastToClassModifier6(i interface{}) *ClassModifier6 {
@@ -23485,10 +25274,17 @@ func NewFieldModifier0(token IToken )*FieldModifier0{
       return my
     }
 
-func (my *FieldModifier0)      AcceptWithVisitor(v Visitor) { v.VisitFieldModifier0(my)}
-func (my *FieldModifier0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldModifier0WithArg(my, o) }
-func (my *FieldModifier0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldModifier0WithResult(my) }
-func (my *FieldModifier0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldModifier0WithResultArgument(my, o) }
+func (my *FieldModifier0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldModifier0)       Enter(v Visitor){
+        v.VisitFieldModifier0(my)
+        v.EndVisitFieldModifier0(my)
+    }
 
 
 func AnyCastToFieldModifier0(i interface{}) *FieldModifier0 {
@@ -23515,10 +25311,17 @@ func NewFieldModifier1(token IToken )*FieldModifier1{
       return my
     }
 
-func (my *FieldModifier1)      AcceptWithVisitor(v Visitor) { v.VisitFieldModifier1(my)}
-func (my *FieldModifier1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldModifier1WithArg(my, o) }
-func (my *FieldModifier1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldModifier1WithResult(my) }
-func (my *FieldModifier1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldModifier1WithResultArgument(my, o) }
+func (my *FieldModifier1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldModifier1)       Enter(v Visitor){
+        v.VisitFieldModifier1(my)
+        v.EndVisitFieldModifier1(my)
+    }
 
 
 func AnyCastToFieldModifier1(i interface{}) *FieldModifier1 {
@@ -23545,10 +25348,17 @@ func NewFieldModifier2(token IToken )*FieldModifier2{
       return my
     }
 
-func (my *FieldModifier2)      AcceptWithVisitor(v Visitor) { v.VisitFieldModifier2(my)}
-func (my *FieldModifier2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldModifier2WithArg(my, o) }
-func (my *FieldModifier2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldModifier2WithResult(my) }
-func (my *FieldModifier2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldModifier2WithResultArgument(my, o) }
+func (my *FieldModifier2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldModifier2)       Enter(v Visitor){
+        v.VisitFieldModifier2(my)
+        v.EndVisitFieldModifier2(my)
+    }
 
 
 func AnyCastToFieldModifier2(i interface{}) *FieldModifier2 {
@@ -23575,10 +25385,17 @@ func NewFieldModifier3(token IToken )*FieldModifier3{
       return my
     }
 
-func (my *FieldModifier3)      AcceptWithVisitor(v Visitor) { v.VisitFieldModifier3(my)}
-func (my *FieldModifier3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldModifier3WithArg(my, o) }
-func (my *FieldModifier3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldModifier3WithResult(my) }
-func (my *FieldModifier3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldModifier3WithResultArgument(my, o) }
+func (my *FieldModifier3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldModifier3)       Enter(v Visitor){
+        v.VisitFieldModifier3(my)
+        v.EndVisitFieldModifier3(my)
+    }
 
 
 func AnyCastToFieldModifier3(i interface{}) *FieldModifier3 {
@@ -23605,10 +25422,17 @@ func NewFieldModifier4(token IToken )*FieldModifier4{
       return my
     }
 
-func (my *FieldModifier4)      AcceptWithVisitor(v Visitor) { v.VisitFieldModifier4(my)}
-func (my *FieldModifier4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldModifier4WithArg(my, o) }
-func (my *FieldModifier4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldModifier4WithResult(my) }
-func (my *FieldModifier4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldModifier4WithResultArgument(my, o) }
+func (my *FieldModifier4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldModifier4)       Enter(v Visitor){
+        v.VisitFieldModifier4(my)
+        v.EndVisitFieldModifier4(my)
+    }
 
 
 func AnyCastToFieldModifier4(i interface{}) *FieldModifier4 {
@@ -23635,10 +25459,17 @@ func NewFieldModifier5(token IToken )*FieldModifier5{
       return my
     }
 
-func (my *FieldModifier5)      AcceptWithVisitor(v Visitor) { v.VisitFieldModifier5(my)}
-func (my *FieldModifier5)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldModifier5WithArg(my, o) }
-func (my *FieldModifier5)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldModifier5WithResult(my) }
-func (my *FieldModifier5)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldModifier5WithResultArgument(my, o) }
+func (my *FieldModifier5)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldModifier5)       Enter(v Visitor){
+        v.VisitFieldModifier5(my)
+        v.EndVisitFieldModifier5(my)
+    }
 
 
 func AnyCastToFieldModifier5(i interface{}) *FieldModifier5 {
@@ -23665,10 +25496,17 @@ func NewFieldModifier6(token IToken )*FieldModifier6{
       return my
     }
 
-func (my *FieldModifier6)      AcceptWithVisitor(v Visitor) { v.VisitFieldModifier6(my)}
-func (my *FieldModifier6)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldModifier6WithArg(my, o) }
-func (my *FieldModifier6)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldModifier6WithResult(my) }
-func (my *FieldModifier6)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldModifier6WithResultArgument(my, o) }
+func (my *FieldModifier6)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldModifier6)       Enter(v Visitor){
+        v.VisitFieldModifier6(my)
+        v.EndVisitFieldModifier6(my)
+    }
 
 
 func AnyCastToFieldModifier6(i interface{}) *FieldModifier6 {
@@ -23745,10 +25583,23 @@ func (my *MethodDeclarator0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodDeclarator0)      AcceptWithVisitor(v Visitor) { v.VisitMethodDeclarator0(my)}
-func (my *MethodDeclarator0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodDeclarator0WithArg(my, o) }
-func (my *MethodDeclarator0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodDeclarator0WithResult(my) }
-func (my *MethodDeclarator0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodDeclarator0WithResultArgument(my, o) }
+func (my *MethodDeclarator0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodDeclarator0)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodDeclarator0(my)
+        if checkChildren{
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._FormalParameterListopt{my._FormalParameterListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitMethodDeclarator0(my)
+    }
 
 
 func AnyCastToMethodDeclarator0(i interface{}) *MethodDeclarator0 {
@@ -23812,10 +25663,22 @@ func (my *MethodDeclarator1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodDeclarator1)      AcceptWithVisitor(v Visitor) { v.VisitMethodDeclarator1(my)}
-func (my *MethodDeclarator1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodDeclarator1WithArg(my, o) }
-func (my *MethodDeclarator1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodDeclarator1WithResult(my) }
-func (my *MethodDeclarator1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodDeclarator1WithResultArgument(my, o) }
+func (my *MethodDeclarator1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodDeclarator1)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodDeclarator1(my)
+        if checkChildren{
+            if nil != my._MethodDeclarator{my._MethodDeclarator.Accept(v)}
+            if nil != my._LBRACKET{my._LBRACKET.Accept(v)}
+            if nil != my._RBRACKET{my._RBRACKET.Accept(v)}
+        }
+        v.EndVisitMethodDeclarator1(my)
+    }
 
 
 func AnyCastToMethodDeclarator1(i interface{}) *MethodDeclarator1 {
@@ -23842,10 +25705,17 @@ func NewMethodModifier0(token IToken )*MethodModifier0{
       return my
     }
 
-func (my *MethodModifier0)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier0(my)}
-func (my *MethodModifier0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier0WithArg(my, o) }
-func (my *MethodModifier0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier0WithResult(my) }
-func (my *MethodModifier0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier0WithResultArgument(my, o) }
+func (my *MethodModifier0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier0)       Enter(v Visitor){
+        v.VisitMethodModifier0(my)
+        v.EndVisitMethodModifier0(my)
+    }
 
 
 func AnyCastToMethodModifier0(i interface{}) *MethodModifier0 {
@@ -23872,10 +25742,17 @@ func NewMethodModifier1(token IToken )*MethodModifier1{
       return my
     }
 
-func (my *MethodModifier1)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier1(my)}
-func (my *MethodModifier1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier1WithArg(my, o) }
-func (my *MethodModifier1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier1WithResult(my) }
-func (my *MethodModifier1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier1WithResultArgument(my, o) }
+func (my *MethodModifier1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier1)       Enter(v Visitor){
+        v.VisitMethodModifier1(my)
+        v.EndVisitMethodModifier1(my)
+    }
 
 
 func AnyCastToMethodModifier1(i interface{}) *MethodModifier1 {
@@ -23902,10 +25779,17 @@ func NewMethodModifier2(token IToken )*MethodModifier2{
       return my
     }
 
-func (my *MethodModifier2)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier2(my)}
-func (my *MethodModifier2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier2WithArg(my, o) }
-func (my *MethodModifier2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier2WithResult(my) }
-func (my *MethodModifier2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier2WithResultArgument(my, o) }
+func (my *MethodModifier2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier2)       Enter(v Visitor){
+        v.VisitMethodModifier2(my)
+        v.EndVisitMethodModifier2(my)
+    }
 
 
 func AnyCastToMethodModifier2(i interface{}) *MethodModifier2 {
@@ -23932,10 +25816,17 @@ func NewMethodModifier3(token IToken )*MethodModifier3{
       return my
     }
 
-func (my *MethodModifier3)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier3(my)}
-func (my *MethodModifier3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier3WithArg(my, o) }
-func (my *MethodModifier3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier3WithResult(my) }
-func (my *MethodModifier3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier3WithResultArgument(my, o) }
+func (my *MethodModifier3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier3)       Enter(v Visitor){
+        v.VisitMethodModifier3(my)
+        v.EndVisitMethodModifier3(my)
+    }
 
 
 func AnyCastToMethodModifier3(i interface{}) *MethodModifier3 {
@@ -23962,10 +25853,17 @@ func NewMethodModifier4(token IToken )*MethodModifier4{
       return my
     }
 
-func (my *MethodModifier4)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier4(my)}
-func (my *MethodModifier4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier4WithArg(my, o) }
-func (my *MethodModifier4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier4WithResult(my) }
-func (my *MethodModifier4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier4WithResultArgument(my, o) }
+func (my *MethodModifier4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier4)       Enter(v Visitor){
+        v.VisitMethodModifier4(my)
+        v.EndVisitMethodModifier4(my)
+    }
 
 
 func AnyCastToMethodModifier4(i interface{}) *MethodModifier4 {
@@ -23992,10 +25890,17 @@ func NewMethodModifier5(token IToken )*MethodModifier5{
       return my
     }
 
-func (my *MethodModifier5)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier5(my)}
-func (my *MethodModifier5)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier5WithArg(my, o) }
-func (my *MethodModifier5)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier5WithResult(my) }
-func (my *MethodModifier5)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier5WithResultArgument(my, o) }
+func (my *MethodModifier5)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier5)       Enter(v Visitor){
+        v.VisitMethodModifier5(my)
+        v.EndVisitMethodModifier5(my)
+    }
 
 
 func AnyCastToMethodModifier5(i interface{}) *MethodModifier5 {
@@ -24022,10 +25927,17 @@ func NewMethodModifier6(token IToken )*MethodModifier6{
       return my
     }
 
-func (my *MethodModifier6)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier6(my)}
-func (my *MethodModifier6)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier6WithArg(my, o) }
-func (my *MethodModifier6)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier6WithResult(my) }
-func (my *MethodModifier6)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier6WithResultArgument(my, o) }
+func (my *MethodModifier6)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier6)       Enter(v Visitor){
+        v.VisitMethodModifier6(my)
+        v.EndVisitMethodModifier6(my)
+    }
 
 
 func AnyCastToMethodModifier6(i interface{}) *MethodModifier6 {
@@ -24052,10 +25964,17 @@ func NewMethodModifier7(token IToken )*MethodModifier7{
       return my
     }
 
-func (my *MethodModifier7)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier7(my)}
-func (my *MethodModifier7)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier7WithArg(my, o) }
-func (my *MethodModifier7)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier7WithResult(my) }
-func (my *MethodModifier7)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier7WithResultArgument(my, o) }
+func (my *MethodModifier7)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier7)       Enter(v Visitor){
+        v.VisitMethodModifier7(my)
+        v.EndVisitMethodModifier7(my)
+    }
 
 
 func AnyCastToMethodModifier7(i interface{}) *MethodModifier7 {
@@ -24082,10 +26001,17 @@ func NewMethodModifier8(token IToken )*MethodModifier8{
       return my
     }
 
-func (my *MethodModifier8)      AcceptWithVisitor(v Visitor) { v.VisitMethodModifier8(my)}
-func (my *MethodModifier8)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodModifier8WithArg(my, o) }
-func (my *MethodModifier8)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodModifier8WithResult(my) }
-func (my *MethodModifier8)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodModifier8WithResultArgument(my, o) }
+func (my *MethodModifier8)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodModifier8)       Enter(v Visitor){
+        v.VisitMethodModifier8(my)
+        v.EndVisitMethodModifier8(my)
+    }
 
 
 func AnyCastToMethodModifier8(i interface{}) *MethodModifier8 {
@@ -24112,10 +26038,17 @@ func NewConstructorModifier0(token IToken )*ConstructorModifier0{
       return my
     }
 
-func (my *ConstructorModifier0)      AcceptWithVisitor(v Visitor) { v.VisitConstructorModifier0(my)}
-func (my *ConstructorModifier0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstructorModifier0WithArg(my, o) }
-func (my *ConstructorModifier0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstructorModifier0WithResult(my) }
-func (my *ConstructorModifier0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstructorModifier0WithResultArgument(my, o) }
+func (my *ConstructorModifier0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstructorModifier0)       Enter(v Visitor){
+        v.VisitConstructorModifier0(my)
+        v.EndVisitConstructorModifier0(my)
+    }
 
 
 func AnyCastToConstructorModifier0(i interface{}) *ConstructorModifier0 {
@@ -24142,10 +26075,17 @@ func NewConstructorModifier1(token IToken )*ConstructorModifier1{
       return my
     }
 
-func (my *ConstructorModifier1)      AcceptWithVisitor(v Visitor) { v.VisitConstructorModifier1(my)}
-func (my *ConstructorModifier1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstructorModifier1WithArg(my, o) }
-func (my *ConstructorModifier1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstructorModifier1WithResult(my) }
-func (my *ConstructorModifier1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstructorModifier1WithResultArgument(my, o) }
+func (my *ConstructorModifier1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstructorModifier1)       Enter(v Visitor){
+        v.VisitConstructorModifier1(my)
+        v.EndVisitConstructorModifier1(my)
+    }
 
 
 func AnyCastToConstructorModifier1(i interface{}) *ConstructorModifier1 {
@@ -24172,10 +26112,17 @@ func NewConstructorModifier2(token IToken )*ConstructorModifier2{
       return my
     }
 
-func (my *ConstructorModifier2)      AcceptWithVisitor(v Visitor) { v.VisitConstructorModifier2(my)}
-func (my *ConstructorModifier2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstructorModifier2WithArg(my, o) }
-func (my *ConstructorModifier2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstructorModifier2WithResult(my) }
-func (my *ConstructorModifier2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstructorModifier2WithResultArgument(my, o) }
+func (my *ConstructorModifier2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstructorModifier2)       Enter(v Visitor){
+        v.VisitConstructorModifier2(my)
+        v.EndVisitConstructorModifier2(my)
+    }
 
 
 func AnyCastToConstructorModifier2(i interface{}) *ConstructorModifier2 {
@@ -24275,10 +26222,25 @@ func (my *ExplicitConstructorInvocation0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExplicitConstructorInvocation0)      AcceptWithVisitor(v Visitor) { v.VisitExplicitConstructorInvocation0(my)}
-func (my *ExplicitConstructorInvocation0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExplicitConstructorInvocation0WithArg(my, o) }
-func (my *ExplicitConstructorInvocation0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExplicitConstructorInvocation0WithResult(my) }
-func (my *ExplicitConstructorInvocation0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExplicitConstructorInvocation0WithResultArgument(my, o) }
+func (my *ExplicitConstructorInvocation0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExplicitConstructorInvocation0)       Enter(v Visitor){
+        var checkChildren = v.VisitExplicitConstructorInvocation0(my)
+        if checkChildren{
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+            if nil != my._this{my._this.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitExplicitConstructorInvocation0(my)
+    }
 
 
 func AnyCastToExplicitConstructorInvocation0(i interface{}) *ExplicitConstructorInvocation0 {
@@ -24378,10 +26340,25 @@ func (my *ExplicitConstructorInvocation1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExplicitConstructorInvocation1)      AcceptWithVisitor(v Visitor) { v.VisitExplicitConstructorInvocation1(my)}
-func (my *ExplicitConstructorInvocation1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExplicitConstructorInvocation1WithArg(my, o) }
-func (my *ExplicitConstructorInvocation1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExplicitConstructorInvocation1WithResult(my) }
-func (my *ExplicitConstructorInvocation1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExplicitConstructorInvocation1WithResultArgument(my, o) }
+func (my *ExplicitConstructorInvocation1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExplicitConstructorInvocation1)       Enter(v Visitor){
+        var checkChildren = v.VisitExplicitConstructorInvocation1(my)
+        if checkChildren{
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+            if nil != my._super{my._super.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitExplicitConstructorInvocation1(my)
+    }
 
 
 func AnyCastToExplicitConstructorInvocation1(i interface{}) *ExplicitConstructorInvocation1 {
@@ -24501,10 +26478,27 @@ func (my *ExplicitConstructorInvocation2)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExplicitConstructorInvocation2)      AcceptWithVisitor(v Visitor) { v.VisitExplicitConstructorInvocation2(my)}
-func (my *ExplicitConstructorInvocation2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExplicitConstructorInvocation2WithArg(my, o) }
-func (my *ExplicitConstructorInvocation2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExplicitConstructorInvocation2WithResult(my) }
-func (my *ExplicitConstructorInvocation2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExplicitConstructorInvocation2WithResultArgument(my, o) }
+func (my *ExplicitConstructorInvocation2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExplicitConstructorInvocation2)       Enter(v Visitor){
+        var checkChildren = v.VisitExplicitConstructorInvocation2(my)
+        if checkChildren{
+            if nil != my._Primary{my._Primary.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+            if nil != my._super{my._super.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitExplicitConstructorInvocation2(my)
+    }
 
 
 func AnyCastToExplicitConstructorInvocation2(i interface{}) *ExplicitConstructorInvocation2 {
@@ -24531,10 +26525,17 @@ func NewInterfaceModifier0(token IToken )*InterfaceModifier0{
       return my
     }
 
-func (my *InterfaceModifier0)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceModifier0(my)}
-func (my *InterfaceModifier0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceModifier0WithArg(my, o) }
-func (my *InterfaceModifier0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceModifier0WithResult(my) }
-func (my *InterfaceModifier0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceModifier0WithResultArgument(my, o) }
+func (my *InterfaceModifier0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceModifier0)       Enter(v Visitor){
+        v.VisitInterfaceModifier0(my)
+        v.EndVisitInterfaceModifier0(my)
+    }
 
 
 func AnyCastToInterfaceModifier0(i interface{}) *InterfaceModifier0 {
@@ -24561,10 +26562,17 @@ func NewInterfaceModifier1(token IToken )*InterfaceModifier1{
       return my
     }
 
-func (my *InterfaceModifier1)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceModifier1(my)}
-func (my *InterfaceModifier1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceModifier1WithArg(my, o) }
-func (my *InterfaceModifier1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceModifier1WithResult(my) }
-func (my *InterfaceModifier1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceModifier1WithResultArgument(my, o) }
+func (my *InterfaceModifier1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceModifier1)       Enter(v Visitor){
+        v.VisitInterfaceModifier1(my)
+        v.EndVisitInterfaceModifier1(my)
+    }
 
 
 func AnyCastToInterfaceModifier1(i interface{}) *InterfaceModifier1 {
@@ -24591,10 +26599,17 @@ func NewInterfaceModifier2(token IToken )*InterfaceModifier2{
       return my
     }
 
-func (my *InterfaceModifier2)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceModifier2(my)}
-func (my *InterfaceModifier2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceModifier2WithArg(my, o) }
-func (my *InterfaceModifier2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceModifier2WithResult(my) }
-func (my *InterfaceModifier2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceModifier2WithResultArgument(my, o) }
+func (my *InterfaceModifier2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceModifier2)       Enter(v Visitor){
+        v.VisitInterfaceModifier2(my)
+        v.EndVisitInterfaceModifier2(my)
+    }
 
 
 func AnyCastToInterfaceModifier2(i interface{}) *InterfaceModifier2 {
@@ -24621,10 +26636,17 @@ func NewInterfaceModifier3(token IToken )*InterfaceModifier3{
       return my
     }
 
-func (my *InterfaceModifier3)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceModifier3(my)}
-func (my *InterfaceModifier3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceModifier3WithArg(my, o) }
-func (my *InterfaceModifier3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceModifier3WithResult(my) }
-func (my *InterfaceModifier3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceModifier3WithResultArgument(my, o) }
+func (my *InterfaceModifier3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceModifier3)       Enter(v Visitor){
+        v.VisitInterfaceModifier3(my)
+        v.EndVisitInterfaceModifier3(my)
+    }
 
 
 func AnyCastToInterfaceModifier3(i interface{}) *InterfaceModifier3 {
@@ -24651,10 +26673,17 @@ func NewInterfaceModifier4(token IToken )*InterfaceModifier4{
       return my
     }
 
-func (my *InterfaceModifier4)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceModifier4(my)}
-func (my *InterfaceModifier4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceModifier4WithArg(my, o) }
-func (my *InterfaceModifier4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceModifier4WithResult(my) }
-func (my *InterfaceModifier4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceModifier4WithResultArgument(my, o) }
+func (my *InterfaceModifier4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceModifier4)       Enter(v Visitor){
+        v.VisitInterfaceModifier4(my)
+        v.EndVisitInterfaceModifier4(my)
+    }
 
 
 func AnyCastToInterfaceModifier4(i interface{}) *InterfaceModifier4 {
@@ -24681,10 +26710,17 @@ func NewInterfaceModifier5(token IToken )*InterfaceModifier5{
       return my
     }
 
-func (my *InterfaceModifier5)      AcceptWithVisitor(v Visitor) { v.VisitInterfaceModifier5(my)}
-func (my *InterfaceModifier5)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitInterfaceModifier5WithArg(my, o) }
-func (my *InterfaceModifier5)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitInterfaceModifier5WithResult(my) }
-func (my *InterfaceModifier5)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitInterfaceModifier5WithResultArgument(my, o) }
+func (my *InterfaceModifier5)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *InterfaceModifier5)       Enter(v Visitor){
+        v.VisitInterfaceModifier5(my)
+        v.EndVisitInterfaceModifier5(my)
+    }
 
 
 func AnyCastToInterfaceModifier5(i interface{}) *InterfaceModifier5 {
@@ -24738,10 +26774,21 @@ func (my *ExtendsInterfaces0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExtendsInterfaces0)      AcceptWithVisitor(v Visitor) { v.VisitExtendsInterfaces0(my)}
-func (my *ExtendsInterfaces0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExtendsInterfaces0WithArg(my, o) }
-func (my *ExtendsInterfaces0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExtendsInterfaces0WithResult(my) }
-func (my *ExtendsInterfaces0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExtendsInterfaces0WithResultArgument(my, o) }
+func (my *ExtendsInterfaces0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExtendsInterfaces0)       Enter(v Visitor){
+        var checkChildren = v.VisitExtendsInterfaces0(my)
+        if checkChildren{
+            if nil != my._extends{my._extends.Accept(v)}
+            if nil != my._InterfaceType{my._InterfaceType.Accept(v)}
+        }
+        v.EndVisitExtendsInterfaces0(my)
+    }
 
 
 func AnyCastToExtendsInterfaces0(i interface{}) *ExtendsInterfaces0 {
@@ -24805,10 +26852,22 @@ func (my *ExtendsInterfaces1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ExtendsInterfaces1)      AcceptWithVisitor(v Visitor) { v.VisitExtendsInterfaces1(my)}
-func (my *ExtendsInterfaces1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitExtendsInterfaces1WithArg(my, o) }
-func (my *ExtendsInterfaces1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitExtendsInterfaces1WithResult(my) }
-func (my *ExtendsInterfaces1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitExtendsInterfaces1WithResultArgument(my, o) }
+func (my *ExtendsInterfaces1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ExtendsInterfaces1)       Enter(v Visitor){
+        var checkChildren = v.VisitExtendsInterfaces1(my)
+        if checkChildren{
+            if nil != my._ExtendsInterfaces{my._ExtendsInterfaces.Accept(v)}
+            if nil != my._COMMA{my._COMMA.Accept(v)}
+            if nil != my._InterfaceType{my._InterfaceType.Accept(v)}
+        }
+        v.EndVisitExtendsInterfaces1(my)
+    }
 
 
 func AnyCastToExtendsInterfaces1(i interface{}) *ExtendsInterfaces1 {
@@ -24835,10 +26894,17 @@ func NewConstantModifier0(token IToken )*ConstantModifier0{
       return my
     }
 
-func (my *ConstantModifier0)      AcceptWithVisitor(v Visitor) { v.VisitConstantModifier0(my)}
-func (my *ConstantModifier0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstantModifier0WithArg(my, o) }
-func (my *ConstantModifier0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstantModifier0WithResult(my) }
-func (my *ConstantModifier0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstantModifier0WithResultArgument(my, o) }
+func (my *ConstantModifier0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstantModifier0)       Enter(v Visitor){
+        v.VisitConstantModifier0(my)
+        v.EndVisitConstantModifier0(my)
+    }
 
 
 func AnyCastToConstantModifier0(i interface{}) *ConstantModifier0 {
@@ -24865,10 +26931,17 @@ func NewConstantModifier1(token IToken )*ConstantModifier1{
       return my
     }
 
-func (my *ConstantModifier1)      AcceptWithVisitor(v Visitor) { v.VisitConstantModifier1(my)}
-func (my *ConstantModifier1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstantModifier1WithArg(my, o) }
-func (my *ConstantModifier1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstantModifier1WithResult(my) }
-func (my *ConstantModifier1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstantModifier1WithResultArgument(my, o) }
+func (my *ConstantModifier1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstantModifier1)       Enter(v Visitor){
+        v.VisitConstantModifier1(my)
+        v.EndVisitConstantModifier1(my)
+    }
 
 
 func AnyCastToConstantModifier1(i interface{}) *ConstantModifier1 {
@@ -24895,10 +26968,17 @@ func NewConstantModifier2(token IToken )*ConstantModifier2{
       return my
     }
 
-func (my *ConstantModifier2)      AcceptWithVisitor(v Visitor) { v.VisitConstantModifier2(my)}
-func (my *ConstantModifier2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitConstantModifier2WithArg(my, o) }
-func (my *ConstantModifier2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitConstantModifier2WithResult(my) }
-func (my *ConstantModifier2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitConstantModifier2WithResultArgument(my, o) }
+func (my *ConstantModifier2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ConstantModifier2)       Enter(v Visitor){
+        v.VisitConstantModifier2(my)
+        v.EndVisitConstantModifier2(my)
+    }
 
 
 func AnyCastToConstantModifier2(i interface{}) *ConstantModifier2 {
@@ -24925,10 +27005,17 @@ func NewAbstractMethodModifier0(token IToken )*AbstractMethodModifier0{
       return my
     }
 
-func (my *AbstractMethodModifier0)      AcceptWithVisitor(v Visitor) { v.VisitAbstractMethodModifier0(my)}
-func (my *AbstractMethodModifier0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAbstractMethodModifier0WithArg(my, o) }
-func (my *AbstractMethodModifier0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAbstractMethodModifier0WithResult(my) }
-func (my *AbstractMethodModifier0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAbstractMethodModifier0WithResultArgument(my, o) }
+func (my *AbstractMethodModifier0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AbstractMethodModifier0)       Enter(v Visitor){
+        v.VisitAbstractMethodModifier0(my)
+        v.EndVisitAbstractMethodModifier0(my)
+    }
 
 
 func AnyCastToAbstractMethodModifier0(i interface{}) *AbstractMethodModifier0 {
@@ -24955,10 +27042,17 @@ func NewAbstractMethodModifier1(token IToken )*AbstractMethodModifier1{
       return my
     }
 
-func (my *AbstractMethodModifier1)      AcceptWithVisitor(v Visitor) { v.VisitAbstractMethodModifier1(my)}
-func (my *AbstractMethodModifier1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAbstractMethodModifier1WithArg(my, o) }
-func (my *AbstractMethodModifier1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAbstractMethodModifier1WithResult(my) }
-func (my *AbstractMethodModifier1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAbstractMethodModifier1WithResultArgument(my, o) }
+func (my *AbstractMethodModifier1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AbstractMethodModifier1)       Enter(v Visitor){
+        v.VisitAbstractMethodModifier1(my)
+        v.EndVisitAbstractMethodModifier1(my)
+    }
 
 
 func AnyCastToAbstractMethodModifier1(i interface{}) *AbstractMethodModifier1 {
@@ -25068,10 +27162,26 @@ func (my *AnnotationTypeElementDeclaration0)        GetAllChildren() * ArrayList
         return list
     }
 
-func (my *AnnotationTypeElementDeclaration0)      AcceptWithVisitor(v Visitor) { v.VisitAnnotationTypeElementDeclaration0(my)}
-func (my *AnnotationTypeElementDeclaration0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAnnotationTypeElementDeclaration0WithArg(my, o) }
-func (my *AnnotationTypeElementDeclaration0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAnnotationTypeElementDeclaration0WithResult(my) }
-func (my *AnnotationTypeElementDeclaration0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAnnotationTypeElementDeclaration0WithResultArgument(my, o) }
+func (my *AnnotationTypeElementDeclaration0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AnnotationTypeElementDeclaration0)       Enter(v Visitor){
+        var checkChildren = v.VisitAnnotationTypeElementDeclaration0(my)
+        if checkChildren{
+            if nil != my._AbstractMethodModifiersopt{my._AbstractMethodModifiersopt.Accept(v)}
+            if nil != my._Type{my._Type.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._DefaultValueopt{my._DefaultValueopt.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitAnnotationTypeElementDeclaration0(my)
+    }
 
 
 func AnyCastToAnnotationTypeElementDeclaration0(i interface{}) *AnnotationTypeElementDeclaration0 {
@@ -25098,10 +27208,17 @@ func NewAnnotationTypeElementDeclaration1(token IToken )*AnnotationTypeElementDe
       return my
     }
 
-func (my *AnnotationTypeElementDeclaration1)      AcceptWithVisitor(v Visitor) { v.VisitAnnotationTypeElementDeclaration1(my)}
-func (my *AnnotationTypeElementDeclaration1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAnnotationTypeElementDeclaration1WithArg(my, o) }
-func (my *AnnotationTypeElementDeclaration1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAnnotationTypeElementDeclaration1WithResult(my) }
-func (my *AnnotationTypeElementDeclaration1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAnnotationTypeElementDeclaration1WithResultArgument(my, o) }
+func (my *AnnotationTypeElementDeclaration1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AnnotationTypeElementDeclaration1)       Enter(v Visitor){
+        v.VisitAnnotationTypeElementDeclaration1(my)
+        v.EndVisitAnnotationTypeElementDeclaration1(my)
+    }
 
 
 func AnyCastToAnnotationTypeElementDeclaration1(i interface{}) *AnnotationTypeElementDeclaration1 {
@@ -25165,10 +27282,22 @@ func (my *AssertStatement0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AssertStatement0)      AcceptWithVisitor(v Visitor) { v.VisitAssertStatement0(my)}
-func (my *AssertStatement0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssertStatement0WithArg(my, o) }
-func (my *AssertStatement0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssertStatement0WithResult(my) }
-func (my *AssertStatement0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssertStatement0WithResultArgument(my, o) }
+func (my *AssertStatement0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssertStatement0)       Enter(v Visitor){
+        var checkChildren = v.VisitAssertStatement0(my)
+        if checkChildren{
+            if nil != my._assert{my._assert.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitAssertStatement0(my)
+    }
 
 
 func AnyCastToAssertStatement0(i interface{}) *AssertStatement0 {
@@ -25252,10 +27381,24 @@ func (my *AssertStatement1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AssertStatement1)      AcceptWithVisitor(v Visitor) { v.VisitAssertStatement1(my)}
-func (my *AssertStatement1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssertStatement1WithArg(my, o) }
-func (my *AssertStatement1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssertStatement1WithResult(my) }
-func (my *AssertStatement1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssertStatement1WithResultArgument(my, o) }
+func (my *AssertStatement1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssertStatement1)       Enter(v Visitor){
+        var checkChildren = v.VisitAssertStatement1(my)
+        if checkChildren{
+            if nil != my._assert{my._assert.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._COLON{my._COLON.Accept(v)}
+            if nil != my._Expression4{my._Expression4.Accept(v)}
+            if nil != my._SEMICOLON{my._SEMICOLON.Accept(v)}
+        }
+        v.EndVisitAssertStatement1(my)
+    }
 
 
 func AnyCastToAssertStatement1(i interface{}) *AssertStatement1 {
@@ -25319,10 +27462,22 @@ func (my *SwitchLabel0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SwitchLabel0)      AcceptWithVisitor(v Visitor) { v.VisitSwitchLabel0(my)}
-func (my *SwitchLabel0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSwitchLabel0WithArg(my, o) }
-func (my *SwitchLabel0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSwitchLabel0WithResult(my) }
-func (my *SwitchLabel0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSwitchLabel0WithResultArgument(my, o) }
+func (my *SwitchLabel0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SwitchLabel0)       Enter(v Visitor){
+        var checkChildren = v.VisitSwitchLabel0(my)
+        if checkChildren{
+            if nil != my._case{my._case.Accept(v)}
+            if nil != my._ConstantExpression{my._ConstantExpression.Accept(v)}
+            if nil != my._COLON{my._COLON.Accept(v)}
+        }
+        v.EndVisitSwitchLabel0(my)
+    }
 
 
 func AnyCastToSwitchLabel0(i interface{}) *SwitchLabel0 {
@@ -25386,10 +27541,22 @@ func (my *SwitchLabel1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SwitchLabel1)      AcceptWithVisitor(v Visitor) { v.VisitSwitchLabel1(my)}
-func (my *SwitchLabel1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSwitchLabel1WithArg(my, o) }
-func (my *SwitchLabel1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSwitchLabel1WithResult(my) }
-func (my *SwitchLabel1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSwitchLabel1WithResultArgument(my, o) }
+func (my *SwitchLabel1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SwitchLabel1)       Enter(v Visitor){
+        var checkChildren = v.VisitSwitchLabel1(my)
+        if checkChildren{
+            if nil != my._case{my._case.Accept(v)}
+            if nil != my._EnumConstant{my._EnumConstant.Accept(v)}
+            if nil != my._COLON{my._COLON.Accept(v)}
+        }
+        v.EndVisitSwitchLabel1(my)
+    }
 
 
 func AnyCastToSwitchLabel1(i interface{}) *SwitchLabel1 {
@@ -25443,10 +27610,21 @@ func (my *SwitchLabel2)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *SwitchLabel2)      AcceptWithVisitor(v Visitor) { v.VisitSwitchLabel2(my)}
-func (my *SwitchLabel2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitSwitchLabel2WithArg(my, o) }
-func (my *SwitchLabel2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitSwitchLabel2WithResult(my) }
-func (my *SwitchLabel2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitSwitchLabel2WithResultArgument(my, o) }
+func (my *SwitchLabel2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *SwitchLabel2)       Enter(v Visitor){
+        var checkChildren = v.VisitSwitchLabel2(my)
+        if checkChildren{
+            if nil != my._default{my._default.Accept(v)}
+            if nil != my._COLON{my._COLON.Accept(v)}
+        }
+        v.EndVisitSwitchLabel2(my)
+    }
 
 
 func AnyCastToSwitchLabel2(i interface{}) *SwitchLabel2 {
@@ -25510,10 +27688,22 @@ func (my *TryStatement0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TryStatement0)      AcceptWithVisitor(v Visitor) { v.VisitTryStatement0(my)}
-func (my *TryStatement0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTryStatement0WithArg(my, o) }
-func (my *TryStatement0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTryStatement0WithResult(my) }
-func (my *TryStatement0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTryStatement0WithResultArgument(my, o) }
+func (my *TryStatement0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TryStatement0)       Enter(v Visitor){
+        var checkChildren = v.VisitTryStatement0(my)
+        if checkChildren{
+            if nil != my._try{my._try.Accept(v)}
+            if nil != my._Block{my._Block.Accept(v)}
+            if nil != my._Catches{my._Catches.Accept(v)}
+        }
+        v.EndVisitTryStatement0(my)
+    }
 
 
 func AnyCastToTryStatement0(i interface{}) *TryStatement0 {
@@ -25590,10 +27780,23 @@ func (my *TryStatement1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *TryStatement1)      AcceptWithVisitor(v Visitor) { v.VisitTryStatement1(my)}
-func (my *TryStatement1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitTryStatement1WithArg(my, o) }
-func (my *TryStatement1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitTryStatement1WithResult(my) }
-func (my *TryStatement1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitTryStatement1WithResultArgument(my, o) }
+func (my *TryStatement1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *TryStatement1)       Enter(v Visitor){
+        var checkChildren = v.VisitTryStatement1(my)
+        if checkChildren{
+            if nil != my._try{my._try.Accept(v)}
+            if nil != my._Block{my._Block.Accept(v)}
+            if nil != my._Catchesopt{my._Catchesopt.Accept(v)}
+            if nil != my._Finally{my._Finally.Accept(v)}
+        }
+        v.EndVisitTryStatement1(my)
+    }
 
 
 func AnyCastToTryStatement1(i interface{}) *TryStatement1 {
@@ -25657,10 +27860,22 @@ func (my *PrimaryNoNewArray0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PrimaryNoNewArray0)      AcceptWithVisitor(v Visitor) { v.VisitPrimaryNoNewArray0(my)}
-func (my *PrimaryNoNewArray0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPrimaryNoNewArray0WithArg(my, o) }
-func (my *PrimaryNoNewArray0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPrimaryNoNewArray0WithResult(my) }
-func (my *PrimaryNoNewArray0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPrimaryNoNewArray0WithResultArgument(my, o) }
+func (my *PrimaryNoNewArray0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PrimaryNoNewArray0)       Enter(v Visitor){
+        var checkChildren = v.VisitPrimaryNoNewArray0(my)
+        if checkChildren{
+            if nil != my._Type{my._Type.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._class{my._class.Accept(v)}
+        }
+        v.EndVisitPrimaryNoNewArray0(my)
+    }
 
 
 func AnyCastToPrimaryNoNewArray0(i interface{}) *PrimaryNoNewArray0 {
@@ -25724,10 +27939,22 @@ func (my *PrimaryNoNewArray1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PrimaryNoNewArray1)      AcceptWithVisitor(v Visitor) { v.VisitPrimaryNoNewArray1(my)}
-func (my *PrimaryNoNewArray1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPrimaryNoNewArray1WithArg(my, o) }
-func (my *PrimaryNoNewArray1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPrimaryNoNewArray1WithResult(my) }
-func (my *PrimaryNoNewArray1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPrimaryNoNewArray1WithResultArgument(my, o) }
+func (my *PrimaryNoNewArray1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PrimaryNoNewArray1)       Enter(v Visitor){
+        var checkChildren = v.VisitPrimaryNoNewArray1(my)
+        if checkChildren{
+            if nil != my._void{my._void.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._class{my._class.Accept(v)}
+        }
+        v.EndVisitPrimaryNoNewArray1(my)
+    }
 
 
 func AnyCastToPrimaryNoNewArray1(i interface{}) *PrimaryNoNewArray1 {
@@ -25754,10 +27981,17 @@ func NewPrimaryNoNewArray2(token IToken )*PrimaryNoNewArray2{
       return my
     }
 
-func (my *PrimaryNoNewArray2)      AcceptWithVisitor(v Visitor) { v.VisitPrimaryNoNewArray2(my)}
-func (my *PrimaryNoNewArray2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPrimaryNoNewArray2WithArg(my, o) }
-func (my *PrimaryNoNewArray2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPrimaryNoNewArray2WithResult(my) }
-func (my *PrimaryNoNewArray2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPrimaryNoNewArray2WithResultArgument(my, o) }
+func (my *PrimaryNoNewArray2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PrimaryNoNewArray2)       Enter(v Visitor){
+        v.VisitPrimaryNoNewArray2(my)
+        v.EndVisitPrimaryNoNewArray2(my)
+    }
 
 
 func AnyCastToPrimaryNoNewArray2(i interface{}) *PrimaryNoNewArray2 {
@@ -25821,10 +28055,22 @@ func (my *PrimaryNoNewArray3)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PrimaryNoNewArray3)      AcceptWithVisitor(v Visitor) { v.VisitPrimaryNoNewArray3(my)}
-func (my *PrimaryNoNewArray3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPrimaryNoNewArray3WithArg(my, o) }
-func (my *PrimaryNoNewArray3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPrimaryNoNewArray3WithResult(my) }
-func (my *PrimaryNoNewArray3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPrimaryNoNewArray3WithResultArgument(my, o) }
+func (my *PrimaryNoNewArray3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PrimaryNoNewArray3)       Enter(v Visitor){
+        var checkChildren = v.VisitPrimaryNoNewArray3(my)
+        if checkChildren{
+            if nil != my._ClassName{my._ClassName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._this{my._this.Accept(v)}
+        }
+        v.EndVisitPrimaryNoNewArray3(my)
+    }
 
 
 func AnyCastToPrimaryNoNewArray3(i interface{}) *PrimaryNoNewArray3 {
@@ -25888,10 +28134,22 @@ func (my *PrimaryNoNewArray4)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *PrimaryNoNewArray4)      AcceptWithVisitor(v Visitor) { v.VisitPrimaryNoNewArray4(my)}
-func (my *PrimaryNoNewArray4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitPrimaryNoNewArray4WithArg(my, o) }
-func (my *PrimaryNoNewArray4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitPrimaryNoNewArray4WithResult(my) }
-func (my *PrimaryNoNewArray4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitPrimaryNoNewArray4WithResultArgument(my, o) }
+func (my *PrimaryNoNewArray4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *PrimaryNoNewArray4)       Enter(v Visitor){
+        var checkChildren = v.VisitPrimaryNoNewArray4(my)
+        if checkChildren{
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitPrimaryNoNewArray4(my)
+    }
 
 
 func AnyCastToPrimaryNoNewArray4(i interface{}) *PrimaryNoNewArray4 {
@@ -25918,10 +28176,17 @@ func NewLiteral0(token IToken )*Literal0{
       return my
     }
 
-func (my *Literal0)      AcceptWithVisitor(v Visitor) { v.VisitLiteral0(my)}
-func (my *Literal0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLiteral0WithArg(my, o) }
-func (my *Literal0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLiteral0WithResult(my) }
-func (my *Literal0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLiteral0WithResultArgument(my, o) }
+func (my *Literal0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Literal0)       Enter(v Visitor){
+        v.VisitLiteral0(my)
+        v.EndVisitLiteral0(my)
+    }
 
 
 func AnyCastToLiteral0(i interface{}) *Literal0 {
@@ -25948,10 +28213,17 @@ func NewLiteral1(token IToken )*Literal1{
       return my
     }
 
-func (my *Literal1)      AcceptWithVisitor(v Visitor) { v.VisitLiteral1(my)}
-func (my *Literal1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLiteral1WithArg(my, o) }
-func (my *Literal1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLiteral1WithResult(my) }
-func (my *Literal1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLiteral1WithResultArgument(my, o) }
+func (my *Literal1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Literal1)       Enter(v Visitor){
+        v.VisitLiteral1(my)
+        v.EndVisitLiteral1(my)
+    }
 
 
 func AnyCastToLiteral1(i interface{}) *Literal1 {
@@ -25978,10 +28250,17 @@ func NewLiteral2(token IToken )*Literal2{
       return my
     }
 
-func (my *Literal2)      AcceptWithVisitor(v Visitor) { v.VisitLiteral2(my)}
-func (my *Literal2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLiteral2WithArg(my, o) }
-func (my *Literal2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLiteral2WithResult(my) }
-func (my *Literal2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLiteral2WithResultArgument(my, o) }
+func (my *Literal2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Literal2)       Enter(v Visitor){
+        v.VisitLiteral2(my)
+        v.EndVisitLiteral2(my)
+    }
 
 
 func AnyCastToLiteral2(i interface{}) *Literal2 {
@@ -26008,10 +28287,17 @@ func NewLiteral3(token IToken )*Literal3{
       return my
     }
 
-func (my *Literal3)      AcceptWithVisitor(v Visitor) { v.VisitLiteral3(my)}
-func (my *Literal3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLiteral3WithArg(my, o) }
-func (my *Literal3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLiteral3WithResult(my) }
-func (my *Literal3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLiteral3WithResultArgument(my, o) }
+func (my *Literal3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Literal3)       Enter(v Visitor){
+        v.VisitLiteral3(my)
+        v.EndVisitLiteral3(my)
+    }
 
 
 func AnyCastToLiteral3(i interface{}) *Literal3 {
@@ -26038,10 +28324,17 @@ func NewLiteral4(token IToken )*Literal4{
       return my
     }
 
-func (my *Literal4)      AcceptWithVisitor(v Visitor) { v.VisitLiteral4(my)}
-func (my *Literal4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLiteral4WithArg(my, o) }
-func (my *Literal4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLiteral4WithResult(my) }
-func (my *Literal4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLiteral4WithResultArgument(my, o) }
+func (my *Literal4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Literal4)       Enter(v Visitor){
+        v.VisitLiteral4(my)
+        v.EndVisitLiteral4(my)
+    }
 
 
 func AnyCastToLiteral4(i interface{}) *Literal4 {
@@ -26068,10 +28361,17 @@ func NewLiteral5(token IToken )*Literal5{
       return my
     }
 
-func (my *Literal5)      AcceptWithVisitor(v Visitor) { v.VisitLiteral5(my)}
-func (my *Literal5)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLiteral5WithArg(my, o) }
-func (my *Literal5)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLiteral5WithResult(my) }
-func (my *Literal5)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLiteral5WithResultArgument(my, o) }
+func (my *Literal5)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Literal5)       Enter(v Visitor){
+        v.VisitLiteral5(my)
+        v.EndVisitLiteral5(my)
+    }
 
 
 func AnyCastToLiteral5(i interface{}) *Literal5 {
@@ -26098,10 +28398,17 @@ func NewLiteral6(token IToken )*Literal6{
       return my
     }
 
-func (my *Literal6)      AcceptWithVisitor(v Visitor) { v.VisitLiteral6(my)}
-func (my *Literal6)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitLiteral6WithArg(my, o) }
-func (my *Literal6)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitLiteral6WithResult(my) }
-func (my *Literal6)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitLiteral6WithResultArgument(my, o) }
+func (my *Literal6)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Literal6)       Enter(v Visitor){
+        v.VisitLiteral6(my)
+        v.EndVisitLiteral6(my)
+    }
 
 
 func AnyCastToLiteral6(i interface{}) *Literal6 {
@@ -26128,10 +28435,17 @@ func NewBooleanLiteral0(token IToken )*BooleanLiteral0{
       return my
     }
 
-func (my *BooleanLiteral0)      AcceptWithVisitor(v Visitor) { v.VisitBooleanLiteral0(my)}
-func (my *BooleanLiteral0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitBooleanLiteral0WithArg(my, o) }
-func (my *BooleanLiteral0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitBooleanLiteral0WithResult(my) }
-func (my *BooleanLiteral0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitBooleanLiteral0WithResultArgument(my, o) }
+func (my *BooleanLiteral0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *BooleanLiteral0)       Enter(v Visitor){
+        v.VisitBooleanLiteral0(my)
+        v.EndVisitBooleanLiteral0(my)
+    }
 
 
 func AnyCastToBooleanLiteral0(i interface{}) *BooleanLiteral0 {
@@ -26158,10 +28472,17 @@ func NewBooleanLiteral1(token IToken )*BooleanLiteral1{
       return my
     }
 
-func (my *BooleanLiteral1)      AcceptWithVisitor(v Visitor) { v.VisitBooleanLiteral1(my)}
-func (my *BooleanLiteral1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitBooleanLiteral1WithArg(my, o) }
-func (my *BooleanLiteral1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitBooleanLiteral1WithResult(my) }
-func (my *BooleanLiteral1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitBooleanLiteral1WithResultArgument(my, o) }
+func (my *BooleanLiteral1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *BooleanLiteral1)       Enter(v Visitor){
+        v.VisitBooleanLiteral1(my)
+        v.EndVisitBooleanLiteral1(my)
+    }
 
 
 func AnyCastToBooleanLiteral1(i interface{}) *BooleanLiteral1 {
@@ -26287,10 +28608,27 @@ func (my *ClassInstanceCreationExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ClassInstanceCreationExpression0)      AcceptWithVisitor(v Visitor) { v.VisitClassInstanceCreationExpression0(my)}
-func (my *ClassInstanceCreationExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassInstanceCreationExpression0WithArg(my, o) }
-func (my *ClassInstanceCreationExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassInstanceCreationExpression0WithResult(my) }
-func (my *ClassInstanceCreationExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassInstanceCreationExpression0WithResultArgument(my, o) }
+func (my *ClassInstanceCreationExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassInstanceCreationExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitClassInstanceCreationExpression0(my)
+        if checkChildren{
+            if nil != my._new{my._new.Accept(v)}
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+            if nil != my._ClassOrInterfaceType{my._ClassOrInterfaceType.Accept(v)}
+            if nil != my._TypeArgumentsopt4{my._TypeArgumentsopt4.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._ClassBodyopt{my._ClassBodyopt.Accept(v)}
+        }
+        v.EndVisitClassInstanceCreationExpression0(my)
+    }
 
 
 func AnyCastToClassInstanceCreationExpression0(i interface{}) *ClassInstanceCreationExpression0 {
@@ -26436,10 +28774,29 @@ func (my *ClassInstanceCreationExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ClassInstanceCreationExpression1)      AcceptWithVisitor(v Visitor) { v.VisitClassInstanceCreationExpression1(my)}
-func (my *ClassInstanceCreationExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitClassInstanceCreationExpression1WithArg(my, o) }
-func (my *ClassInstanceCreationExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitClassInstanceCreationExpression1WithResult(my) }
-func (my *ClassInstanceCreationExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitClassInstanceCreationExpression1WithResultArgument(my, o) }
+func (my *ClassInstanceCreationExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ClassInstanceCreationExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitClassInstanceCreationExpression1(my)
+        if checkChildren{
+            if nil != my._Primary{my._Primary.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._new{my._new.Accept(v)}
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._TypeArgumentsopt6{my._TypeArgumentsopt6.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._ClassBodyopt{my._ClassBodyopt.Accept(v)}
+        }
+        v.EndVisitClassInstanceCreationExpression1(my)
+    }
 
 
 func AnyCastToClassInstanceCreationExpression1(i interface{}) *ClassInstanceCreationExpression1 {
@@ -26516,10 +28873,23 @@ func (my *ArrayCreationExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArrayCreationExpression0)      AcceptWithVisitor(v Visitor) { v.VisitArrayCreationExpression0(my)}
-func (my *ArrayCreationExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArrayCreationExpression0WithArg(my, o) }
-func (my *ArrayCreationExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArrayCreationExpression0WithResult(my) }
-func (my *ArrayCreationExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArrayCreationExpression0WithResultArgument(my, o) }
+func (my *ArrayCreationExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArrayCreationExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitArrayCreationExpression0(my)
+        if checkChildren{
+            if nil != my._new{my._new.Accept(v)}
+            if nil != my._PrimitiveType{my._PrimitiveType.Accept(v)}
+            if nil != my._DimExprs{my._DimExprs.Accept(v)}
+            if nil != my._Dimsopt{my._Dimsopt.Accept(v)}
+        }
+        v.EndVisitArrayCreationExpression0(my)
+    }
 
 
 func AnyCastToArrayCreationExpression0(i interface{}) *ArrayCreationExpression0 {
@@ -26596,10 +28966,23 @@ func (my *ArrayCreationExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArrayCreationExpression1)      AcceptWithVisitor(v Visitor) { v.VisitArrayCreationExpression1(my)}
-func (my *ArrayCreationExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArrayCreationExpression1WithArg(my, o) }
-func (my *ArrayCreationExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArrayCreationExpression1WithResult(my) }
-func (my *ArrayCreationExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArrayCreationExpression1WithResultArgument(my, o) }
+func (my *ArrayCreationExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArrayCreationExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitArrayCreationExpression1(my)
+        if checkChildren{
+            if nil != my._new{my._new.Accept(v)}
+            if nil != my._ClassOrInterfaceType{my._ClassOrInterfaceType.Accept(v)}
+            if nil != my._DimExprs{my._DimExprs.Accept(v)}
+            if nil != my._Dimsopt{my._Dimsopt.Accept(v)}
+        }
+        v.EndVisitArrayCreationExpression1(my)
+    }
 
 
 func AnyCastToArrayCreationExpression1(i interface{}) *ArrayCreationExpression1 {
@@ -26673,10 +29056,23 @@ func (my *ArrayCreationExpression2)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArrayCreationExpression2)      AcceptWithVisitor(v Visitor) { v.VisitArrayCreationExpression2(my)}
-func (my *ArrayCreationExpression2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArrayCreationExpression2WithArg(my, o) }
-func (my *ArrayCreationExpression2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArrayCreationExpression2WithResult(my) }
-func (my *ArrayCreationExpression2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArrayCreationExpression2WithResultArgument(my, o) }
+func (my *ArrayCreationExpression2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArrayCreationExpression2)       Enter(v Visitor){
+        var checkChildren = v.VisitArrayCreationExpression2(my)
+        if checkChildren{
+            if nil != my._new{my._new.Accept(v)}
+            if nil != my._PrimitiveType{my._PrimitiveType.Accept(v)}
+            if nil != my._Dims{my._Dims.Accept(v)}
+            if nil != my._ArrayInitializer{my._ArrayInitializer.Accept(v)}
+        }
+        v.EndVisitArrayCreationExpression2(my)
+    }
 
 
 func AnyCastToArrayCreationExpression2(i interface{}) *ArrayCreationExpression2 {
@@ -26750,10 +29146,23 @@ func (my *ArrayCreationExpression3)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArrayCreationExpression3)      AcceptWithVisitor(v Visitor) { v.VisitArrayCreationExpression3(my)}
-func (my *ArrayCreationExpression3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArrayCreationExpression3WithArg(my, o) }
-func (my *ArrayCreationExpression3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArrayCreationExpression3WithResult(my) }
-func (my *ArrayCreationExpression3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArrayCreationExpression3WithResultArgument(my, o) }
+func (my *ArrayCreationExpression3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArrayCreationExpression3)       Enter(v Visitor){
+        var checkChildren = v.VisitArrayCreationExpression3(my)
+        if checkChildren{
+            if nil != my._new{my._new.Accept(v)}
+            if nil != my._ClassOrInterfaceType{my._ClassOrInterfaceType.Accept(v)}
+            if nil != my._Dims{my._Dims.Accept(v)}
+            if nil != my._ArrayInitializer{my._ArrayInitializer.Accept(v)}
+        }
+        v.EndVisitArrayCreationExpression3(my)
+    }
 
 
 func AnyCastToArrayCreationExpression3(i interface{}) *ArrayCreationExpression3 {
@@ -26807,10 +29216,21 @@ func (my *Dims0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Dims0)      AcceptWithVisitor(v Visitor) { v.VisitDims0(my)}
-func (my *Dims0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitDims0WithArg(my, o) }
-func (my *Dims0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitDims0WithResult(my) }
-func (my *Dims0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitDims0WithResultArgument(my, o) }
+func (my *Dims0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Dims0)       Enter(v Visitor){
+        var checkChildren = v.VisitDims0(my)
+        if checkChildren{
+            if nil != my._LBRACKET{my._LBRACKET.Accept(v)}
+            if nil != my._RBRACKET{my._RBRACKET.Accept(v)}
+        }
+        v.EndVisitDims0(my)
+    }
 
 
 func AnyCastToDims0(i interface{}) *Dims0 {
@@ -26874,10 +29294,22 @@ func (my *Dims1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *Dims1)      AcceptWithVisitor(v Visitor) { v.VisitDims1(my)}
-func (my *Dims1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitDims1WithArg(my, o) }
-func (my *Dims1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitDims1WithResult(my) }
-func (my *Dims1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitDims1WithResultArgument(my, o) }
+func (my *Dims1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *Dims1)       Enter(v Visitor){
+        var checkChildren = v.VisitDims1(my)
+        if checkChildren{
+            if nil != my._Dims{my._Dims.Accept(v)}
+            if nil != my._LBRACKET{my._LBRACKET.Accept(v)}
+            if nil != my._RBRACKET{my._RBRACKET.Accept(v)}
+        }
+        v.EndVisitDims1(my)
+    }
 
 
 func AnyCastToDims1(i interface{}) *Dims1 {
@@ -26941,10 +29373,22 @@ func (my *FieldAccess0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *FieldAccess0)      AcceptWithVisitor(v Visitor) { v.VisitFieldAccess0(my)}
-func (my *FieldAccess0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldAccess0WithArg(my, o) }
-func (my *FieldAccess0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldAccess0WithResult(my) }
-func (my *FieldAccess0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldAccess0WithResultArgument(my, o) }
+func (my *FieldAccess0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldAccess0)       Enter(v Visitor){
+        var checkChildren = v.VisitFieldAccess0(my)
+        if checkChildren{
+            if nil != my._Primary{my._Primary.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitFieldAccess0(my)
+    }
 
 
 func AnyCastToFieldAccess0(i interface{}) *FieldAccess0 {
@@ -27008,10 +29452,22 @@ func (my *FieldAccess1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *FieldAccess1)      AcceptWithVisitor(v Visitor) { v.VisitFieldAccess1(my)}
-func (my *FieldAccess1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldAccess1WithArg(my, o) }
-func (my *FieldAccess1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldAccess1WithResult(my) }
-func (my *FieldAccess1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldAccess1WithResultArgument(my, o) }
+func (my *FieldAccess1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldAccess1)       Enter(v Visitor){
+        var checkChildren = v.VisitFieldAccess1(my)
+        if checkChildren{
+            if nil != my._super{my._super.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitFieldAccess1(my)
+    }
 
 
 func AnyCastToFieldAccess1(i interface{}) *FieldAccess1 {
@@ -27095,10 +29551,24 @@ func (my *FieldAccess2)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *FieldAccess2)      AcceptWithVisitor(v Visitor) { v.VisitFieldAccess2(my)}
-func (my *FieldAccess2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitFieldAccess2WithArg(my, o) }
-func (my *FieldAccess2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitFieldAccess2WithResult(my) }
-func (my *FieldAccess2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitFieldAccess2WithResultArgument(my, o) }
+func (my *FieldAccess2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *FieldAccess2)       Enter(v Visitor){
+        var checkChildren = v.VisitFieldAccess2(my)
+        if checkChildren{
+            if nil != my._ClassName{my._ClassName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._super{my._super.Accept(v)}
+            if nil != my._DOT4{my._DOT4.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+        }
+        v.EndVisitFieldAccess2(my)
+    }
 
 
 func AnyCastToFieldAccess2(i interface{}) *FieldAccess2 {
@@ -27175,10 +29645,23 @@ func (my *MethodInvocation0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodInvocation0)      AcceptWithVisitor(v Visitor) { v.VisitMethodInvocation0(my)}
-func (my *MethodInvocation0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodInvocation0WithArg(my, o) }
-func (my *MethodInvocation0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodInvocation0WithResult(my) }
-func (my *MethodInvocation0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodInvocation0WithResultArgument(my, o) }
+func (my *MethodInvocation0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodInvocation0)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodInvocation0(my)
+        if checkChildren{
+            if nil != my._MethodName{my._MethodName.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitMethodInvocation0(my)
+    }
 
 
 func AnyCastToMethodInvocation0(i interface{}) *MethodInvocation0 {
@@ -27288,10 +29771,26 @@ func (my *MethodInvocation1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodInvocation1)      AcceptWithVisitor(v Visitor) { v.VisitMethodInvocation1(my)}
-func (my *MethodInvocation1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodInvocation1WithArg(my, o) }
-func (my *MethodInvocation1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodInvocation1WithResult(my) }
-func (my *MethodInvocation1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodInvocation1WithResultArgument(my, o) }
+func (my *MethodInvocation1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodInvocation1)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodInvocation1(my)
+        if checkChildren{
+            if nil != my._Primary{my._Primary.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitMethodInvocation1(my)
+    }
 
 
 func AnyCastToMethodInvocation1(i interface{}) *MethodInvocation1 {
@@ -27401,10 +29900,26 @@ func (my *MethodInvocation2)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodInvocation2)      AcceptWithVisitor(v Visitor) { v.VisitMethodInvocation2(my)}
-func (my *MethodInvocation2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodInvocation2WithArg(my, o) }
-func (my *MethodInvocation2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodInvocation2WithResult(my) }
-func (my *MethodInvocation2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodInvocation2WithResultArgument(my, o) }
+func (my *MethodInvocation2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodInvocation2)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodInvocation2(my)
+        if checkChildren{
+            if nil != my._super{my._super.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitMethodInvocation2(my)
+    }
 
 
 func AnyCastToMethodInvocation2(i interface{}) *MethodInvocation2 {
@@ -27534,10 +30049,28 @@ func (my *MethodInvocation3)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodInvocation3)      AcceptWithVisitor(v Visitor) { v.VisitMethodInvocation3(my)}
-func (my *MethodInvocation3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodInvocation3WithArg(my, o) }
-func (my *MethodInvocation3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodInvocation3WithResult(my) }
-func (my *MethodInvocation3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodInvocation3WithResultArgument(my, o) }
+func (my *MethodInvocation3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodInvocation3)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodInvocation3(my)
+        if checkChildren{
+            if nil != my._ClassName{my._ClassName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._super{my._super.Accept(v)}
+            if nil != my._DOT4{my._DOT4.Accept(v)}
+            if nil != my._TypeArgumentsopt{my._TypeArgumentsopt.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitMethodInvocation3(my)
+    }
 
 
 func AnyCastToMethodInvocation3(i interface{}) *MethodInvocation3 {
@@ -27644,10 +30177,26 @@ func (my *MethodInvocation4)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MethodInvocation4)      AcceptWithVisitor(v Visitor) { v.VisitMethodInvocation4(my)}
-func (my *MethodInvocation4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMethodInvocation4WithArg(my, o) }
-func (my *MethodInvocation4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMethodInvocation4WithResult(my) }
-func (my *MethodInvocation4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMethodInvocation4WithResultArgument(my, o) }
+func (my *MethodInvocation4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MethodInvocation4)       Enter(v Visitor){
+        var checkChildren = v.VisitMethodInvocation4(my)
+        if checkChildren{
+            if nil != my._TypeName{my._TypeName.Accept(v)}
+            if nil != my._DOT{my._DOT.Accept(v)}
+            if nil != my._TypeArguments{my._TypeArguments.Accept(v)}
+            if nil != my._identifier{my._identifier.Accept(v)}
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ArgumentListopt{my._ArgumentListopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+        }
+        v.EndVisitMethodInvocation4(my)
+    }
 
 
 func AnyCastToMethodInvocation4(i interface{}) *MethodInvocation4 {
@@ -27721,10 +30270,23 @@ func (my *ArrayAccess0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArrayAccess0)      AcceptWithVisitor(v Visitor) { v.VisitArrayAccess0(my)}
-func (my *ArrayAccess0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArrayAccess0WithArg(my, o) }
-func (my *ArrayAccess0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArrayAccess0WithResult(my) }
-func (my *ArrayAccess0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArrayAccess0WithResultArgument(my, o) }
+func (my *ArrayAccess0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArrayAccess0)       Enter(v Visitor){
+        var checkChildren = v.VisitArrayAccess0(my)
+        if checkChildren{
+            if nil != my._ExpressionName{my._ExpressionName.Accept(v)}
+            if nil != my._LBRACKET{my._LBRACKET.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RBRACKET{my._RBRACKET.Accept(v)}
+        }
+        v.EndVisitArrayAccess0(my)
+    }
 
 
 func AnyCastToArrayAccess0(i interface{}) *ArrayAccess0 {
@@ -27798,10 +30360,23 @@ func (my *ArrayAccess1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ArrayAccess1)      AcceptWithVisitor(v Visitor) { v.VisitArrayAccess1(my)}
-func (my *ArrayAccess1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitArrayAccess1WithArg(my, o) }
-func (my *ArrayAccess1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitArrayAccess1WithResult(my) }
-func (my *ArrayAccess1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitArrayAccess1WithResultArgument(my, o) }
+func (my *ArrayAccess1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ArrayAccess1)       Enter(v Visitor){
+        var checkChildren = v.VisitArrayAccess1(my)
+        if checkChildren{
+            if nil != my._PrimaryNoNewArray{my._PrimaryNoNewArray.Accept(v)}
+            if nil != my._LBRACKET{my._LBRACKET.Accept(v)}
+            if nil != my._Expression{my._Expression.Accept(v)}
+            if nil != my._RBRACKET{my._RBRACKET.Accept(v)}
+        }
+        v.EndVisitArrayAccess1(my)
+    }
 
 
 func AnyCastToArrayAccess1(i interface{}) *ArrayAccess1 {
@@ -27855,10 +30430,21 @@ func (my *UnaryExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *UnaryExpression0)      AcceptWithVisitor(v Visitor) { v.VisitUnaryExpression0(my)}
-func (my *UnaryExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitUnaryExpression0WithArg(my, o) }
-func (my *UnaryExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitUnaryExpression0WithResult(my) }
-func (my *UnaryExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitUnaryExpression0WithResultArgument(my, o) }
+func (my *UnaryExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *UnaryExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitUnaryExpression0(my)
+        if checkChildren{
+            if nil != my._PLUS{my._PLUS.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitUnaryExpression0(my)
+    }
 
 
 func AnyCastToUnaryExpression0(i interface{}) *UnaryExpression0 {
@@ -27912,10 +30498,21 @@ func (my *UnaryExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *UnaryExpression1)      AcceptWithVisitor(v Visitor) { v.VisitUnaryExpression1(my)}
-func (my *UnaryExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitUnaryExpression1WithArg(my, o) }
-func (my *UnaryExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitUnaryExpression1WithResult(my) }
-func (my *UnaryExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitUnaryExpression1WithResultArgument(my, o) }
+func (my *UnaryExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *UnaryExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitUnaryExpression1(my)
+        if checkChildren{
+            if nil != my._MINUS{my._MINUS.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitUnaryExpression1(my)
+    }
 
 
 func AnyCastToUnaryExpression1(i interface{}) *UnaryExpression1 {
@@ -27969,10 +30566,21 @@ func (my *UnaryExpressionNotPlusMinus0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *UnaryExpressionNotPlusMinus0)      AcceptWithVisitor(v Visitor) { v.VisitUnaryExpressionNotPlusMinus0(my)}
-func (my *UnaryExpressionNotPlusMinus0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitUnaryExpressionNotPlusMinus0WithArg(my, o) }
-func (my *UnaryExpressionNotPlusMinus0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitUnaryExpressionNotPlusMinus0WithResult(my) }
-func (my *UnaryExpressionNotPlusMinus0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitUnaryExpressionNotPlusMinus0WithResultArgument(my, o) }
+func (my *UnaryExpressionNotPlusMinus0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *UnaryExpressionNotPlusMinus0)       Enter(v Visitor){
+        var checkChildren = v.VisitUnaryExpressionNotPlusMinus0(my)
+        if checkChildren{
+            if nil != my._TWIDDLE{my._TWIDDLE.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitUnaryExpressionNotPlusMinus0(my)
+    }
 
 
 func AnyCastToUnaryExpressionNotPlusMinus0(i interface{}) *UnaryExpressionNotPlusMinus0 {
@@ -28026,10 +30634,21 @@ func (my *UnaryExpressionNotPlusMinus1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *UnaryExpressionNotPlusMinus1)      AcceptWithVisitor(v Visitor) { v.VisitUnaryExpressionNotPlusMinus1(my)}
-func (my *UnaryExpressionNotPlusMinus1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitUnaryExpressionNotPlusMinus1WithArg(my, o) }
-func (my *UnaryExpressionNotPlusMinus1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitUnaryExpressionNotPlusMinus1WithResult(my) }
-func (my *UnaryExpressionNotPlusMinus1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitUnaryExpressionNotPlusMinus1WithResultArgument(my, o) }
+func (my *UnaryExpressionNotPlusMinus1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *UnaryExpressionNotPlusMinus1)       Enter(v Visitor){
+        var checkChildren = v.VisitUnaryExpressionNotPlusMinus1(my)
+        if checkChildren{
+            if nil != my._NOT{my._NOT.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitUnaryExpressionNotPlusMinus1(my)
+    }
 
 
 func AnyCastToUnaryExpressionNotPlusMinus1(i interface{}) *UnaryExpressionNotPlusMinus1 {
@@ -28116,10 +30735,24 @@ func (my *CastExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *CastExpression0)      AcceptWithVisitor(v Visitor) { v.VisitCastExpression0(my)}
-func (my *CastExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitCastExpression0WithArg(my, o) }
-func (my *CastExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitCastExpression0WithResult(my) }
-func (my *CastExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitCastExpression0WithResultArgument(my, o) }
+func (my *CastExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *CastExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitCastExpression0(my)
+        if checkChildren{
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._PrimitiveType{my._PrimitiveType.Accept(v)}
+            if nil != my._Dimsopt{my._Dimsopt.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitCastExpression0(my)
+    }
 
 
 func AnyCastToCastExpression0(i interface{}) *CastExpression0 {
@@ -28193,10 +30826,23 @@ func (my *CastExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *CastExpression1)      AcceptWithVisitor(v Visitor) { v.VisitCastExpression1(my)}
-func (my *CastExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitCastExpression1WithArg(my, o) }
-func (my *CastExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitCastExpression1WithResult(my) }
-func (my *CastExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitCastExpression1WithResultArgument(my, o) }
+func (my *CastExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *CastExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitCastExpression1(my)
+        if checkChildren{
+            if nil != my._LPAREN{my._LPAREN.Accept(v)}
+            if nil != my._ReferenceType{my._ReferenceType.Accept(v)}
+            if nil != my._RPAREN{my._RPAREN.Accept(v)}
+            if nil != my._UnaryExpressionNotPlusMinus{my._UnaryExpressionNotPlusMinus.Accept(v)}
+        }
+        v.EndVisitCastExpression1(my)
+    }
 
 
 func AnyCastToCastExpression1(i interface{}) *CastExpression1 {
@@ -28260,10 +30906,22 @@ func (my *MultiplicativeExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MultiplicativeExpression0)      AcceptWithVisitor(v Visitor) { v.VisitMultiplicativeExpression0(my)}
-func (my *MultiplicativeExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMultiplicativeExpression0WithArg(my, o) }
-func (my *MultiplicativeExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMultiplicativeExpression0WithResult(my) }
-func (my *MultiplicativeExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMultiplicativeExpression0WithResultArgument(my, o) }
+func (my *MultiplicativeExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MultiplicativeExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitMultiplicativeExpression0(my)
+        if checkChildren{
+            if nil != my._MultiplicativeExpression{my._MultiplicativeExpression.Accept(v)}
+            if nil != my._MULTIPLY{my._MULTIPLY.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitMultiplicativeExpression0(my)
+    }
 
 
 func AnyCastToMultiplicativeExpression0(i interface{}) *MultiplicativeExpression0 {
@@ -28327,10 +30985,22 @@ func (my *MultiplicativeExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MultiplicativeExpression1)      AcceptWithVisitor(v Visitor) { v.VisitMultiplicativeExpression1(my)}
-func (my *MultiplicativeExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMultiplicativeExpression1WithArg(my, o) }
-func (my *MultiplicativeExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMultiplicativeExpression1WithResult(my) }
-func (my *MultiplicativeExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMultiplicativeExpression1WithResultArgument(my, o) }
+func (my *MultiplicativeExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MultiplicativeExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitMultiplicativeExpression1(my)
+        if checkChildren{
+            if nil != my._MultiplicativeExpression{my._MultiplicativeExpression.Accept(v)}
+            if nil != my._DIVIDE{my._DIVIDE.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitMultiplicativeExpression1(my)
+    }
 
 
 func AnyCastToMultiplicativeExpression1(i interface{}) *MultiplicativeExpression1 {
@@ -28394,10 +31064,22 @@ func (my *MultiplicativeExpression2)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *MultiplicativeExpression2)      AcceptWithVisitor(v Visitor) { v.VisitMultiplicativeExpression2(my)}
-func (my *MultiplicativeExpression2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitMultiplicativeExpression2WithArg(my, o) }
-func (my *MultiplicativeExpression2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitMultiplicativeExpression2WithResult(my) }
-func (my *MultiplicativeExpression2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitMultiplicativeExpression2WithResultArgument(my, o) }
+func (my *MultiplicativeExpression2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *MultiplicativeExpression2)       Enter(v Visitor){
+        var checkChildren = v.VisitMultiplicativeExpression2(my)
+        if checkChildren{
+            if nil != my._MultiplicativeExpression{my._MultiplicativeExpression.Accept(v)}
+            if nil != my._REMAINDER{my._REMAINDER.Accept(v)}
+            if nil != my._UnaryExpression{my._UnaryExpression.Accept(v)}
+        }
+        v.EndVisitMultiplicativeExpression2(my)
+    }
 
 
 func AnyCastToMultiplicativeExpression2(i interface{}) *MultiplicativeExpression2 {
@@ -28461,10 +31143,22 @@ func (my *AdditiveExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AdditiveExpression0)      AcceptWithVisitor(v Visitor) { v.VisitAdditiveExpression0(my)}
-func (my *AdditiveExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAdditiveExpression0WithArg(my, o) }
-func (my *AdditiveExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAdditiveExpression0WithResult(my) }
-func (my *AdditiveExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAdditiveExpression0WithResultArgument(my, o) }
+func (my *AdditiveExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AdditiveExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitAdditiveExpression0(my)
+        if checkChildren{
+            if nil != my._AdditiveExpression{my._AdditiveExpression.Accept(v)}
+            if nil != my._PLUS{my._PLUS.Accept(v)}
+            if nil != my._MultiplicativeExpression{my._MultiplicativeExpression.Accept(v)}
+        }
+        v.EndVisitAdditiveExpression0(my)
+    }
 
 
 func AnyCastToAdditiveExpression0(i interface{}) *AdditiveExpression0 {
@@ -28528,10 +31222,22 @@ func (my *AdditiveExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AdditiveExpression1)      AcceptWithVisitor(v Visitor) { v.VisitAdditiveExpression1(my)}
-func (my *AdditiveExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAdditiveExpression1WithArg(my, o) }
-func (my *AdditiveExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAdditiveExpression1WithResult(my) }
-func (my *AdditiveExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAdditiveExpression1WithResultArgument(my, o) }
+func (my *AdditiveExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AdditiveExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitAdditiveExpression1(my)
+        if checkChildren{
+            if nil != my._AdditiveExpression{my._AdditiveExpression.Accept(v)}
+            if nil != my._MINUS{my._MINUS.Accept(v)}
+            if nil != my._MultiplicativeExpression{my._MultiplicativeExpression.Accept(v)}
+        }
+        v.EndVisitAdditiveExpression1(my)
+    }
 
 
 func AnyCastToAdditiveExpression1(i interface{}) *AdditiveExpression1 {
@@ -28595,10 +31301,22 @@ func (my *ShiftExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ShiftExpression0)      AcceptWithVisitor(v Visitor) { v.VisitShiftExpression0(my)}
-func (my *ShiftExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitShiftExpression0WithArg(my, o) }
-func (my *ShiftExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitShiftExpression0WithResult(my) }
-func (my *ShiftExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitShiftExpression0WithResultArgument(my, o) }
+func (my *ShiftExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ShiftExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitShiftExpression0(my)
+        if checkChildren{
+            if nil != my._ShiftExpression{my._ShiftExpression.Accept(v)}
+            if nil != my._LEFT_SHIFT{my._LEFT_SHIFT.Accept(v)}
+            if nil != my._AdditiveExpression{my._AdditiveExpression.Accept(v)}
+        }
+        v.EndVisitShiftExpression0(my)
+    }
 
 
 func AnyCastToShiftExpression0(i interface{}) *ShiftExpression0 {
@@ -28672,10 +31390,23 @@ func (my *ShiftExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ShiftExpression1)      AcceptWithVisitor(v Visitor) { v.VisitShiftExpression1(my)}
-func (my *ShiftExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitShiftExpression1WithArg(my, o) }
-func (my *ShiftExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitShiftExpression1WithResult(my) }
-func (my *ShiftExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitShiftExpression1WithResultArgument(my, o) }
+func (my *ShiftExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ShiftExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitShiftExpression1(my)
+        if checkChildren{
+            if nil != my._ShiftExpression{my._ShiftExpression.Accept(v)}
+            if nil != my._GREATER{my._GREATER.Accept(v)}
+            if nil != my._GREATER3{my._GREATER3.Accept(v)}
+            if nil != my._AdditiveExpression{my._AdditiveExpression.Accept(v)}
+        }
+        v.EndVisitShiftExpression1(my)
+    }
 
 
 func AnyCastToShiftExpression1(i interface{}) *ShiftExpression1 {
@@ -28759,10 +31490,24 @@ func (my *ShiftExpression2)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *ShiftExpression2)      AcceptWithVisitor(v Visitor) { v.VisitShiftExpression2(my)}
-func (my *ShiftExpression2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitShiftExpression2WithArg(my, o) }
-func (my *ShiftExpression2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitShiftExpression2WithResult(my) }
-func (my *ShiftExpression2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitShiftExpression2WithResultArgument(my, o) }
+func (my *ShiftExpression2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *ShiftExpression2)       Enter(v Visitor){
+        var checkChildren = v.VisitShiftExpression2(my)
+        if checkChildren{
+            if nil != my._ShiftExpression{my._ShiftExpression.Accept(v)}
+            if nil != my._GREATER{my._GREATER.Accept(v)}
+            if nil != my._GREATER3{my._GREATER3.Accept(v)}
+            if nil != my._GREATER4{my._GREATER4.Accept(v)}
+            if nil != my._AdditiveExpression{my._AdditiveExpression.Accept(v)}
+        }
+        v.EndVisitShiftExpression2(my)
+    }
 
 
 func AnyCastToShiftExpression2(i interface{}) *ShiftExpression2 {
@@ -28826,10 +31571,22 @@ func (my *RelationalExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *RelationalExpression0)      AcceptWithVisitor(v Visitor) { v.VisitRelationalExpression0(my)}
-func (my *RelationalExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitRelationalExpression0WithArg(my, o) }
-func (my *RelationalExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitRelationalExpression0WithResult(my) }
-func (my *RelationalExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitRelationalExpression0WithResultArgument(my, o) }
+func (my *RelationalExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *RelationalExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitRelationalExpression0(my)
+        if checkChildren{
+            if nil != my._RelationalExpression{my._RelationalExpression.Accept(v)}
+            if nil != my._LESS{my._LESS.Accept(v)}
+            if nil != my._ShiftExpression{my._ShiftExpression.Accept(v)}
+        }
+        v.EndVisitRelationalExpression0(my)
+    }
 
 
 func AnyCastToRelationalExpression0(i interface{}) *RelationalExpression0 {
@@ -28893,10 +31650,22 @@ func (my *RelationalExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *RelationalExpression1)      AcceptWithVisitor(v Visitor) { v.VisitRelationalExpression1(my)}
-func (my *RelationalExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitRelationalExpression1WithArg(my, o) }
-func (my *RelationalExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitRelationalExpression1WithResult(my) }
-func (my *RelationalExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitRelationalExpression1WithResultArgument(my, o) }
+func (my *RelationalExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *RelationalExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitRelationalExpression1(my)
+        if checkChildren{
+            if nil != my._RelationalExpression{my._RelationalExpression.Accept(v)}
+            if nil != my._GREATER{my._GREATER.Accept(v)}
+            if nil != my._ShiftExpression{my._ShiftExpression.Accept(v)}
+        }
+        v.EndVisitRelationalExpression1(my)
+    }
 
 
 func AnyCastToRelationalExpression1(i interface{}) *RelationalExpression1 {
@@ -28960,10 +31729,22 @@ func (my *RelationalExpression2)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *RelationalExpression2)      AcceptWithVisitor(v Visitor) { v.VisitRelationalExpression2(my)}
-func (my *RelationalExpression2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitRelationalExpression2WithArg(my, o) }
-func (my *RelationalExpression2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitRelationalExpression2WithResult(my) }
-func (my *RelationalExpression2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitRelationalExpression2WithResultArgument(my, o) }
+func (my *RelationalExpression2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *RelationalExpression2)       Enter(v Visitor){
+        var checkChildren = v.VisitRelationalExpression2(my)
+        if checkChildren{
+            if nil != my._RelationalExpression{my._RelationalExpression.Accept(v)}
+            if nil != my._LESS_EQUAL{my._LESS_EQUAL.Accept(v)}
+            if nil != my._ShiftExpression{my._ShiftExpression.Accept(v)}
+        }
+        v.EndVisitRelationalExpression2(my)
+    }
 
 
 func AnyCastToRelationalExpression2(i interface{}) *RelationalExpression2 {
@@ -29037,10 +31818,23 @@ func (my *RelationalExpression3)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *RelationalExpression3)      AcceptWithVisitor(v Visitor) { v.VisitRelationalExpression3(my)}
-func (my *RelationalExpression3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitRelationalExpression3WithArg(my, o) }
-func (my *RelationalExpression3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitRelationalExpression3WithResult(my) }
-func (my *RelationalExpression3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitRelationalExpression3WithResultArgument(my, o) }
+func (my *RelationalExpression3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *RelationalExpression3)       Enter(v Visitor){
+        var checkChildren = v.VisitRelationalExpression3(my)
+        if checkChildren{
+            if nil != my._RelationalExpression{my._RelationalExpression.Accept(v)}
+            if nil != my._GREATER{my._GREATER.Accept(v)}
+            if nil != my._EQUAL{my._EQUAL.Accept(v)}
+            if nil != my._ShiftExpression{my._ShiftExpression.Accept(v)}
+        }
+        v.EndVisitRelationalExpression3(my)
+    }
 
 
 func AnyCastToRelationalExpression3(i interface{}) *RelationalExpression3 {
@@ -29104,10 +31898,22 @@ func (my *RelationalExpression4)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *RelationalExpression4)      AcceptWithVisitor(v Visitor) { v.VisitRelationalExpression4(my)}
-func (my *RelationalExpression4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitRelationalExpression4WithArg(my, o) }
-func (my *RelationalExpression4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitRelationalExpression4WithResult(my) }
-func (my *RelationalExpression4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitRelationalExpression4WithResultArgument(my, o) }
+func (my *RelationalExpression4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *RelationalExpression4)       Enter(v Visitor){
+        var checkChildren = v.VisitRelationalExpression4(my)
+        if checkChildren{
+            if nil != my._RelationalExpression{my._RelationalExpression.Accept(v)}
+            if nil != my._instanceof{my._instanceof.Accept(v)}
+            if nil != my._ReferenceType{my._ReferenceType.Accept(v)}
+        }
+        v.EndVisitRelationalExpression4(my)
+    }
 
 
 func AnyCastToRelationalExpression4(i interface{}) *RelationalExpression4 {
@@ -29171,10 +31977,22 @@ func (my *EqualityExpression0)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *EqualityExpression0)      AcceptWithVisitor(v Visitor) { v.VisitEqualityExpression0(my)}
-func (my *EqualityExpression0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEqualityExpression0WithArg(my, o) }
-func (my *EqualityExpression0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEqualityExpression0WithResult(my) }
-func (my *EqualityExpression0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEqualityExpression0WithResultArgument(my, o) }
+func (my *EqualityExpression0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EqualityExpression0)       Enter(v Visitor){
+        var checkChildren = v.VisitEqualityExpression0(my)
+        if checkChildren{
+            if nil != my._EqualityExpression{my._EqualityExpression.Accept(v)}
+            if nil != my._EQUAL_EQUAL{my._EQUAL_EQUAL.Accept(v)}
+            if nil != my._RelationalExpression{my._RelationalExpression.Accept(v)}
+        }
+        v.EndVisitEqualityExpression0(my)
+    }
 
 
 func AnyCastToEqualityExpression0(i interface{}) *EqualityExpression0 {
@@ -29238,10 +32056,22 @@ func (my *EqualityExpression1)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *EqualityExpression1)      AcceptWithVisitor(v Visitor) { v.VisitEqualityExpression1(my)}
-func (my *EqualityExpression1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitEqualityExpression1WithArg(my, o) }
-func (my *EqualityExpression1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitEqualityExpression1WithResult(my) }
-func (my *EqualityExpression1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitEqualityExpression1WithResultArgument(my, o) }
+func (my *EqualityExpression1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *EqualityExpression1)       Enter(v Visitor){
+        var checkChildren = v.VisitEqualityExpression1(my)
+        if checkChildren{
+            if nil != my._EqualityExpression{my._EqualityExpression.Accept(v)}
+            if nil != my._NOT_EQUAL{my._NOT_EQUAL.Accept(v)}
+            if nil != my._RelationalExpression{my._RelationalExpression.Accept(v)}
+        }
+        v.EndVisitEqualityExpression1(my)
+    }
 
 
 func AnyCastToEqualityExpression1(i interface{}) *EqualityExpression1 {
@@ -29268,10 +32098,17 @@ func NewAssignmentOperator0(token IToken )*AssignmentOperator0{
       return my
     }
 
-func (my *AssignmentOperator0)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator0(my)}
-func (my *AssignmentOperator0)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator0WithArg(my, o) }
-func (my *AssignmentOperator0)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator0WithResult(my) }
-func (my *AssignmentOperator0)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator0WithResultArgument(my, o) }
+func (my *AssignmentOperator0)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator0)       Enter(v Visitor){
+        v.VisitAssignmentOperator0(my)
+        v.EndVisitAssignmentOperator0(my)
+    }
 
 
 func AnyCastToAssignmentOperator0(i interface{}) *AssignmentOperator0 {
@@ -29298,10 +32135,17 @@ func NewAssignmentOperator1(token IToken )*AssignmentOperator1{
       return my
     }
 
-func (my *AssignmentOperator1)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator1(my)}
-func (my *AssignmentOperator1)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator1WithArg(my, o) }
-func (my *AssignmentOperator1)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator1WithResult(my) }
-func (my *AssignmentOperator1)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator1WithResultArgument(my, o) }
+func (my *AssignmentOperator1)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator1)       Enter(v Visitor){
+        v.VisitAssignmentOperator1(my)
+        v.EndVisitAssignmentOperator1(my)
+    }
 
 
 func AnyCastToAssignmentOperator1(i interface{}) *AssignmentOperator1 {
@@ -29328,10 +32172,17 @@ func NewAssignmentOperator2(token IToken )*AssignmentOperator2{
       return my
     }
 
-func (my *AssignmentOperator2)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator2(my)}
-func (my *AssignmentOperator2)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator2WithArg(my, o) }
-func (my *AssignmentOperator2)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator2WithResult(my) }
-func (my *AssignmentOperator2)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator2WithResultArgument(my, o) }
+func (my *AssignmentOperator2)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator2)       Enter(v Visitor){
+        v.VisitAssignmentOperator2(my)
+        v.EndVisitAssignmentOperator2(my)
+    }
 
 
 func AnyCastToAssignmentOperator2(i interface{}) *AssignmentOperator2 {
@@ -29358,10 +32209,17 @@ func NewAssignmentOperator3(token IToken )*AssignmentOperator3{
       return my
     }
 
-func (my *AssignmentOperator3)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator3(my)}
-func (my *AssignmentOperator3)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator3WithArg(my, o) }
-func (my *AssignmentOperator3)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator3WithResult(my) }
-func (my *AssignmentOperator3)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator3WithResultArgument(my, o) }
+func (my *AssignmentOperator3)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator3)       Enter(v Visitor){
+        v.VisitAssignmentOperator3(my)
+        v.EndVisitAssignmentOperator3(my)
+    }
 
 
 func AnyCastToAssignmentOperator3(i interface{}) *AssignmentOperator3 {
@@ -29388,10 +32246,17 @@ func NewAssignmentOperator4(token IToken )*AssignmentOperator4{
       return my
     }
 
-func (my *AssignmentOperator4)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator4(my)}
-func (my *AssignmentOperator4)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator4WithArg(my, o) }
-func (my *AssignmentOperator4)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator4WithResult(my) }
-func (my *AssignmentOperator4)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator4WithResultArgument(my, o) }
+func (my *AssignmentOperator4)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator4)       Enter(v Visitor){
+        v.VisitAssignmentOperator4(my)
+        v.EndVisitAssignmentOperator4(my)
+    }
 
 
 func AnyCastToAssignmentOperator4(i interface{}) *AssignmentOperator4 {
@@ -29418,10 +32283,17 @@ func NewAssignmentOperator5(token IToken )*AssignmentOperator5{
       return my
     }
 
-func (my *AssignmentOperator5)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator5(my)}
-func (my *AssignmentOperator5)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator5WithArg(my, o) }
-func (my *AssignmentOperator5)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator5WithResult(my) }
-func (my *AssignmentOperator5)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator5WithResultArgument(my, o) }
+func (my *AssignmentOperator5)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator5)       Enter(v Visitor){
+        v.VisitAssignmentOperator5(my)
+        v.EndVisitAssignmentOperator5(my)
+    }
 
 
 func AnyCastToAssignmentOperator5(i interface{}) *AssignmentOperator5 {
@@ -29448,10 +32320,17 @@ func NewAssignmentOperator6(token IToken )*AssignmentOperator6{
       return my
     }
 
-func (my *AssignmentOperator6)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator6(my)}
-func (my *AssignmentOperator6)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator6WithArg(my, o) }
-func (my *AssignmentOperator6)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator6WithResult(my) }
-func (my *AssignmentOperator6)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator6WithResultArgument(my, o) }
+func (my *AssignmentOperator6)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator6)       Enter(v Visitor){
+        v.VisitAssignmentOperator6(my)
+        v.EndVisitAssignmentOperator6(my)
+    }
 
 
 func AnyCastToAssignmentOperator6(i interface{}) *AssignmentOperator6 {
@@ -29515,10 +32394,22 @@ func (my *AssignmentOperator7)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AssignmentOperator7)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator7(my)}
-func (my *AssignmentOperator7)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator7WithArg(my, o) }
-func (my *AssignmentOperator7)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator7WithResult(my) }
-func (my *AssignmentOperator7)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator7WithResultArgument(my, o) }
+func (my *AssignmentOperator7)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator7)       Enter(v Visitor){
+        var checkChildren = v.VisitAssignmentOperator7(my)
+        if checkChildren{
+            if nil != my._GREATER{my._GREATER.Accept(v)}
+            if nil != my._GREATER2{my._GREATER2.Accept(v)}
+            if nil != my._EQUAL{my._EQUAL.Accept(v)}
+        }
+        v.EndVisitAssignmentOperator7(my)
+    }
 
 
 func AnyCastToAssignmentOperator7(i interface{}) *AssignmentOperator7 {
@@ -29592,10 +32483,23 @@ func (my *AssignmentOperator8)        GetAllChildren() * ArrayList{
         return list
     }
 
-func (my *AssignmentOperator8)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator8(my)}
-func (my *AssignmentOperator8)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator8WithArg(my, o) }
-func (my *AssignmentOperator8)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator8WithResult(my) }
-func (my *AssignmentOperator8)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator8WithResultArgument(my, o) }
+func (my *AssignmentOperator8)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator8)       Enter(v Visitor){
+        var checkChildren = v.VisitAssignmentOperator8(my)
+        if checkChildren{
+            if nil != my._GREATER{my._GREATER.Accept(v)}
+            if nil != my._GREATER2{my._GREATER2.Accept(v)}
+            if nil != my._GREATER3{my._GREATER3.Accept(v)}
+            if nil != my._EQUAL{my._EQUAL.Accept(v)}
+        }
+        v.EndVisitAssignmentOperator8(my)
+    }
 
 
 func AnyCastToAssignmentOperator8(i interface{}) *AssignmentOperator8 {
@@ -29622,10 +32526,17 @@ func NewAssignmentOperator9(token IToken )*AssignmentOperator9{
       return my
     }
 
-func (my *AssignmentOperator9)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator9(my)}
-func (my *AssignmentOperator9)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator9WithArg(my, o) }
-func (my *AssignmentOperator9)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator9WithResult(my) }
-func (my *AssignmentOperator9)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator9WithResultArgument(my, o) }
+func (my *AssignmentOperator9)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator9)       Enter(v Visitor){
+        v.VisitAssignmentOperator9(my)
+        v.EndVisitAssignmentOperator9(my)
+    }
 
 
 func AnyCastToAssignmentOperator9(i interface{}) *AssignmentOperator9 {
@@ -29652,10 +32563,17 @@ func NewAssignmentOperator10(token IToken )*AssignmentOperator10{
       return my
     }
 
-func (my *AssignmentOperator10)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator10(my)}
-func (my *AssignmentOperator10)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator10WithArg(my, o) }
-func (my *AssignmentOperator10)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator10WithResult(my) }
-func (my *AssignmentOperator10)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator10WithResultArgument(my, o) }
+func (my *AssignmentOperator10)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator10)       Enter(v Visitor){
+        v.VisitAssignmentOperator10(my)
+        v.EndVisitAssignmentOperator10(my)
+    }
 
 
 func AnyCastToAssignmentOperator10(i interface{}) *AssignmentOperator10 {
@@ -29682,10 +32600,17 @@ func NewAssignmentOperator11(token IToken )*AssignmentOperator11{
       return my
     }
 
-func (my *AssignmentOperator11)      AcceptWithVisitor(v Visitor) { v.VisitAssignmentOperator11(my)}
-func (my *AssignmentOperator11)      AcceptWithArg(v ArgumentVisitor, o interface{}){ v.VisitAssignmentOperator11WithArg(my, o) }
-func (my *AssignmentOperator11)      AcceptWithResult(v ResultVisitor) interface{}{return v.VisitAssignmentOperator11WithResult(my) }
-func (my *AssignmentOperator11)      AcceptWithResultArgument(v ResultArgumentVisitor, o interface{}) interface{}{return v.VisitAssignmentOperator11WithResultArgument(my, o) }
+func (my *AssignmentOperator11)       Accept(v IAstVisitor){
+        if ! v.PreVisit(my){ return }
+        var _ctor ,_ = v.(Visitor)
+        my.Enter(_ctor)
+        v.PostVisit(my)
+}
+
+func (my *AssignmentOperator11)       Enter(v Visitor){
+        v.VisitAssignmentOperator11(my)
+        v.EndVisitAssignmentOperator11(my)
+    }
 
 
 func AnyCastToAssignmentOperator11(i interface{}) *AssignmentOperator11 {
@@ -29696,278 +32621,819 @@ func AnyCastToAssignmentOperator11(i interface{}) *AssignmentOperator11 {
 	}
 }
 type Visitor interface{
-    VisitAstToken(n  *AstToken) 
-    Visitidentifier(n  *identifier) 
-    VisitPrimitiveType(n  *PrimitiveType) 
-    VisitClassType(n  *ClassType) 
-    VisitInterfaceType(n  *InterfaceType) 
-    VisitTypeName(n  *TypeName) 
-    VisitArrayType(n  *ArrayType) 
-    VisitTypeParameter(n  *TypeParameter) 
-    VisitTypeBound(n  *TypeBound) 
-    VisitAdditionalBoundList(n  *AdditionalBoundList) 
-    VisitAdditionalBound(n  *AdditionalBound) 
-    VisitTypeArguments(n  *TypeArguments) 
-    VisitActualTypeArgumentList(n  *ActualTypeArgumentList) 
-    VisitWildcard(n  *Wildcard) 
-    VisitPackageName(n  *PackageName) 
-    VisitExpressionName(n  *ExpressionName) 
-    VisitMethodName(n  *MethodName) 
-    VisitPackageOrTypeName(n  *PackageOrTypeName) 
-    VisitAmbiguousName(n  *AmbiguousName) 
-    VisitCompilationUnit(n  *CompilationUnit) 
-    VisitImportDeclarations(n  *ImportDeclarations) 
-    VisitTypeDeclarations(n  *TypeDeclarations) 
-    VisitPackageDeclaration(n  *PackageDeclaration) 
-    VisitSingleTypeImportDeclaration(n  *SingleTypeImportDeclaration) 
-    VisitTypeImportOnDemandDeclaration(n  *TypeImportOnDemandDeclaration) 
-    VisitSingleStaticImportDeclaration(n  *SingleStaticImportDeclaration) 
-    VisitStaticImportOnDemandDeclaration(n  *StaticImportOnDemandDeclaration) 
-    VisitTypeDeclaration(n  *TypeDeclaration) 
-    VisitNormalClassDeclaration(n  *NormalClassDeclaration) 
-    VisitClassModifiers(n  *ClassModifiers) 
-    VisitTypeParameters(n  *TypeParameters) 
-    VisitTypeParameterList(n  *TypeParameterList) 
-    VisitSuper(n  *Super) 
-    VisitInterfaces(n  *Interfaces) 
-    VisitInterfaceTypeList(n  *InterfaceTypeList) 
-    VisitClassBody(n  *ClassBody) 
-    VisitClassBodyDeclarations(n  *ClassBodyDeclarations) 
-    VisitClassMemberDeclaration(n  *ClassMemberDeclaration) 
-    VisitFieldDeclaration(n  *FieldDeclaration) 
-    VisitVariableDeclarators(n  *VariableDeclarators) 
-    VisitVariableDeclarator(n  *VariableDeclarator) 
-    VisitVariableDeclaratorId(n  *VariableDeclaratorId) 
-    VisitFieldModifiers(n  *FieldModifiers) 
-    VisitMethodDeclaration(n  *MethodDeclaration) 
-    VisitMethodHeader(n  *MethodHeader) 
-    VisitResultType(n  *ResultType) 
-    VisitFormalParameterList(n  *FormalParameterList) 
-    VisitFormalParameters(n  *FormalParameters) 
-    VisitFormalParameter(n  *FormalParameter) 
-    VisitVariableModifiers(n  *VariableModifiers) 
-    VisitVariableModifier(n  *VariableModifier) 
-    VisitLastFormalParameter(n  *LastFormalParameter) 
-    VisitMethodModifiers(n  *MethodModifiers) 
-    VisitThrows(n  *Throws) 
-    VisitExceptionTypeList(n  *ExceptionTypeList) 
-    VisitMethodBody(n  *MethodBody) 
-    VisitStaticInitializer(n  *StaticInitializer) 
-    VisitConstructorDeclaration(n  *ConstructorDeclaration) 
-    VisitConstructorDeclarator(n  *ConstructorDeclarator) 
-    VisitConstructorModifiers(n  *ConstructorModifiers) 
-    VisitConstructorBody(n  *ConstructorBody) 
-    VisitEnumDeclaration(n  *EnumDeclaration) 
-    VisitEnumBody(n  *EnumBody) 
-    VisitEnumConstants(n  *EnumConstants) 
-    VisitEnumConstant(n  *EnumConstant) 
-    VisitArguments(n  *Arguments) 
-    VisitEnumBodyDeclarations(n  *EnumBodyDeclarations) 
-    VisitNormalInterfaceDeclaration(n  *NormalInterfaceDeclaration) 
-    VisitInterfaceModifiers(n  *InterfaceModifiers) 
-    VisitInterfaceBody(n  *InterfaceBody) 
-    VisitInterfaceMemberDeclarations(n  *InterfaceMemberDeclarations) 
-    VisitInterfaceMemberDeclaration(n  *InterfaceMemberDeclaration) 
-    VisitConstantDeclaration(n  *ConstantDeclaration) 
-    VisitConstantModifiers(n  *ConstantModifiers) 
-    VisitAbstractMethodDeclaration(n  *AbstractMethodDeclaration) 
-    VisitAbstractMethodModifiers(n  *AbstractMethodModifiers) 
-    VisitAnnotationTypeDeclaration(n  *AnnotationTypeDeclaration) 
-    VisitAnnotationTypeBody(n  *AnnotationTypeBody) 
-    VisitAnnotationTypeElementDeclarations(n  *AnnotationTypeElementDeclarations) 
-    VisitDefaultValue(n  *DefaultValue) 
-    VisitAnnotations(n  *Annotations) 
-    VisitNormalAnnotation(n  *NormalAnnotation) 
-    VisitElementValuePairs(n  *ElementValuePairs) 
-    VisitElementValuePair(n  *ElementValuePair) 
-    VisitElementValueArrayInitializer(n  *ElementValueArrayInitializer) 
-    VisitElementValues(n  *ElementValues) 
-    VisitMarkerAnnotation(n  *MarkerAnnotation) 
-    VisitSingleElementAnnotation(n  *SingleElementAnnotation) 
-    VisitArrayInitializer(n  *ArrayInitializer) 
-    VisitVariableInitializers(n  *VariableInitializers) 
-    VisitBlock(n  *Block) 
-    VisitBlockStatements(n  *BlockStatements) 
-    VisitLocalVariableDeclarationStatement(n  *LocalVariableDeclarationStatement) 
-    VisitLocalVariableDeclaration(n  *LocalVariableDeclaration) 
-    VisitIfThenStatement(n  *IfThenStatement) 
-    VisitIfThenElseStatement(n  *IfThenElseStatement) 
-    VisitIfThenElseStatementNoShortIf(n  *IfThenElseStatementNoShortIf) 
-    VisitEmptyStatement(n  *EmptyStatement) 
-    VisitLabeledStatement(n  *LabeledStatement) 
-    VisitLabeledStatementNoShortIf(n  *LabeledStatementNoShortIf) 
-    VisitExpressionStatement(n  *ExpressionStatement) 
-    VisitSwitchStatement(n  *SwitchStatement) 
-    VisitSwitchBlock(n  *SwitchBlock) 
-    VisitSwitchBlockStatementGroups(n  *SwitchBlockStatementGroups) 
-    VisitSwitchBlockStatementGroup(n  *SwitchBlockStatementGroup) 
-    VisitSwitchLabels(n  *SwitchLabels) 
-    VisitWhileStatement(n  *WhileStatement) 
-    VisitWhileStatementNoShortIf(n  *WhileStatementNoShortIf) 
-    VisitDoStatement(n  *DoStatement) 
-    VisitBasicForStatement(n  *BasicForStatement) 
-    VisitForStatementNoShortIf(n  *ForStatementNoShortIf) 
-    VisitStatementExpressionList(n  *StatementExpressionList) 
-    VisitEnhancedForStatement(n  *EnhancedForStatement) 
-    VisitBreakStatement(n  *BreakStatement) 
-    VisitContinueStatement(n  *ContinueStatement) 
-    VisitReturnStatement(n  *ReturnStatement) 
-    VisitThrowStatement(n  *ThrowStatement) 
-    VisitSynchronizedStatement(n  *SynchronizedStatement) 
-    VisitCatches(n  *Catches) 
-    VisitCatchClause(n  *CatchClause) 
-    VisitFinally(n  *Finally) 
-    VisitArgumentList(n  *ArgumentList) 
-    VisitDimExprs(n  *DimExprs) 
-    VisitDimExpr(n  *DimExpr) 
-    VisitPostIncrementExpression(n  *PostIncrementExpression) 
-    VisitPostDecrementExpression(n  *PostDecrementExpression) 
-    VisitPreIncrementExpression(n  *PreIncrementExpression) 
-    VisitPreDecrementExpression(n  *PreDecrementExpression) 
-    VisitAndExpression(n  *AndExpression) 
-    VisitExclusiveOrExpression(n  *ExclusiveOrExpression) 
-    VisitInclusiveOrExpression(n  *InclusiveOrExpression) 
-    VisitConditionalAndExpression(n  *ConditionalAndExpression) 
-    VisitConditionalOrExpression(n  *ConditionalOrExpression) 
-    VisitConditionalExpression(n  *ConditionalExpression) 
-    VisitAssignment(n  *Assignment) 
-    VisitCommaopt(n  *Commaopt) 
-    VisitEllipsisopt(n  *Ellipsisopt) 
-    VisitLPGUserAction0(n  *LPGUserAction0) 
-    VisitLPGUserAction1(n  *LPGUserAction1) 
-    VisitLPGUserAction2(n  *LPGUserAction2) 
-    VisitLPGUserAction3(n  *LPGUserAction3) 
-    VisitLPGUserAction4(n  *LPGUserAction4) 
-    VisitIntegralType0(n  *IntegralType0) 
-    VisitIntegralType1(n  *IntegralType1) 
-    VisitIntegralType2(n  *IntegralType2) 
-    VisitIntegralType3(n  *IntegralType3) 
-    VisitIntegralType4(n  *IntegralType4) 
-    VisitFloatingPointType0(n  *FloatingPointType0) 
-    VisitFloatingPointType1(n  *FloatingPointType1) 
-    VisitWildcardBounds0(n  *WildcardBounds0) 
-    VisitWildcardBounds1(n  *WildcardBounds1) 
-    VisitClassModifier0(n  *ClassModifier0) 
-    VisitClassModifier1(n  *ClassModifier1) 
-    VisitClassModifier2(n  *ClassModifier2) 
-    VisitClassModifier3(n  *ClassModifier3) 
-    VisitClassModifier4(n  *ClassModifier4) 
-    VisitClassModifier5(n  *ClassModifier5) 
-    VisitClassModifier6(n  *ClassModifier6) 
-    VisitFieldModifier0(n  *FieldModifier0) 
-    VisitFieldModifier1(n  *FieldModifier1) 
-    VisitFieldModifier2(n  *FieldModifier2) 
-    VisitFieldModifier3(n  *FieldModifier3) 
-    VisitFieldModifier4(n  *FieldModifier4) 
-    VisitFieldModifier5(n  *FieldModifier5) 
-    VisitFieldModifier6(n  *FieldModifier6) 
-    VisitMethodDeclarator0(n  *MethodDeclarator0) 
-    VisitMethodDeclarator1(n  *MethodDeclarator1) 
-    VisitMethodModifier0(n  *MethodModifier0) 
-    VisitMethodModifier1(n  *MethodModifier1) 
-    VisitMethodModifier2(n  *MethodModifier2) 
-    VisitMethodModifier3(n  *MethodModifier3) 
-    VisitMethodModifier4(n  *MethodModifier4) 
-    VisitMethodModifier5(n  *MethodModifier5) 
-    VisitMethodModifier6(n  *MethodModifier6) 
-    VisitMethodModifier7(n  *MethodModifier7) 
-    VisitMethodModifier8(n  *MethodModifier8) 
-    VisitConstructorModifier0(n  *ConstructorModifier0) 
-    VisitConstructorModifier1(n  *ConstructorModifier1) 
-    VisitConstructorModifier2(n  *ConstructorModifier2) 
-    VisitExplicitConstructorInvocation0(n  *ExplicitConstructorInvocation0) 
-    VisitExplicitConstructorInvocation1(n  *ExplicitConstructorInvocation1) 
-    VisitExplicitConstructorInvocation2(n  *ExplicitConstructorInvocation2) 
-    VisitInterfaceModifier0(n  *InterfaceModifier0) 
-    VisitInterfaceModifier1(n  *InterfaceModifier1) 
-    VisitInterfaceModifier2(n  *InterfaceModifier2) 
-    VisitInterfaceModifier3(n  *InterfaceModifier3) 
-    VisitInterfaceModifier4(n  *InterfaceModifier4) 
-    VisitInterfaceModifier5(n  *InterfaceModifier5) 
-    VisitExtendsInterfaces0(n  *ExtendsInterfaces0) 
-    VisitExtendsInterfaces1(n  *ExtendsInterfaces1) 
-    VisitConstantModifier0(n  *ConstantModifier0) 
-    VisitConstantModifier1(n  *ConstantModifier1) 
-    VisitConstantModifier2(n  *ConstantModifier2) 
-    VisitAbstractMethodModifier0(n  *AbstractMethodModifier0) 
-    VisitAbstractMethodModifier1(n  *AbstractMethodModifier1) 
-    VisitAnnotationTypeElementDeclaration0(n  *AnnotationTypeElementDeclaration0) 
-    VisitAnnotationTypeElementDeclaration1(n  *AnnotationTypeElementDeclaration1) 
-    VisitAssertStatement0(n  *AssertStatement0) 
-    VisitAssertStatement1(n  *AssertStatement1) 
-    VisitSwitchLabel0(n  *SwitchLabel0) 
-    VisitSwitchLabel1(n  *SwitchLabel1) 
-    VisitSwitchLabel2(n  *SwitchLabel2) 
-    VisitTryStatement0(n  *TryStatement0) 
-    VisitTryStatement1(n  *TryStatement1) 
-    VisitPrimaryNoNewArray0(n  *PrimaryNoNewArray0) 
-    VisitPrimaryNoNewArray1(n  *PrimaryNoNewArray1) 
-    VisitPrimaryNoNewArray2(n  *PrimaryNoNewArray2) 
-    VisitPrimaryNoNewArray3(n  *PrimaryNoNewArray3) 
-    VisitPrimaryNoNewArray4(n  *PrimaryNoNewArray4) 
-    VisitLiteral0(n  *Literal0) 
-    VisitLiteral1(n  *Literal1) 
-    VisitLiteral2(n  *Literal2) 
-    VisitLiteral3(n  *Literal3) 
-    VisitLiteral4(n  *Literal4) 
-    VisitLiteral5(n  *Literal5) 
-    VisitLiteral6(n  *Literal6) 
-    VisitBooleanLiteral0(n  *BooleanLiteral0) 
-    VisitBooleanLiteral1(n  *BooleanLiteral1) 
-    VisitClassInstanceCreationExpression0(n  *ClassInstanceCreationExpression0) 
-    VisitClassInstanceCreationExpression1(n  *ClassInstanceCreationExpression1) 
-    VisitArrayCreationExpression0(n  *ArrayCreationExpression0) 
-    VisitArrayCreationExpression1(n  *ArrayCreationExpression1) 
-    VisitArrayCreationExpression2(n  *ArrayCreationExpression2) 
-    VisitArrayCreationExpression3(n  *ArrayCreationExpression3) 
-    VisitDims0(n  *Dims0) 
-    VisitDims1(n  *Dims1) 
-    VisitFieldAccess0(n  *FieldAccess0) 
-    VisitFieldAccess1(n  *FieldAccess1) 
-    VisitFieldAccess2(n  *FieldAccess2) 
-    VisitMethodInvocation0(n  *MethodInvocation0) 
-    VisitMethodInvocation1(n  *MethodInvocation1) 
-    VisitMethodInvocation2(n  *MethodInvocation2) 
-    VisitMethodInvocation3(n  *MethodInvocation3) 
-    VisitMethodInvocation4(n  *MethodInvocation4) 
-    VisitArrayAccess0(n  *ArrayAccess0) 
-    VisitArrayAccess1(n  *ArrayAccess1) 
-    VisitUnaryExpression0(n  *UnaryExpression0) 
-    VisitUnaryExpression1(n  *UnaryExpression1) 
-    VisitUnaryExpressionNotPlusMinus0(n  *UnaryExpressionNotPlusMinus0) 
-    VisitUnaryExpressionNotPlusMinus1(n  *UnaryExpressionNotPlusMinus1) 
-    VisitCastExpression0(n  *CastExpression0) 
-    VisitCastExpression1(n  *CastExpression1) 
-    VisitMultiplicativeExpression0(n  *MultiplicativeExpression0) 
-    VisitMultiplicativeExpression1(n  *MultiplicativeExpression1) 
-    VisitMultiplicativeExpression2(n  *MultiplicativeExpression2) 
-    VisitAdditiveExpression0(n  *AdditiveExpression0) 
-    VisitAdditiveExpression1(n  *AdditiveExpression1) 
-    VisitShiftExpression0(n  *ShiftExpression0) 
-    VisitShiftExpression1(n  *ShiftExpression1) 
-    VisitShiftExpression2(n  *ShiftExpression2) 
-    VisitRelationalExpression0(n  *RelationalExpression0) 
-    VisitRelationalExpression1(n  *RelationalExpression1) 
-    VisitRelationalExpression2(n  *RelationalExpression2) 
-    VisitRelationalExpression3(n  *RelationalExpression3) 
-    VisitRelationalExpression4(n  *RelationalExpression4) 
-    VisitEqualityExpression0(n  *EqualityExpression0) 
-    VisitEqualityExpression1(n  *EqualityExpression1) 
-    VisitAssignmentOperator0(n  *AssignmentOperator0) 
-    VisitAssignmentOperator1(n  *AssignmentOperator1) 
-    VisitAssignmentOperator2(n  *AssignmentOperator2) 
-    VisitAssignmentOperator3(n  *AssignmentOperator3) 
-    VisitAssignmentOperator4(n  *AssignmentOperator4) 
-    VisitAssignmentOperator5(n  *AssignmentOperator5) 
-    VisitAssignmentOperator6(n  *AssignmentOperator6) 
-    VisitAssignmentOperator7(n  *AssignmentOperator7) 
-    VisitAssignmentOperator8(n  *AssignmentOperator8) 
-    VisitAssignmentOperator9(n  *AssignmentOperator9) 
-    VisitAssignmentOperator10(n  *AssignmentOperator10) 
-    VisitAssignmentOperator11(n  *AssignmentOperator11) 
+  IAstVisitor
+    Visit(n  IAst) bool
+    EndVisit(n IAst)
 
-    Visit(n  IAst)
+    VisitAstToken(n *AstToken) bool
+    EndVisitAstToken(n *AstToken)
+
+    Visitidentifier(n *identifier) bool
+    EndVisitidentifier(n *identifier)
+
+    VisitPrimitiveType(n *PrimitiveType) bool
+    EndVisitPrimitiveType(n *PrimitiveType)
+
+    VisitClassType(n *ClassType) bool
+    EndVisitClassType(n *ClassType)
+
+    VisitInterfaceType(n *InterfaceType) bool
+    EndVisitInterfaceType(n *InterfaceType)
+
+    VisitTypeName(n *TypeName) bool
+    EndVisitTypeName(n *TypeName)
+
+    VisitArrayType(n *ArrayType) bool
+    EndVisitArrayType(n *ArrayType)
+
+    VisitTypeParameter(n *TypeParameter) bool
+    EndVisitTypeParameter(n *TypeParameter)
+
+    VisitTypeBound(n *TypeBound) bool
+    EndVisitTypeBound(n *TypeBound)
+
+    VisitAdditionalBoundList(n *AdditionalBoundList) bool
+    EndVisitAdditionalBoundList(n *AdditionalBoundList)
+
+    VisitAdditionalBound(n *AdditionalBound) bool
+    EndVisitAdditionalBound(n *AdditionalBound)
+
+    VisitTypeArguments(n *TypeArguments) bool
+    EndVisitTypeArguments(n *TypeArguments)
+
+    VisitActualTypeArgumentList(n *ActualTypeArgumentList) bool
+    EndVisitActualTypeArgumentList(n *ActualTypeArgumentList)
+
+    VisitWildcard(n *Wildcard) bool
+    EndVisitWildcard(n *Wildcard)
+
+    VisitPackageName(n *PackageName) bool
+    EndVisitPackageName(n *PackageName)
+
+    VisitExpressionName(n *ExpressionName) bool
+    EndVisitExpressionName(n *ExpressionName)
+
+    VisitMethodName(n *MethodName) bool
+    EndVisitMethodName(n *MethodName)
+
+    VisitPackageOrTypeName(n *PackageOrTypeName) bool
+    EndVisitPackageOrTypeName(n *PackageOrTypeName)
+
+    VisitAmbiguousName(n *AmbiguousName) bool
+    EndVisitAmbiguousName(n *AmbiguousName)
+
+    VisitCompilationUnit(n *CompilationUnit) bool
+    EndVisitCompilationUnit(n *CompilationUnit)
+
+    VisitImportDeclarations(n *ImportDeclarations) bool
+    EndVisitImportDeclarations(n *ImportDeclarations)
+
+    VisitTypeDeclarations(n *TypeDeclarations) bool
+    EndVisitTypeDeclarations(n *TypeDeclarations)
+
+    VisitPackageDeclaration(n *PackageDeclaration) bool
+    EndVisitPackageDeclaration(n *PackageDeclaration)
+
+    VisitSingleTypeImportDeclaration(n *SingleTypeImportDeclaration) bool
+    EndVisitSingleTypeImportDeclaration(n *SingleTypeImportDeclaration)
+
+    VisitTypeImportOnDemandDeclaration(n *TypeImportOnDemandDeclaration) bool
+    EndVisitTypeImportOnDemandDeclaration(n *TypeImportOnDemandDeclaration)
+
+    VisitSingleStaticImportDeclaration(n *SingleStaticImportDeclaration) bool
+    EndVisitSingleStaticImportDeclaration(n *SingleStaticImportDeclaration)
+
+    VisitStaticImportOnDemandDeclaration(n *StaticImportOnDemandDeclaration) bool
+    EndVisitStaticImportOnDemandDeclaration(n *StaticImportOnDemandDeclaration)
+
+    VisitTypeDeclaration(n *TypeDeclaration) bool
+    EndVisitTypeDeclaration(n *TypeDeclaration)
+
+    VisitNormalClassDeclaration(n *NormalClassDeclaration) bool
+    EndVisitNormalClassDeclaration(n *NormalClassDeclaration)
+
+    VisitClassModifiers(n *ClassModifiers) bool
+    EndVisitClassModifiers(n *ClassModifiers)
+
+    VisitTypeParameters(n *TypeParameters) bool
+    EndVisitTypeParameters(n *TypeParameters)
+
+    VisitTypeParameterList(n *TypeParameterList) bool
+    EndVisitTypeParameterList(n *TypeParameterList)
+
+    VisitSuper(n *Super) bool
+    EndVisitSuper(n *Super)
+
+    VisitInterfaces(n *Interfaces) bool
+    EndVisitInterfaces(n *Interfaces)
+
+    VisitInterfaceTypeList(n *InterfaceTypeList) bool
+    EndVisitInterfaceTypeList(n *InterfaceTypeList)
+
+    VisitClassBody(n *ClassBody) bool
+    EndVisitClassBody(n *ClassBody)
+
+    VisitClassBodyDeclarations(n *ClassBodyDeclarations) bool
+    EndVisitClassBodyDeclarations(n *ClassBodyDeclarations)
+
+    VisitClassMemberDeclaration(n *ClassMemberDeclaration) bool
+    EndVisitClassMemberDeclaration(n *ClassMemberDeclaration)
+
+    VisitFieldDeclaration(n *FieldDeclaration) bool
+    EndVisitFieldDeclaration(n *FieldDeclaration)
+
+    VisitVariableDeclarators(n *VariableDeclarators) bool
+    EndVisitVariableDeclarators(n *VariableDeclarators)
+
+    VisitVariableDeclarator(n *VariableDeclarator) bool
+    EndVisitVariableDeclarator(n *VariableDeclarator)
+
+    VisitVariableDeclaratorId(n *VariableDeclaratorId) bool
+    EndVisitVariableDeclaratorId(n *VariableDeclaratorId)
+
+    VisitFieldModifiers(n *FieldModifiers) bool
+    EndVisitFieldModifiers(n *FieldModifiers)
+
+    VisitMethodDeclaration(n *MethodDeclaration) bool
+    EndVisitMethodDeclaration(n *MethodDeclaration)
+
+    VisitMethodHeader(n *MethodHeader) bool
+    EndVisitMethodHeader(n *MethodHeader)
+
+    VisitResultType(n *ResultType) bool
+    EndVisitResultType(n *ResultType)
+
+    VisitFormalParameterList(n *FormalParameterList) bool
+    EndVisitFormalParameterList(n *FormalParameterList)
+
+    VisitFormalParameters(n *FormalParameters) bool
+    EndVisitFormalParameters(n *FormalParameters)
+
+    VisitFormalParameter(n *FormalParameter) bool
+    EndVisitFormalParameter(n *FormalParameter)
+
+    VisitVariableModifiers(n *VariableModifiers) bool
+    EndVisitVariableModifiers(n *VariableModifiers)
+
+    VisitVariableModifier(n *VariableModifier) bool
+    EndVisitVariableModifier(n *VariableModifier)
+
+    VisitLastFormalParameter(n *LastFormalParameter) bool
+    EndVisitLastFormalParameter(n *LastFormalParameter)
+
+    VisitMethodModifiers(n *MethodModifiers) bool
+    EndVisitMethodModifiers(n *MethodModifiers)
+
+    VisitThrows(n *Throws) bool
+    EndVisitThrows(n *Throws)
+
+    VisitExceptionTypeList(n *ExceptionTypeList) bool
+    EndVisitExceptionTypeList(n *ExceptionTypeList)
+
+    VisitMethodBody(n *MethodBody) bool
+    EndVisitMethodBody(n *MethodBody)
+
+    VisitStaticInitializer(n *StaticInitializer) bool
+    EndVisitStaticInitializer(n *StaticInitializer)
+
+    VisitConstructorDeclaration(n *ConstructorDeclaration) bool
+    EndVisitConstructorDeclaration(n *ConstructorDeclaration)
+
+    VisitConstructorDeclarator(n *ConstructorDeclarator) bool
+    EndVisitConstructorDeclarator(n *ConstructorDeclarator)
+
+    VisitConstructorModifiers(n *ConstructorModifiers) bool
+    EndVisitConstructorModifiers(n *ConstructorModifiers)
+
+    VisitConstructorBody(n *ConstructorBody) bool
+    EndVisitConstructorBody(n *ConstructorBody)
+
+    VisitEnumDeclaration(n *EnumDeclaration) bool
+    EndVisitEnumDeclaration(n *EnumDeclaration)
+
+    VisitEnumBody(n *EnumBody) bool
+    EndVisitEnumBody(n *EnumBody)
+
+    VisitEnumConstants(n *EnumConstants) bool
+    EndVisitEnumConstants(n *EnumConstants)
+
+    VisitEnumConstant(n *EnumConstant) bool
+    EndVisitEnumConstant(n *EnumConstant)
+
+    VisitArguments(n *Arguments) bool
+    EndVisitArguments(n *Arguments)
+
+    VisitEnumBodyDeclarations(n *EnumBodyDeclarations) bool
+    EndVisitEnumBodyDeclarations(n *EnumBodyDeclarations)
+
+    VisitNormalInterfaceDeclaration(n *NormalInterfaceDeclaration) bool
+    EndVisitNormalInterfaceDeclaration(n *NormalInterfaceDeclaration)
+
+    VisitInterfaceModifiers(n *InterfaceModifiers) bool
+    EndVisitInterfaceModifiers(n *InterfaceModifiers)
+
+    VisitInterfaceBody(n *InterfaceBody) bool
+    EndVisitInterfaceBody(n *InterfaceBody)
+
+    VisitInterfaceMemberDeclarations(n *InterfaceMemberDeclarations) bool
+    EndVisitInterfaceMemberDeclarations(n *InterfaceMemberDeclarations)
+
+    VisitInterfaceMemberDeclaration(n *InterfaceMemberDeclaration) bool
+    EndVisitInterfaceMemberDeclaration(n *InterfaceMemberDeclaration)
+
+    VisitConstantDeclaration(n *ConstantDeclaration) bool
+    EndVisitConstantDeclaration(n *ConstantDeclaration)
+
+    VisitConstantModifiers(n *ConstantModifiers) bool
+    EndVisitConstantModifiers(n *ConstantModifiers)
+
+    VisitAbstractMethodDeclaration(n *AbstractMethodDeclaration) bool
+    EndVisitAbstractMethodDeclaration(n *AbstractMethodDeclaration)
+
+    VisitAbstractMethodModifiers(n *AbstractMethodModifiers) bool
+    EndVisitAbstractMethodModifiers(n *AbstractMethodModifiers)
+
+    VisitAnnotationTypeDeclaration(n *AnnotationTypeDeclaration) bool
+    EndVisitAnnotationTypeDeclaration(n *AnnotationTypeDeclaration)
+
+    VisitAnnotationTypeBody(n *AnnotationTypeBody) bool
+    EndVisitAnnotationTypeBody(n *AnnotationTypeBody)
+
+    VisitAnnotationTypeElementDeclarations(n *AnnotationTypeElementDeclarations) bool
+    EndVisitAnnotationTypeElementDeclarations(n *AnnotationTypeElementDeclarations)
+
+    VisitDefaultValue(n *DefaultValue) bool
+    EndVisitDefaultValue(n *DefaultValue)
+
+    VisitAnnotations(n *Annotations) bool
+    EndVisitAnnotations(n *Annotations)
+
+    VisitNormalAnnotation(n *NormalAnnotation) bool
+    EndVisitNormalAnnotation(n *NormalAnnotation)
+
+    VisitElementValuePairs(n *ElementValuePairs) bool
+    EndVisitElementValuePairs(n *ElementValuePairs)
+
+    VisitElementValuePair(n *ElementValuePair) bool
+    EndVisitElementValuePair(n *ElementValuePair)
+
+    VisitElementValueArrayInitializer(n *ElementValueArrayInitializer) bool
+    EndVisitElementValueArrayInitializer(n *ElementValueArrayInitializer)
+
+    VisitElementValues(n *ElementValues) bool
+    EndVisitElementValues(n *ElementValues)
+
+    VisitMarkerAnnotation(n *MarkerAnnotation) bool
+    EndVisitMarkerAnnotation(n *MarkerAnnotation)
+
+    VisitSingleElementAnnotation(n *SingleElementAnnotation) bool
+    EndVisitSingleElementAnnotation(n *SingleElementAnnotation)
+
+    VisitArrayInitializer(n *ArrayInitializer) bool
+    EndVisitArrayInitializer(n *ArrayInitializer)
+
+    VisitVariableInitializers(n *VariableInitializers) bool
+    EndVisitVariableInitializers(n *VariableInitializers)
+
+    VisitBlock(n *Block) bool
+    EndVisitBlock(n *Block)
+
+    VisitBlockStatements(n *BlockStatements) bool
+    EndVisitBlockStatements(n *BlockStatements)
+
+    VisitLocalVariableDeclarationStatement(n *LocalVariableDeclarationStatement) bool
+    EndVisitLocalVariableDeclarationStatement(n *LocalVariableDeclarationStatement)
+
+    VisitLocalVariableDeclaration(n *LocalVariableDeclaration) bool
+    EndVisitLocalVariableDeclaration(n *LocalVariableDeclaration)
+
+    VisitIfThenStatement(n *IfThenStatement) bool
+    EndVisitIfThenStatement(n *IfThenStatement)
+
+    VisitIfThenElseStatement(n *IfThenElseStatement) bool
+    EndVisitIfThenElseStatement(n *IfThenElseStatement)
+
+    VisitIfThenElseStatementNoShortIf(n *IfThenElseStatementNoShortIf) bool
+    EndVisitIfThenElseStatementNoShortIf(n *IfThenElseStatementNoShortIf)
+
+    VisitEmptyStatement(n *EmptyStatement) bool
+    EndVisitEmptyStatement(n *EmptyStatement)
+
+    VisitLabeledStatement(n *LabeledStatement) bool
+    EndVisitLabeledStatement(n *LabeledStatement)
+
+    VisitLabeledStatementNoShortIf(n *LabeledStatementNoShortIf) bool
+    EndVisitLabeledStatementNoShortIf(n *LabeledStatementNoShortIf)
+
+    VisitExpressionStatement(n *ExpressionStatement) bool
+    EndVisitExpressionStatement(n *ExpressionStatement)
+
+    VisitSwitchStatement(n *SwitchStatement) bool
+    EndVisitSwitchStatement(n *SwitchStatement)
+
+    VisitSwitchBlock(n *SwitchBlock) bool
+    EndVisitSwitchBlock(n *SwitchBlock)
+
+    VisitSwitchBlockStatementGroups(n *SwitchBlockStatementGroups) bool
+    EndVisitSwitchBlockStatementGroups(n *SwitchBlockStatementGroups)
+
+    VisitSwitchBlockStatementGroup(n *SwitchBlockStatementGroup) bool
+    EndVisitSwitchBlockStatementGroup(n *SwitchBlockStatementGroup)
+
+    VisitSwitchLabels(n *SwitchLabels) bool
+    EndVisitSwitchLabels(n *SwitchLabels)
+
+    VisitWhileStatement(n *WhileStatement) bool
+    EndVisitWhileStatement(n *WhileStatement)
+
+    VisitWhileStatementNoShortIf(n *WhileStatementNoShortIf) bool
+    EndVisitWhileStatementNoShortIf(n *WhileStatementNoShortIf)
+
+    VisitDoStatement(n *DoStatement) bool
+    EndVisitDoStatement(n *DoStatement)
+
+    VisitBasicForStatement(n *BasicForStatement) bool
+    EndVisitBasicForStatement(n *BasicForStatement)
+
+    VisitForStatementNoShortIf(n *ForStatementNoShortIf) bool
+    EndVisitForStatementNoShortIf(n *ForStatementNoShortIf)
+
+    VisitStatementExpressionList(n *StatementExpressionList) bool
+    EndVisitStatementExpressionList(n *StatementExpressionList)
+
+    VisitEnhancedForStatement(n *EnhancedForStatement) bool
+    EndVisitEnhancedForStatement(n *EnhancedForStatement)
+
+    VisitBreakStatement(n *BreakStatement) bool
+    EndVisitBreakStatement(n *BreakStatement)
+
+    VisitContinueStatement(n *ContinueStatement) bool
+    EndVisitContinueStatement(n *ContinueStatement)
+
+    VisitReturnStatement(n *ReturnStatement) bool
+    EndVisitReturnStatement(n *ReturnStatement)
+
+    VisitThrowStatement(n *ThrowStatement) bool
+    EndVisitThrowStatement(n *ThrowStatement)
+
+    VisitSynchronizedStatement(n *SynchronizedStatement) bool
+    EndVisitSynchronizedStatement(n *SynchronizedStatement)
+
+    VisitCatches(n *Catches) bool
+    EndVisitCatches(n *Catches)
+
+    VisitCatchClause(n *CatchClause) bool
+    EndVisitCatchClause(n *CatchClause)
+
+    VisitFinally(n *Finally) bool
+    EndVisitFinally(n *Finally)
+
+    VisitArgumentList(n *ArgumentList) bool
+    EndVisitArgumentList(n *ArgumentList)
+
+    VisitDimExprs(n *DimExprs) bool
+    EndVisitDimExprs(n *DimExprs)
+
+    VisitDimExpr(n *DimExpr) bool
+    EndVisitDimExpr(n *DimExpr)
+
+    VisitPostIncrementExpression(n *PostIncrementExpression) bool
+    EndVisitPostIncrementExpression(n *PostIncrementExpression)
+
+    VisitPostDecrementExpression(n *PostDecrementExpression) bool
+    EndVisitPostDecrementExpression(n *PostDecrementExpression)
+
+    VisitPreIncrementExpression(n *PreIncrementExpression) bool
+    EndVisitPreIncrementExpression(n *PreIncrementExpression)
+
+    VisitPreDecrementExpression(n *PreDecrementExpression) bool
+    EndVisitPreDecrementExpression(n *PreDecrementExpression)
+
+    VisitAndExpression(n *AndExpression) bool
+    EndVisitAndExpression(n *AndExpression)
+
+    VisitExclusiveOrExpression(n *ExclusiveOrExpression) bool
+    EndVisitExclusiveOrExpression(n *ExclusiveOrExpression)
+
+    VisitInclusiveOrExpression(n *InclusiveOrExpression) bool
+    EndVisitInclusiveOrExpression(n *InclusiveOrExpression)
+
+    VisitConditionalAndExpression(n *ConditionalAndExpression) bool
+    EndVisitConditionalAndExpression(n *ConditionalAndExpression)
+
+    VisitConditionalOrExpression(n *ConditionalOrExpression) bool
+    EndVisitConditionalOrExpression(n *ConditionalOrExpression)
+
+    VisitConditionalExpression(n *ConditionalExpression) bool
+    EndVisitConditionalExpression(n *ConditionalExpression)
+
+    VisitAssignment(n *Assignment) bool
+    EndVisitAssignment(n *Assignment)
+
+    VisitCommaopt(n *Commaopt) bool
+    EndVisitCommaopt(n *Commaopt)
+
+    VisitEllipsisopt(n *Ellipsisopt) bool
+    EndVisitEllipsisopt(n *Ellipsisopt)
+
+    VisitLPGUserAction0(n *LPGUserAction0) bool
+    EndVisitLPGUserAction0(n *LPGUserAction0)
+
+    VisitLPGUserAction1(n *LPGUserAction1) bool
+    EndVisitLPGUserAction1(n *LPGUserAction1)
+
+    VisitLPGUserAction2(n *LPGUserAction2) bool
+    EndVisitLPGUserAction2(n *LPGUserAction2)
+
+    VisitLPGUserAction3(n *LPGUserAction3) bool
+    EndVisitLPGUserAction3(n *LPGUserAction3)
+
+    VisitLPGUserAction4(n *LPGUserAction4) bool
+    EndVisitLPGUserAction4(n *LPGUserAction4)
+
+    VisitIntegralType0(n *IntegralType0) bool
+    EndVisitIntegralType0(n *IntegralType0)
+
+    VisitIntegralType1(n *IntegralType1) bool
+    EndVisitIntegralType1(n *IntegralType1)
+
+    VisitIntegralType2(n *IntegralType2) bool
+    EndVisitIntegralType2(n *IntegralType2)
+
+    VisitIntegralType3(n *IntegralType3) bool
+    EndVisitIntegralType3(n *IntegralType3)
+
+    VisitIntegralType4(n *IntegralType4) bool
+    EndVisitIntegralType4(n *IntegralType4)
+
+    VisitFloatingPointType0(n *FloatingPointType0) bool
+    EndVisitFloatingPointType0(n *FloatingPointType0)
+
+    VisitFloatingPointType1(n *FloatingPointType1) bool
+    EndVisitFloatingPointType1(n *FloatingPointType1)
+
+    VisitWildcardBounds0(n *WildcardBounds0) bool
+    EndVisitWildcardBounds0(n *WildcardBounds0)
+
+    VisitWildcardBounds1(n *WildcardBounds1) bool
+    EndVisitWildcardBounds1(n *WildcardBounds1)
+
+    VisitClassModifier0(n *ClassModifier0) bool
+    EndVisitClassModifier0(n *ClassModifier0)
+
+    VisitClassModifier1(n *ClassModifier1) bool
+    EndVisitClassModifier1(n *ClassModifier1)
+
+    VisitClassModifier2(n *ClassModifier2) bool
+    EndVisitClassModifier2(n *ClassModifier2)
+
+    VisitClassModifier3(n *ClassModifier3) bool
+    EndVisitClassModifier3(n *ClassModifier3)
+
+    VisitClassModifier4(n *ClassModifier4) bool
+    EndVisitClassModifier4(n *ClassModifier4)
+
+    VisitClassModifier5(n *ClassModifier5) bool
+    EndVisitClassModifier5(n *ClassModifier5)
+
+    VisitClassModifier6(n *ClassModifier6) bool
+    EndVisitClassModifier6(n *ClassModifier6)
+
+    VisitFieldModifier0(n *FieldModifier0) bool
+    EndVisitFieldModifier0(n *FieldModifier0)
+
+    VisitFieldModifier1(n *FieldModifier1) bool
+    EndVisitFieldModifier1(n *FieldModifier1)
+
+    VisitFieldModifier2(n *FieldModifier2) bool
+    EndVisitFieldModifier2(n *FieldModifier2)
+
+    VisitFieldModifier3(n *FieldModifier3) bool
+    EndVisitFieldModifier3(n *FieldModifier3)
+
+    VisitFieldModifier4(n *FieldModifier4) bool
+    EndVisitFieldModifier4(n *FieldModifier4)
+
+    VisitFieldModifier5(n *FieldModifier5) bool
+    EndVisitFieldModifier5(n *FieldModifier5)
+
+    VisitFieldModifier6(n *FieldModifier6) bool
+    EndVisitFieldModifier6(n *FieldModifier6)
+
+    VisitMethodDeclarator0(n *MethodDeclarator0) bool
+    EndVisitMethodDeclarator0(n *MethodDeclarator0)
+
+    VisitMethodDeclarator1(n *MethodDeclarator1) bool
+    EndVisitMethodDeclarator1(n *MethodDeclarator1)
+
+    VisitMethodModifier0(n *MethodModifier0) bool
+    EndVisitMethodModifier0(n *MethodModifier0)
+
+    VisitMethodModifier1(n *MethodModifier1) bool
+    EndVisitMethodModifier1(n *MethodModifier1)
+
+    VisitMethodModifier2(n *MethodModifier2) bool
+    EndVisitMethodModifier2(n *MethodModifier2)
+
+    VisitMethodModifier3(n *MethodModifier3) bool
+    EndVisitMethodModifier3(n *MethodModifier3)
+
+    VisitMethodModifier4(n *MethodModifier4) bool
+    EndVisitMethodModifier4(n *MethodModifier4)
+
+    VisitMethodModifier5(n *MethodModifier5) bool
+    EndVisitMethodModifier5(n *MethodModifier5)
+
+    VisitMethodModifier6(n *MethodModifier6) bool
+    EndVisitMethodModifier6(n *MethodModifier6)
+
+    VisitMethodModifier7(n *MethodModifier7) bool
+    EndVisitMethodModifier7(n *MethodModifier7)
+
+    VisitMethodModifier8(n *MethodModifier8) bool
+    EndVisitMethodModifier8(n *MethodModifier8)
+
+    VisitConstructorModifier0(n *ConstructorModifier0) bool
+    EndVisitConstructorModifier0(n *ConstructorModifier0)
+
+    VisitConstructorModifier1(n *ConstructorModifier1) bool
+    EndVisitConstructorModifier1(n *ConstructorModifier1)
+
+    VisitConstructorModifier2(n *ConstructorModifier2) bool
+    EndVisitConstructorModifier2(n *ConstructorModifier2)
+
+    VisitExplicitConstructorInvocation0(n *ExplicitConstructorInvocation0) bool
+    EndVisitExplicitConstructorInvocation0(n *ExplicitConstructorInvocation0)
+
+    VisitExplicitConstructorInvocation1(n *ExplicitConstructorInvocation1) bool
+    EndVisitExplicitConstructorInvocation1(n *ExplicitConstructorInvocation1)
+
+    VisitExplicitConstructorInvocation2(n *ExplicitConstructorInvocation2) bool
+    EndVisitExplicitConstructorInvocation2(n *ExplicitConstructorInvocation2)
+
+    VisitInterfaceModifier0(n *InterfaceModifier0) bool
+    EndVisitInterfaceModifier0(n *InterfaceModifier0)
+
+    VisitInterfaceModifier1(n *InterfaceModifier1) bool
+    EndVisitInterfaceModifier1(n *InterfaceModifier1)
+
+    VisitInterfaceModifier2(n *InterfaceModifier2) bool
+    EndVisitInterfaceModifier2(n *InterfaceModifier2)
+
+    VisitInterfaceModifier3(n *InterfaceModifier3) bool
+    EndVisitInterfaceModifier3(n *InterfaceModifier3)
+
+    VisitInterfaceModifier4(n *InterfaceModifier4) bool
+    EndVisitInterfaceModifier4(n *InterfaceModifier4)
+
+    VisitInterfaceModifier5(n *InterfaceModifier5) bool
+    EndVisitInterfaceModifier5(n *InterfaceModifier5)
+
+    VisitExtendsInterfaces0(n *ExtendsInterfaces0) bool
+    EndVisitExtendsInterfaces0(n *ExtendsInterfaces0)
+
+    VisitExtendsInterfaces1(n *ExtendsInterfaces1) bool
+    EndVisitExtendsInterfaces1(n *ExtendsInterfaces1)
+
+    VisitConstantModifier0(n *ConstantModifier0) bool
+    EndVisitConstantModifier0(n *ConstantModifier0)
+
+    VisitConstantModifier1(n *ConstantModifier1) bool
+    EndVisitConstantModifier1(n *ConstantModifier1)
+
+    VisitConstantModifier2(n *ConstantModifier2) bool
+    EndVisitConstantModifier2(n *ConstantModifier2)
+
+    VisitAbstractMethodModifier0(n *AbstractMethodModifier0) bool
+    EndVisitAbstractMethodModifier0(n *AbstractMethodModifier0)
+
+    VisitAbstractMethodModifier1(n *AbstractMethodModifier1) bool
+    EndVisitAbstractMethodModifier1(n *AbstractMethodModifier1)
+
+    VisitAnnotationTypeElementDeclaration0(n *AnnotationTypeElementDeclaration0) bool
+    EndVisitAnnotationTypeElementDeclaration0(n *AnnotationTypeElementDeclaration0)
+
+    VisitAnnotationTypeElementDeclaration1(n *AnnotationTypeElementDeclaration1) bool
+    EndVisitAnnotationTypeElementDeclaration1(n *AnnotationTypeElementDeclaration1)
+
+    VisitAssertStatement0(n *AssertStatement0) bool
+    EndVisitAssertStatement0(n *AssertStatement0)
+
+    VisitAssertStatement1(n *AssertStatement1) bool
+    EndVisitAssertStatement1(n *AssertStatement1)
+
+    VisitSwitchLabel0(n *SwitchLabel0) bool
+    EndVisitSwitchLabel0(n *SwitchLabel0)
+
+    VisitSwitchLabel1(n *SwitchLabel1) bool
+    EndVisitSwitchLabel1(n *SwitchLabel1)
+
+    VisitSwitchLabel2(n *SwitchLabel2) bool
+    EndVisitSwitchLabel2(n *SwitchLabel2)
+
+    VisitTryStatement0(n *TryStatement0) bool
+    EndVisitTryStatement0(n *TryStatement0)
+
+    VisitTryStatement1(n *TryStatement1) bool
+    EndVisitTryStatement1(n *TryStatement1)
+
+    VisitPrimaryNoNewArray0(n *PrimaryNoNewArray0) bool
+    EndVisitPrimaryNoNewArray0(n *PrimaryNoNewArray0)
+
+    VisitPrimaryNoNewArray1(n *PrimaryNoNewArray1) bool
+    EndVisitPrimaryNoNewArray1(n *PrimaryNoNewArray1)
+
+    VisitPrimaryNoNewArray2(n *PrimaryNoNewArray2) bool
+    EndVisitPrimaryNoNewArray2(n *PrimaryNoNewArray2)
+
+    VisitPrimaryNoNewArray3(n *PrimaryNoNewArray3) bool
+    EndVisitPrimaryNoNewArray3(n *PrimaryNoNewArray3)
+
+    VisitPrimaryNoNewArray4(n *PrimaryNoNewArray4) bool
+    EndVisitPrimaryNoNewArray4(n *PrimaryNoNewArray4)
+
+    VisitLiteral0(n *Literal0) bool
+    EndVisitLiteral0(n *Literal0)
+
+    VisitLiteral1(n *Literal1) bool
+    EndVisitLiteral1(n *Literal1)
+
+    VisitLiteral2(n *Literal2) bool
+    EndVisitLiteral2(n *Literal2)
+
+    VisitLiteral3(n *Literal3) bool
+    EndVisitLiteral3(n *Literal3)
+
+    VisitLiteral4(n *Literal4) bool
+    EndVisitLiteral4(n *Literal4)
+
+    VisitLiteral5(n *Literal5) bool
+    EndVisitLiteral5(n *Literal5)
+
+    VisitLiteral6(n *Literal6) bool
+    EndVisitLiteral6(n *Literal6)
+
+    VisitBooleanLiteral0(n *BooleanLiteral0) bool
+    EndVisitBooleanLiteral0(n *BooleanLiteral0)
+
+    VisitBooleanLiteral1(n *BooleanLiteral1) bool
+    EndVisitBooleanLiteral1(n *BooleanLiteral1)
+
+    VisitClassInstanceCreationExpression0(n *ClassInstanceCreationExpression0) bool
+    EndVisitClassInstanceCreationExpression0(n *ClassInstanceCreationExpression0)
+
+    VisitClassInstanceCreationExpression1(n *ClassInstanceCreationExpression1) bool
+    EndVisitClassInstanceCreationExpression1(n *ClassInstanceCreationExpression1)
+
+    VisitArrayCreationExpression0(n *ArrayCreationExpression0) bool
+    EndVisitArrayCreationExpression0(n *ArrayCreationExpression0)
+
+    VisitArrayCreationExpression1(n *ArrayCreationExpression1) bool
+    EndVisitArrayCreationExpression1(n *ArrayCreationExpression1)
+
+    VisitArrayCreationExpression2(n *ArrayCreationExpression2) bool
+    EndVisitArrayCreationExpression2(n *ArrayCreationExpression2)
+
+    VisitArrayCreationExpression3(n *ArrayCreationExpression3) bool
+    EndVisitArrayCreationExpression3(n *ArrayCreationExpression3)
+
+    VisitDims0(n *Dims0) bool
+    EndVisitDims0(n *Dims0)
+
+    VisitDims1(n *Dims1) bool
+    EndVisitDims1(n *Dims1)
+
+    VisitFieldAccess0(n *FieldAccess0) bool
+    EndVisitFieldAccess0(n *FieldAccess0)
+
+    VisitFieldAccess1(n *FieldAccess1) bool
+    EndVisitFieldAccess1(n *FieldAccess1)
+
+    VisitFieldAccess2(n *FieldAccess2) bool
+    EndVisitFieldAccess2(n *FieldAccess2)
+
+    VisitMethodInvocation0(n *MethodInvocation0) bool
+    EndVisitMethodInvocation0(n *MethodInvocation0)
+
+    VisitMethodInvocation1(n *MethodInvocation1) bool
+    EndVisitMethodInvocation1(n *MethodInvocation1)
+
+    VisitMethodInvocation2(n *MethodInvocation2) bool
+    EndVisitMethodInvocation2(n *MethodInvocation2)
+
+    VisitMethodInvocation3(n *MethodInvocation3) bool
+    EndVisitMethodInvocation3(n *MethodInvocation3)
+
+    VisitMethodInvocation4(n *MethodInvocation4) bool
+    EndVisitMethodInvocation4(n *MethodInvocation4)
+
+    VisitArrayAccess0(n *ArrayAccess0) bool
+    EndVisitArrayAccess0(n *ArrayAccess0)
+
+    VisitArrayAccess1(n *ArrayAccess1) bool
+    EndVisitArrayAccess1(n *ArrayAccess1)
+
+    VisitUnaryExpression0(n *UnaryExpression0) bool
+    EndVisitUnaryExpression0(n *UnaryExpression0)
+
+    VisitUnaryExpression1(n *UnaryExpression1) bool
+    EndVisitUnaryExpression1(n *UnaryExpression1)
+
+    VisitUnaryExpressionNotPlusMinus0(n *UnaryExpressionNotPlusMinus0) bool
+    EndVisitUnaryExpressionNotPlusMinus0(n *UnaryExpressionNotPlusMinus0)
+
+    VisitUnaryExpressionNotPlusMinus1(n *UnaryExpressionNotPlusMinus1) bool
+    EndVisitUnaryExpressionNotPlusMinus1(n *UnaryExpressionNotPlusMinus1)
+
+    VisitCastExpression0(n *CastExpression0) bool
+    EndVisitCastExpression0(n *CastExpression0)
+
+    VisitCastExpression1(n *CastExpression1) bool
+    EndVisitCastExpression1(n *CastExpression1)
+
+    VisitMultiplicativeExpression0(n *MultiplicativeExpression0) bool
+    EndVisitMultiplicativeExpression0(n *MultiplicativeExpression0)
+
+    VisitMultiplicativeExpression1(n *MultiplicativeExpression1) bool
+    EndVisitMultiplicativeExpression1(n *MultiplicativeExpression1)
+
+    VisitMultiplicativeExpression2(n *MultiplicativeExpression2) bool
+    EndVisitMultiplicativeExpression2(n *MultiplicativeExpression2)
+
+    VisitAdditiveExpression0(n *AdditiveExpression0) bool
+    EndVisitAdditiveExpression0(n *AdditiveExpression0)
+
+    VisitAdditiveExpression1(n *AdditiveExpression1) bool
+    EndVisitAdditiveExpression1(n *AdditiveExpression1)
+
+    VisitShiftExpression0(n *ShiftExpression0) bool
+    EndVisitShiftExpression0(n *ShiftExpression0)
+
+    VisitShiftExpression1(n *ShiftExpression1) bool
+    EndVisitShiftExpression1(n *ShiftExpression1)
+
+    VisitShiftExpression2(n *ShiftExpression2) bool
+    EndVisitShiftExpression2(n *ShiftExpression2)
+
+    VisitRelationalExpression0(n *RelationalExpression0) bool
+    EndVisitRelationalExpression0(n *RelationalExpression0)
+
+    VisitRelationalExpression1(n *RelationalExpression1) bool
+    EndVisitRelationalExpression1(n *RelationalExpression1)
+
+    VisitRelationalExpression2(n *RelationalExpression2) bool
+    EndVisitRelationalExpression2(n *RelationalExpression2)
+
+    VisitRelationalExpression3(n *RelationalExpression3) bool
+    EndVisitRelationalExpression3(n *RelationalExpression3)
+
+    VisitRelationalExpression4(n *RelationalExpression4) bool
+    EndVisitRelationalExpression4(n *RelationalExpression4)
+
+    VisitEqualityExpression0(n *EqualityExpression0) bool
+    EndVisitEqualityExpression0(n *EqualityExpression0)
+
+    VisitEqualityExpression1(n *EqualityExpression1) bool
+    EndVisitEqualityExpression1(n *EqualityExpression1)
+
+    VisitAssignmentOperator0(n *AssignmentOperator0) bool
+    EndVisitAssignmentOperator0(n *AssignmentOperator0)
+
+    VisitAssignmentOperator1(n *AssignmentOperator1) bool
+    EndVisitAssignmentOperator1(n *AssignmentOperator1)
+
+    VisitAssignmentOperator2(n *AssignmentOperator2) bool
+    EndVisitAssignmentOperator2(n *AssignmentOperator2)
+
+    VisitAssignmentOperator3(n *AssignmentOperator3) bool
+    EndVisitAssignmentOperator3(n *AssignmentOperator3)
+
+    VisitAssignmentOperator4(n *AssignmentOperator4) bool
+    EndVisitAssignmentOperator4(n *AssignmentOperator4)
+
+    VisitAssignmentOperator5(n *AssignmentOperator5) bool
+    EndVisitAssignmentOperator5(n *AssignmentOperator5)
+
+    VisitAssignmentOperator6(n *AssignmentOperator6) bool
+    EndVisitAssignmentOperator6(n *AssignmentOperator6)
+
+    VisitAssignmentOperator7(n *AssignmentOperator7) bool
+    EndVisitAssignmentOperator7(n *AssignmentOperator7)
+
+    VisitAssignmentOperator8(n *AssignmentOperator8) bool
+    EndVisitAssignmentOperator8(n *AssignmentOperator8)
+
+    VisitAssignmentOperator9(n *AssignmentOperator9) bool
+    EndVisitAssignmentOperator9(n *AssignmentOperator9)
+
+    VisitAssignmentOperator10(n *AssignmentOperator10) bool
+    EndVisitAssignmentOperator10(n *AssignmentOperator10)
+
+    VisitAssignmentOperator11(n *AssignmentOperator11) bool
+    EndVisitAssignmentOperator11(n *AssignmentOperator11)
+
 }
+
 func AnyCastToVisitor(i interface{}) Visitor {
 	  if nil == i{
 		 return nil
@@ -29975,854 +33441,10 @@ func AnyCastToVisitor(i interface{}) Visitor {
 		 return i.(Visitor)
 	  }
 }
-type ArgumentVisitor interface{
-    VisitAstTokenWithArg(n  *AstToken, o interface{}) 
-    VisitidentifierWithArg(n  *identifier, o interface{}) 
-    VisitPrimitiveTypeWithArg(n  *PrimitiveType, o interface{}) 
-    VisitClassTypeWithArg(n  *ClassType, o interface{}) 
-    VisitInterfaceTypeWithArg(n  *InterfaceType, o interface{}) 
-    VisitTypeNameWithArg(n  *TypeName, o interface{}) 
-    VisitArrayTypeWithArg(n  *ArrayType, o interface{}) 
-    VisitTypeParameterWithArg(n  *TypeParameter, o interface{}) 
-    VisitTypeBoundWithArg(n  *TypeBound, o interface{}) 
-    VisitAdditionalBoundListWithArg(n  *AdditionalBoundList, o interface{}) 
-    VisitAdditionalBoundWithArg(n  *AdditionalBound, o interface{}) 
-    VisitTypeArgumentsWithArg(n  *TypeArguments, o interface{}) 
-    VisitActualTypeArgumentListWithArg(n  *ActualTypeArgumentList, o interface{}) 
-    VisitWildcardWithArg(n  *Wildcard, o interface{}) 
-    VisitPackageNameWithArg(n  *PackageName, o interface{}) 
-    VisitExpressionNameWithArg(n  *ExpressionName, o interface{}) 
-    VisitMethodNameWithArg(n  *MethodName, o interface{}) 
-    VisitPackageOrTypeNameWithArg(n  *PackageOrTypeName, o interface{}) 
-    VisitAmbiguousNameWithArg(n  *AmbiguousName, o interface{}) 
-    VisitCompilationUnitWithArg(n  *CompilationUnit, o interface{}) 
-    VisitImportDeclarationsWithArg(n  *ImportDeclarations, o interface{}) 
-    VisitTypeDeclarationsWithArg(n  *TypeDeclarations, o interface{}) 
-    VisitPackageDeclarationWithArg(n  *PackageDeclaration, o interface{}) 
-    VisitSingleTypeImportDeclarationWithArg(n  *SingleTypeImportDeclaration, o interface{}) 
-    VisitTypeImportOnDemandDeclarationWithArg(n  *TypeImportOnDemandDeclaration, o interface{}) 
-    VisitSingleStaticImportDeclarationWithArg(n  *SingleStaticImportDeclaration, o interface{}) 
-    VisitStaticImportOnDemandDeclarationWithArg(n  *StaticImportOnDemandDeclaration, o interface{}) 
-    VisitTypeDeclarationWithArg(n  *TypeDeclaration, o interface{}) 
-    VisitNormalClassDeclarationWithArg(n  *NormalClassDeclaration, o interface{}) 
-    VisitClassModifiersWithArg(n  *ClassModifiers, o interface{}) 
-    VisitTypeParametersWithArg(n  *TypeParameters, o interface{}) 
-    VisitTypeParameterListWithArg(n  *TypeParameterList, o interface{}) 
-    VisitSuperWithArg(n  *Super, o interface{}) 
-    VisitInterfacesWithArg(n  *Interfaces, o interface{}) 
-    VisitInterfaceTypeListWithArg(n  *InterfaceTypeList, o interface{}) 
-    VisitClassBodyWithArg(n  *ClassBody, o interface{}) 
-    VisitClassBodyDeclarationsWithArg(n  *ClassBodyDeclarations, o interface{}) 
-    VisitClassMemberDeclarationWithArg(n  *ClassMemberDeclaration, o interface{}) 
-    VisitFieldDeclarationWithArg(n  *FieldDeclaration, o interface{}) 
-    VisitVariableDeclaratorsWithArg(n  *VariableDeclarators, o interface{}) 
-    VisitVariableDeclaratorWithArg(n  *VariableDeclarator, o interface{}) 
-    VisitVariableDeclaratorIdWithArg(n  *VariableDeclaratorId, o interface{}) 
-    VisitFieldModifiersWithArg(n  *FieldModifiers, o interface{}) 
-    VisitMethodDeclarationWithArg(n  *MethodDeclaration, o interface{}) 
-    VisitMethodHeaderWithArg(n  *MethodHeader, o interface{}) 
-    VisitResultTypeWithArg(n  *ResultType, o interface{}) 
-    VisitFormalParameterListWithArg(n  *FormalParameterList, o interface{}) 
-    VisitFormalParametersWithArg(n  *FormalParameters, o interface{}) 
-    VisitFormalParameterWithArg(n  *FormalParameter, o interface{}) 
-    VisitVariableModifiersWithArg(n  *VariableModifiers, o interface{}) 
-    VisitVariableModifierWithArg(n  *VariableModifier, o interface{}) 
-    VisitLastFormalParameterWithArg(n  *LastFormalParameter, o interface{}) 
-    VisitMethodModifiersWithArg(n  *MethodModifiers, o interface{}) 
-    VisitThrowsWithArg(n  *Throws, o interface{}) 
-    VisitExceptionTypeListWithArg(n  *ExceptionTypeList, o interface{}) 
-    VisitMethodBodyWithArg(n  *MethodBody, o interface{}) 
-    VisitStaticInitializerWithArg(n  *StaticInitializer, o interface{}) 
-    VisitConstructorDeclarationWithArg(n  *ConstructorDeclaration, o interface{}) 
-    VisitConstructorDeclaratorWithArg(n  *ConstructorDeclarator, o interface{}) 
-    VisitConstructorModifiersWithArg(n  *ConstructorModifiers, o interface{}) 
-    VisitConstructorBodyWithArg(n  *ConstructorBody, o interface{}) 
-    VisitEnumDeclarationWithArg(n  *EnumDeclaration, o interface{}) 
-    VisitEnumBodyWithArg(n  *EnumBody, o interface{}) 
-    VisitEnumConstantsWithArg(n  *EnumConstants, o interface{}) 
-    VisitEnumConstantWithArg(n  *EnumConstant, o interface{}) 
-    VisitArgumentsWithArg(n  *Arguments, o interface{}) 
-    VisitEnumBodyDeclarationsWithArg(n  *EnumBodyDeclarations, o interface{}) 
-    VisitNormalInterfaceDeclarationWithArg(n  *NormalInterfaceDeclaration, o interface{}) 
-    VisitInterfaceModifiersWithArg(n  *InterfaceModifiers, o interface{}) 
-    VisitInterfaceBodyWithArg(n  *InterfaceBody, o interface{}) 
-    VisitInterfaceMemberDeclarationsWithArg(n  *InterfaceMemberDeclarations, o interface{}) 
-    VisitInterfaceMemberDeclarationWithArg(n  *InterfaceMemberDeclaration, o interface{}) 
-    VisitConstantDeclarationWithArg(n  *ConstantDeclaration, o interface{}) 
-    VisitConstantModifiersWithArg(n  *ConstantModifiers, o interface{}) 
-    VisitAbstractMethodDeclarationWithArg(n  *AbstractMethodDeclaration, o interface{}) 
-    VisitAbstractMethodModifiersWithArg(n  *AbstractMethodModifiers, o interface{}) 
-    VisitAnnotationTypeDeclarationWithArg(n  *AnnotationTypeDeclaration, o interface{}) 
-    VisitAnnotationTypeBodyWithArg(n  *AnnotationTypeBody, o interface{}) 
-    VisitAnnotationTypeElementDeclarationsWithArg(n  *AnnotationTypeElementDeclarations, o interface{}) 
-    VisitDefaultValueWithArg(n  *DefaultValue, o interface{}) 
-    VisitAnnotationsWithArg(n  *Annotations, o interface{}) 
-    VisitNormalAnnotationWithArg(n  *NormalAnnotation, o interface{}) 
-    VisitElementValuePairsWithArg(n  *ElementValuePairs, o interface{}) 
-    VisitElementValuePairWithArg(n  *ElementValuePair, o interface{}) 
-    VisitElementValueArrayInitializerWithArg(n  *ElementValueArrayInitializer, o interface{}) 
-    VisitElementValuesWithArg(n  *ElementValues, o interface{}) 
-    VisitMarkerAnnotationWithArg(n  *MarkerAnnotation, o interface{}) 
-    VisitSingleElementAnnotationWithArg(n  *SingleElementAnnotation, o interface{}) 
-    VisitArrayInitializerWithArg(n  *ArrayInitializer, o interface{}) 
-    VisitVariableInitializersWithArg(n  *VariableInitializers, o interface{}) 
-    VisitBlockWithArg(n  *Block, o interface{}) 
-    VisitBlockStatementsWithArg(n  *BlockStatements, o interface{}) 
-    VisitLocalVariableDeclarationStatementWithArg(n  *LocalVariableDeclarationStatement, o interface{}) 
-    VisitLocalVariableDeclarationWithArg(n  *LocalVariableDeclaration, o interface{}) 
-    VisitIfThenStatementWithArg(n  *IfThenStatement, o interface{}) 
-    VisitIfThenElseStatementWithArg(n  *IfThenElseStatement, o interface{}) 
-    VisitIfThenElseStatementNoShortIfWithArg(n  *IfThenElseStatementNoShortIf, o interface{}) 
-    VisitEmptyStatementWithArg(n  *EmptyStatement, o interface{}) 
-    VisitLabeledStatementWithArg(n  *LabeledStatement, o interface{}) 
-    VisitLabeledStatementNoShortIfWithArg(n  *LabeledStatementNoShortIf, o interface{}) 
-    VisitExpressionStatementWithArg(n  *ExpressionStatement, o interface{}) 
-    VisitSwitchStatementWithArg(n  *SwitchStatement, o interface{}) 
-    VisitSwitchBlockWithArg(n  *SwitchBlock, o interface{}) 
-    VisitSwitchBlockStatementGroupsWithArg(n  *SwitchBlockStatementGroups, o interface{}) 
-    VisitSwitchBlockStatementGroupWithArg(n  *SwitchBlockStatementGroup, o interface{}) 
-    VisitSwitchLabelsWithArg(n  *SwitchLabels, o interface{}) 
-    VisitWhileStatementWithArg(n  *WhileStatement, o interface{}) 
-    VisitWhileStatementNoShortIfWithArg(n  *WhileStatementNoShortIf, o interface{}) 
-    VisitDoStatementWithArg(n  *DoStatement, o interface{}) 
-    VisitBasicForStatementWithArg(n  *BasicForStatement, o interface{}) 
-    VisitForStatementNoShortIfWithArg(n  *ForStatementNoShortIf, o interface{}) 
-    VisitStatementExpressionListWithArg(n  *StatementExpressionList, o interface{}) 
-    VisitEnhancedForStatementWithArg(n  *EnhancedForStatement, o interface{}) 
-    VisitBreakStatementWithArg(n  *BreakStatement, o interface{}) 
-    VisitContinueStatementWithArg(n  *ContinueStatement, o interface{}) 
-    VisitReturnStatementWithArg(n  *ReturnStatement, o interface{}) 
-    VisitThrowStatementWithArg(n  *ThrowStatement, o interface{}) 
-    VisitSynchronizedStatementWithArg(n  *SynchronizedStatement, o interface{}) 
-    VisitCatchesWithArg(n  *Catches, o interface{}) 
-    VisitCatchClauseWithArg(n  *CatchClause, o interface{}) 
-    VisitFinallyWithArg(n  *Finally, o interface{}) 
-    VisitArgumentListWithArg(n  *ArgumentList, o interface{}) 
-    VisitDimExprsWithArg(n  *DimExprs, o interface{}) 
-    VisitDimExprWithArg(n  *DimExpr, o interface{}) 
-    VisitPostIncrementExpressionWithArg(n  *PostIncrementExpression, o interface{}) 
-    VisitPostDecrementExpressionWithArg(n  *PostDecrementExpression, o interface{}) 
-    VisitPreIncrementExpressionWithArg(n  *PreIncrementExpression, o interface{}) 
-    VisitPreDecrementExpressionWithArg(n  *PreDecrementExpression, o interface{}) 
-    VisitAndExpressionWithArg(n  *AndExpression, o interface{}) 
-    VisitExclusiveOrExpressionWithArg(n  *ExclusiveOrExpression, o interface{}) 
-    VisitInclusiveOrExpressionWithArg(n  *InclusiveOrExpression, o interface{}) 
-    VisitConditionalAndExpressionWithArg(n  *ConditionalAndExpression, o interface{}) 
-    VisitConditionalOrExpressionWithArg(n  *ConditionalOrExpression, o interface{}) 
-    VisitConditionalExpressionWithArg(n  *ConditionalExpression, o interface{}) 
-    VisitAssignmentWithArg(n  *Assignment, o interface{}) 
-    VisitCommaoptWithArg(n  *Commaopt, o interface{}) 
-    VisitEllipsisoptWithArg(n  *Ellipsisopt, o interface{}) 
-    VisitLPGUserAction0WithArg(n  *LPGUserAction0, o interface{}) 
-    VisitLPGUserAction1WithArg(n  *LPGUserAction1, o interface{}) 
-    VisitLPGUserAction2WithArg(n  *LPGUserAction2, o interface{}) 
-    VisitLPGUserAction3WithArg(n  *LPGUserAction3, o interface{}) 
-    VisitLPGUserAction4WithArg(n  *LPGUserAction4, o interface{}) 
-    VisitIntegralType0WithArg(n  *IntegralType0, o interface{}) 
-    VisitIntegralType1WithArg(n  *IntegralType1, o interface{}) 
-    VisitIntegralType2WithArg(n  *IntegralType2, o interface{}) 
-    VisitIntegralType3WithArg(n  *IntegralType3, o interface{}) 
-    VisitIntegralType4WithArg(n  *IntegralType4, o interface{}) 
-    VisitFloatingPointType0WithArg(n  *FloatingPointType0, o interface{}) 
-    VisitFloatingPointType1WithArg(n  *FloatingPointType1, o interface{}) 
-    VisitWildcardBounds0WithArg(n  *WildcardBounds0, o interface{}) 
-    VisitWildcardBounds1WithArg(n  *WildcardBounds1, o interface{}) 
-    VisitClassModifier0WithArg(n  *ClassModifier0, o interface{}) 
-    VisitClassModifier1WithArg(n  *ClassModifier1, o interface{}) 
-    VisitClassModifier2WithArg(n  *ClassModifier2, o interface{}) 
-    VisitClassModifier3WithArg(n  *ClassModifier3, o interface{}) 
-    VisitClassModifier4WithArg(n  *ClassModifier4, o interface{}) 
-    VisitClassModifier5WithArg(n  *ClassModifier5, o interface{}) 
-    VisitClassModifier6WithArg(n  *ClassModifier6, o interface{}) 
-    VisitFieldModifier0WithArg(n  *FieldModifier0, o interface{}) 
-    VisitFieldModifier1WithArg(n  *FieldModifier1, o interface{}) 
-    VisitFieldModifier2WithArg(n  *FieldModifier2, o interface{}) 
-    VisitFieldModifier3WithArg(n  *FieldModifier3, o interface{}) 
-    VisitFieldModifier4WithArg(n  *FieldModifier4, o interface{}) 
-    VisitFieldModifier5WithArg(n  *FieldModifier5, o interface{}) 
-    VisitFieldModifier6WithArg(n  *FieldModifier6, o interface{}) 
-    VisitMethodDeclarator0WithArg(n  *MethodDeclarator0, o interface{}) 
-    VisitMethodDeclarator1WithArg(n  *MethodDeclarator1, o interface{}) 
-    VisitMethodModifier0WithArg(n  *MethodModifier0, o interface{}) 
-    VisitMethodModifier1WithArg(n  *MethodModifier1, o interface{}) 
-    VisitMethodModifier2WithArg(n  *MethodModifier2, o interface{}) 
-    VisitMethodModifier3WithArg(n  *MethodModifier3, o interface{}) 
-    VisitMethodModifier4WithArg(n  *MethodModifier4, o interface{}) 
-    VisitMethodModifier5WithArg(n  *MethodModifier5, o interface{}) 
-    VisitMethodModifier6WithArg(n  *MethodModifier6, o interface{}) 
-    VisitMethodModifier7WithArg(n  *MethodModifier7, o interface{}) 
-    VisitMethodModifier8WithArg(n  *MethodModifier8, o interface{}) 
-    VisitConstructorModifier0WithArg(n  *ConstructorModifier0, o interface{}) 
-    VisitConstructorModifier1WithArg(n  *ConstructorModifier1, o interface{}) 
-    VisitConstructorModifier2WithArg(n  *ConstructorModifier2, o interface{}) 
-    VisitExplicitConstructorInvocation0WithArg(n  *ExplicitConstructorInvocation0, o interface{}) 
-    VisitExplicitConstructorInvocation1WithArg(n  *ExplicitConstructorInvocation1, o interface{}) 
-    VisitExplicitConstructorInvocation2WithArg(n  *ExplicitConstructorInvocation2, o interface{}) 
-    VisitInterfaceModifier0WithArg(n  *InterfaceModifier0, o interface{}) 
-    VisitInterfaceModifier1WithArg(n  *InterfaceModifier1, o interface{}) 
-    VisitInterfaceModifier2WithArg(n  *InterfaceModifier2, o interface{}) 
-    VisitInterfaceModifier3WithArg(n  *InterfaceModifier3, o interface{}) 
-    VisitInterfaceModifier4WithArg(n  *InterfaceModifier4, o interface{}) 
-    VisitInterfaceModifier5WithArg(n  *InterfaceModifier5, o interface{}) 
-    VisitExtendsInterfaces0WithArg(n  *ExtendsInterfaces0, o interface{}) 
-    VisitExtendsInterfaces1WithArg(n  *ExtendsInterfaces1, o interface{}) 
-    VisitConstantModifier0WithArg(n  *ConstantModifier0, o interface{}) 
-    VisitConstantModifier1WithArg(n  *ConstantModifier1, o interface{}) 
-    VisitConstantModifier2WithArg(n  *ConstantModifier2, o interface{}) 
-    VisitAbstractMethodModifier0WithArg(n  *AbstractMethodModifier0, o interface{}) 
-    VisitAbstractMethodModifier1WithArg(n  *AbstractMethodModifier1, o interface{}) 
-    VisitAnnotationTypeElementDeclaration0WithArg(n  *AnnotationTypeElementDeclaration0, o interface{}) 
-    VisitAnnotationTypeElementDeclaration1WithArg(n  *AnnotationTypeElementDeclaration1, o interface{}) 
-    VisitAssertStatement0WithArg(n  *AssertStatement0, o interface{}) 
-    VisitAssertStatement1WithArg(n  *AssertStatement1, o interface{}) 
-    VisitSwitchLabel0WithArg(n  *SwitchLabel0, o interface{}) 
-    VisitSwitchLabel1WithArg(n  *SwitchLabel1, o interface{}) 
-    VisitSwitchLabel2WithArg(n  *SwitchLabel2, o interface{}) 
-    VisitTryStatement0WithArg(n  *TryStatement0, o interface{}) 
-    VisitTryStatement1WithArg(n  *TryStatement1, o interface{}) 
-    VisitPrimaryNoNewArray0WithArg(n  *PrimaryNoNewArray0, o interface{}) 
-    VisitPrimaryNoNewArray1WithArg(n  *PrimaryNoNewArray1, o interface{}) 
-    VisitPrimaryNoNewArray2WithArg(n  *PrimaryNoNewArray2, o interface{}) 
-    VisitPrimaryNoNewArray3WithArg(n  *PrimaryNoNewArray3, o interface{}) 
-    VisitPrimaryNoNewArray4WithArg(n  *PrimaryNoNewArray4, o interface{}) 
-    VisitLiteral0WithArg(n  *Literal0, o interface{}) 
-    VisitLiteral1WithArg(n  *Literal1, o interface{}) 
-    VisitLiteral2WithArg(n  *Literal2, o interface{}) 
-    VisitLiteral3WithArg(n  *Literal3, o interface{}) 
-    VisitLiteral4WithArg(n  *Literal4, o interface{}) 
-    VisitLiteral5WithArg(n  *Literal5, o interface{}) 
-    VisitLiteral6WithArg(n  *Literal6, o interface{}) 
-    VisitBooleanLiteral0WithArg(n  *BooleanLiteral0, o interface{}) 
-    VisitBooleanLiteral1WithArg(n  *BooleanLiteral1, o interface{}) 
-    VisitClassInstanceCreationExpression0WithArg(n  *ClassInstanceCreationExpression0, o interface{}) 
-    VisitClassInstanceCreationExpression1WithArg(n  *ClassInstanceCreationExpression1, o interface{}) 
-    VisitArrayCreationExpression0WithArg(n  *ArrayCreationExpression0, o interface{}) 
-    VisitArrayCreationExpression1WithArg(n  *ArrayCreationExpression1, o interface{}) 
-    VisitArrayCreationExpression2WithArg(n  *ArrayCreationExpression2, o interface{}) 
-    VisitArrayCreationExpression3WithArg(n  *ArrayCreationExpression3, o interface{}) 
-    VisitDims0WithArg(n  *Dims0, o interface{}) 
-    VisitDims1WithArg(n  *Dims1, o interface{}) 
-    VisitFieldAccess0WithArg(n  *FieldAccess0, o interface{}) 
-    VisitFieldAccess1WithArg(n  *FieldAccess1, o interface{}) 
-    VisitFieldAccess2WithArg(n  *FieldAccess2, o interface{}) 
-    VisitMethodInvocation0WithArg(n  *MethodInvocation0, o interface{}) 
-    VisitMethodInvocation1WithArg(n  *MethodInvocation1, o interface{}) 
-    VisitMethodInvocation2WithArg(n  *MethodInvocation2, o interface{}) 
-    VisitMethodInvocation3WithArg(n  *MethodInvocation3, o interface{}) 
-    VisitMethodInvocation4WithArg(n  *MethodInvocation4, o interface{}) 
-    VisitArrayAccess0WithArg(n  *ArrayAccess0, o interface{}) 
-    VisitArrayAccess1WithArg(n  *ArrayAccess1, o interface{}) 
-    VisitUnaryExpression0WithArg(n  *UnaryExpression0, o interface{}) 
-    VisitUnaryExpression1WithArg(n  *UnaryExpression1, o interface{}) 
-    VisitUnaryExpressionNotPlusMinus0WithArg(n  *UnaryExpressionNotPlusMinus0, o interface{}) 
-    VisitUnaryExpressionNotPlusMinus1WithArg(n  *UnaryExpressionNotPlusMinus1, o interface{}) 
-    VisitCastExpression0WithArg(n  *CastExpression0, o interface{}) 
-    VisitCastExpression1WithArg(n  *CastExpression1, o interface{}) 
-    VisitMultiplicativeExpression0WithArg(n  *MultiplicativeExpression0, o interface{}) 
-    VisitMultiplicativeExpression1WithArg(n  *MultiplicativeExpression1, o interface{}) 
-    VisitMultiplicativeExpression2WithArg(n  *MultiplicativeExpression2, o interface{}) 
-    VisitAdditiveExpression0WithArg(n  *AdditiveExpression0, o interface{}) 
-    VisitAdditiveExpression1WithArg(n  *AdditiveExpression1, o interface{}) 
-    VisitShiftExpression0WithArg(n  *ShiftExpression0, o interface{}) 
-    VisitShiftExpression1WithArg(n  *ShiftExpression1, o interface{}) 
-    VisitShiftExpression2WithArg(n  *ShiftExpression2, o interface{}) 
-    VisitRelationalExpression0WithArg(n  *RelationalExpression0, o interface{}) 
-    VisitRelationalExpression1WithArg(n  *RelationalExpression1, o interface{}) 
-    VisitRelationalExpression2WithArg(n  *RelationalExpression2, o interface{}) 
-    VisitRelationalExpression3WithArg(n  *RelationalExpression3, o interface{}) 
-    VisitRelationalExpression4WithArg(n  *RelationalExpression4, o interface{}) 
-    VisitEqualityExpression0WithArg(n  *EqualityExpression0, o interface{}) 
-    VisitEqualityExpression1WithArg(n  *EqualityExpression1, o interface{}) 
-    VisitAssignmentOperator0WithArg(n  *AssignmentOperator0, o interface{}) 
-    VisitAssignmentOperator1WithArg(n  *AssignmentOperator1, o interface{}) 
-    VisitAssignmentOperator2WithArg(n  *AssignmentOperator2, o interface{}) 
-    VisitAssignmentOperator3WithArg(n  *AssignmentOperator3, o interface{}) 
-    VisitAssignmentOperator4WithArg(n  *AssignmentOperator4, o interface{}) 
-    VisitAssignmentOperator5WithArg(n  *AssignmentOperator5, o interface{}) 
-    VisitAssignmentOperator6WithArg(n  *AssignmentOperator6, o interface{}) 
-    VisitAssignmentOperator7WithArg(n  *AssignmentOperator7, o interface{}) 
-    VisitAssignmentOperator8WithArg(n  *AssignmentOperator8, o interface{}) 
-    VisitAssignmentOperator9WithArg(n  *AssignmentOperator9, o interface{}) 
-    VisitAssignmentOperator10WithArg(n  *AssignmentOperator10, o interface{}) 
-    VisitAssignmentOperator11WithArg(n  *AssignmentOperator11, o interface{}) 
-
-    VisitWithArg(n  IAst, o interface{}) 
-}
-func AnyCastToArgumentVisitor(i interface{}) ArgumentVisitor {
-	  if nil == i{
-		 return nil
-	  }else{
-		 return i.(ArgumentVisitor)
-	  }
-}
-type ResultVisitor interface{
-    VisitAstTokenWithResult(n  *AstToken) interface{}
-    VisitidentifierWithResult(n  *identifier) interface{}
-    VisitPrimitiveTypeWithResult(n  *PrimitiveType) interface{}
-    VisitClassTypeWithResult(n  *ClassType) interface{}
-    VisitInterfaceTypeWithResult(n  *InterfaceType) interface{}
-    VisitTypeNameWithResult(n  *TypeName) interface{}
-    VisitArrayTypeWithResult(n  *ArrayType) interface{}
-    VisitTypeParameterWithResult(n  *TypeParameter) interface{}
-    VisitTypeBoundWithResult(n  *TypeBound) interface{}
-    VisitAdditionalBoundListWithResult(n  *AdditionalBoundList) interface{}
-    VisitAdditionalBoundWithResult(n  *AdditionalBound) interface{}
-    VisitTypeArgumentsWithResult(n  *TypeArguments) interface{}
-    VisitActualTypeArgumentListWithResult(n  *ActualTypeArgumentList) interface{}
-    VisitWildcardWithResult(n  *Wildcard) interface{}
-    VisitPackageNameWithResult(n  *PackageName) interface{}
-    VisitExpressionNameWithResult(n  *ExpressionName) interface{}
-    VisitMethodNameWithResult(n  *MethodName) interface{}
-    VisitPackageOrTypeNameWithResult(n  *PackageOrTypeName) interface{}
-    VisitAmbiguousNameWithResult(n  *AmbiguousName) interface{}
-    VisitCompilationUnitWithResult(n  *CompilationUnit) interface{}
-    VisitImportDeclarationsWithResult(n  *ImportDeclarations) interface{}
-    VisitTypeDeclarationsWithResult(n  *TypeDeclarations) interface{}
-    VisitPackageDeclarationWithResult(n  *PackageDeclaration) interface{}
-    VisitSingleTypeImportDeclarationWithResult(n  *SingleTypeImportDeclaration) interface{}
-    VisitTypeImportOnDemandDeclarationWithResult(n  *TypeImportOnDemandDeclaration) interface{}
-    VisitSingleStaticImportDeclarationWithResult(n  *SingleStaticImportDeclaration) interface{}
-    VisitStaticImportOnDemandDeclarationWithResult(n  *StaticImportOnDemandDeclaration) interface{}
-    VisitTypeDeclarationWithResult(n  *TypeDeclaration) interface{}
-    VisitNormalClassDeclarationWithResult(n  *NormalClassDeclaration) interface{}
-    VisitClassModifiersWithResult(n  *ClassModifiers) interface{}
-    VisitTypeParametersWithResult(n  *TypeParameters) interface{}
-    VisitTypeParameterListWithResult(n  *TypeParameterList) interface{}
-    VisitSuperWithResult(n  *Super) interface{}
-    VisitInterfacesWithResult(n  *Interfaces) interface{}
-    VisitInterfaceTypeListWithResult(n  *InterfaceTypeList) interface{}
-    VisitClassBodyWithResult(n  *ClassBody) interface{}
-    VisitClassBodyDeclarationsWithResult(n  *ClassBodyDeclarations) interface{}
-    VisitClassMemberDeclarationWithResult(n  *ClassMemberDeclaration) interface{}
-    VisitFieldDeclarationWithResult(n  *FieldDeclaration) interface{}
-    VisitVariableDeclaratorsWithResult(n  *VariableDeclarators) interface{}
-    VisitVariableDeclaratorWithResult(n  *VariableDeclarator) interface{}
-    VisitVariableDeclaratorIdWithResult(n  *VariableDeclaratorId) interface{}
-    VisitFieldModifiersWithResult(n  *FieldModifiers) interface{}
-    VisitMethodDeclarationWithResult(n  *MethodDeclaration) interface{}
-    VisitMethodHeaderWithResult(n  *MethodHeader) interface{}
-    VisitResultTypeWithResult(n  *ResultType) interface{}
-    VisitFormalParameterListWithResult(n  *FormalParameterList) interface{}
-    VisitFormalParametersWithResult(n  *FormalParameters) interface{}
-    VisitFormalParameterWithResult(n  *FormalParameter) interface{}
-    VisitVariableModifiersWithResult(n  *VariableModifiers) interface{}
-    VisitVariableModifierWithResult(n  *VariableModifier) interface{}
-    VisitLastFormalParameterWithResult(n  *LastFormalParameter) interface{}
-    VisitMethodModifiersWithResult(n  *MethodModifiers) interface{}
-    VisitThrowsWithResult(n  *Throws) interface{}
-    VisitExceptionTypeListWithResult(n  *ExceptionTypeList) interface{}
-    VisitMethodBodyWithResult(n  *MethodBody) interface{}
-    VisitStaticInitializerWithResult(n  *StaticInitializer) interface{}
-    VisitConstructorDeclarationWithResult(n  *ConstructorDeclaration) interface{}
-    VisitConstructorDeclaratorWithResult(n  *ConstructorDeclarator) interface{}
-    VisitConstructorModifiersWithResult(n  *ConstructorModifiers) interface{}
-    VisitConstructorBodyWithResult(n  *ConstructorBody) interface{}
-    VisitEnumDeclarationWithResult(n  *EnumDeclaration) interface{}
-    VisitEnumBodyWithResult(n  *EnumBody) interface{}
-    VisitEnumConstantsWithResult(n  *EnumConstants) interface{}
-    VisitEnumConstantWithResult(n  *EnumConstant) interface{}
-    VisitArgumentsWithResult(n  *Arguments) interface{}
-    VisitEnumBodyDeclarationsWithResult(n  *EnumBodyDeclarations) interface{}
-    VisitNormalInterfaceDeclarationWithResult(n  *NormalInterfaceDeclaration) interface{}
-    VisitInterfaceModifiersWithResult(n  *InterfaceModifiers) interface{}
-    VisitInterfaceBodyWithResult(n  *InterfaceBody) interface{}
-    VisitInterfaceMemberDeclarationsWithResult(n  *InterfaceMemberDeclarations) interface{}
-    VisitInterfaceMemberDeclarationWithResult(n  *InterfaceMemberDeclaration) interface{}
-    VisitConstantDeclarationWithResult(n  *ConstantDeclaration) interface{}
-    VisitConstantModifiersWithResult(n  *ConstantModifiers) interface{}
-    VisitAbstractMethodDeclarationWithResult(n  *AbstractMethodDeclaration) interface{}
-    VisitAbstractMethodModifiersWithResult(n  *AbstractMethodModifiers) interface{}
-    VisitAnnotationTypeDeclarationWithResult(n  *AnnotationTypeDeclaration) interface{}
-    VisitAnnotationTypeBodyWithResult(n  *AnnotationTypeBody) interface{}
-    VisitAnnotationTypeElementDeclarationsWithResult(n  *AnnotationTypeElementDeclarations) interface{}
-    VisitDefaultValueWithResult(n  *DefaultValue) interface{}
-    VisitAnnotationsWithResult(n  *Annotations) interface{}
-    VisitNormalAnnotationWithResult(n  *NormalAnnotation) interface{}
-    VisitElementValuePairsWithResult(n  *ElementValuePairs) interface{}
-    VisitElementValuePairWithResult(n  *ElementValuePair) interface{}
-    VisitElementValueArrayInitializerWithResult(n  *ElementValueArrayInitializer) interface{}
-    VisitElementValuesWithResult(n  *ElementValues) interface{}
-    VisitMarkerAnnotationWithResult(n  *MarkerAnnotation) interface{}
-    VisitSingleElementAnnotationWithResult(n  *SingleElementAnnotation) interface{}
-    VisitArrayInitializerWithResult(n  *ArrayInitializer) interface{}
-    VisitVariableInitializersWithResult(n  *VariableInitializers) interface{}
-    VisitBlockWithResult(n  *Block) interface{}
-    VisitBlockStatementsWithResult(n  *BlockStatements) interface{}
-    VisitLocalVariableDeclarationStatementWithResult(n  *LocalVariableDeclarationStatement) interface{}
-    VisitLocalVariableDeclarationWithResult(n  *LocalVariableDeclaration) interface{}
-    VisitIfThenStatementWithResult(n  *IfThenStatement) interface{}
-    VisitIfThenElseStatementWithResult(n  *IfThenElseStatement) interface{}
-    VisitIfThenElseStatementNoShortIfWithResult(n  *IfThenElseStatementNoShortIf) interface{}
-    VisitEmptyStatementWithResult(n  *EmptyStatement) interface{}
-    VisitLabeledStatementWithResult(n  *LabeledStatement) interface{}
-    VisitLabeledStatementNoShortIfWithResult(n  *LabeledStatementNoShortIf) interface{}
-    VisitExpressionStatementWithResult(n  *ExpressionStatement) interface{}
-    VisitSwitchStatementWithResult(n  *SwitchStatement) interface{}
-    VisitSwitchBlockWithResult(n  *SwitchBlock) interface{}
-    VisitSwitchBlockStatementGroupsWithResult(n  *SwitchBlockStatementGroups) interface{}
-    VisitSwitchBlockStatementGroupWithResult(n  *SwitchBlockStatementGroup) interface{}
-    VisitSwitchLabelsWithResult(n  *SwitchLabels) interface{}
-    VisitWhileStatementWithResult(n  *WhileStatement) interface{}
-    VisitWhileStatementNoShortIfWithResult(n  *WhileStatementNoShortIf) interface{}
-    VisitDoStatementWithResult(n  *DoStatement) interface{}
-    VisitBasicForStatementWithResult(n  *BasicForStatement) interface{}
-    VisitForStatementNoShortIfWithResult(n  *ForStatementNoShortIf) interface{}
-    VisitStatementExpressionListWithResult(n  *StatementExpressionList) interface{}
-    VisitEnhancedForStatementWithResult(n  *EnhancedForStatement) interface{}
-    VisitBreakStatementWithResult(n  *BreakStatement) interface{}
-    VisitContinueStatementWithResult(n  *ContinueStatement) interface{}
-    VisitReturnStatementWithResult(n  *ReturnStatement) interface{}
-    VisitThrowStatementWithResult(n  *ThrowStatement) interface{}
-    VisitSynchronizedStatementWithResult(n  *SynchronizedStatement) interface{}
-    VisitCatchesWithResult(n  *Catches) interface{}
-    VisitCatchClauseWithResult(n  *CatchClause) interface{}
-    VisitFinallyWithResult(n  *Finally) interface{}
-    VisitArgumentListWithResult(n  *ArgumentList) interface{}
-    VisitDimExprsWithResult(n  *DimExprs) interface{}
-    VisitDimExprWithResult(n  *DimExpr) interface{}
-    VisitPostIncrementExpressionWithResult(n  *PostIncrementExpression) interface{}
-    VisitPostDecrementExpressionWithResult(n  *PostDecrementExpression) interface{}
-    VisitPreIncrementExpressionWithResult(n  *PreIncrementExpression) interface{}
-    VisitPreDecrementExpressionWithResult(n  *PreDecrementExpression) interface{}
-    VisitAndExpressionWithResult(n  *AndExpression) interface{}
-    VisitExclusiveOrExpressionWithResult(n  *ExclusiveOrExpression) interface{}
-    VisitInclusiveOrExpressionWithResult(n  *InclusiveOrExpression) interface{}
-    VisitConditionalAndExpressionWithResult(n  *ConditionalAndExpression) interface{}
-    VisitConditionalOrExpressionWithResult(n  *ConditionalOrExpression) interface{}
-    VisitConditionalExpressionWithResult(n  *ConditionalExpression) interface{}
-    VisitAssignmentWithResult(n  *Assignment) interface{}
-    VisitCommaoptWithResult(n  *Commaopt) interface{}
-    VisitEllipsisoptWithResult(n  *Ellipsisopt) interface{}
-    VisitLPGUserAction0WithResult(n  *LPGUserAction0) interface{}
-    VisitLPGUserAction1WithResult(n  *LPGUserAction1) interface{}
-    VisitLPGUserAction2WithResult(n  *LPGUserAction2) interface{}
-    VisitLPGUserAction3WithResult(n  *LPGUserAction3) interface{}
-    VisitLPGUserAction4WithResult(n  *LPGUserAction4) interface{}
-    VisitIntegralType0WithResult(n  *IntegralType0) interface{}
-    VisitIntegralType1WithResult(n  *IntegralType1) interface{}
-    VisitIntegralType2WithResult(n  *IntegralType2) interface{}
-    VisitIntegralType3WithResult(n  *IntegralType3) interface{}
-    VisitIntegralType4WithResult(n  *IntegralType4) interface{}
-    VisitFloatingPointType0WithResult(n  *FloatingPointType0) interface{}
-    VisitFloatingPointType1WithResult(n  *FloatingPointType1) interface{}
-    VisitWildcardBounds0WithResult(n  *WildcardBounds0) interface{}
-    VisitWildcardBounds1WithResult(n  *WildcardBounds1) interface{}
-    VisitClassModifier0WithResult(n  *ClassModifier0) interface{}
-    VisitClassModifier1WithResult(n  *ClassModifier1) interface{}
-    VisitClassModifier2WithResult(n  *ClassModifier2) interface{}
-    VisitClassModifier3WithResult(n  *ClassModifier3) interface{}
-    VisitClassModifier4WithResult(n  *ClassModifier4) interface{}
-    VisitClassModifier5WithResult(n  *ClassModifier5) interface{}
-    VisitClassModifier6WithResult(n  *ClassModifier6) interface{}
-    VisitFieldModifier0WithResult(n  *FieldModifier0) interface{}
-    VisitFieldModifier1WithResult(n  *FieldModifier1) interface{}
-    VisitFieldModifier2WithResult(n  *FieldModifier2) interface{}
-    VisitFieldModifier3WithResult(n  *FieldModifier3) interface{}
-    VisitFieldModifier4WithResult(n  *FieldModifier4) interface{}
-    VisitFieldModifier5WithResult(n  *FieldModifier5) interface{}
-    VisitFieldModifier6WithResult(n  *FieldModifier6) interface{}
-    VisitMethodDeclarator0WithResult(n  *MethodDeclarator0) interface{}
-    VisitMethodDeclarator1WithResult(n  *MethodDeclarator1) interface{}
-    VisitMethodModifier0WithResult(n  *MethodModifier0) interface{}
-    VisitMethodModifier1WithResult(n  *MethodModifier1) interface{}
-    VisitMethodModifier2WithResult(n  *MethodModifier2) interface{}
-    VisitMethodModifier3WithResult(n  *MethodModifier3) interface{}
-    VisitMethodModifier4WithResult(n  *MethodModifier4) interface{}
-    VisitMethodModifier5WithResult(n  *MethodModifier5) interface{}
-    VisitMethodModifier6WithResult(n  *MethodModifier6) interface{}
-    VisitMethodModifier7WithResult(n  *MethodModifier7) interface{}
-    VisitMethodModifier8WithResult(n  *MethodModifier8) interface{}
-    VisitConstructorModifier0WithResult(n  *ConstructorModifier0) interface{}
-    VisitConstructorModifier1WithResult(n  *ConstructorModifier1) interface{}
-    VisitConstructorModifier2WithResult(n  *ConstructorModifier2) interface{}
-    VisitExplicitConstructorInvocation0WithResult(n  *ExplicitConstructorInvocation0) interface{}
-    VisitExplicitConstructorInvocation1WithResult(n  *ExplicitConstructorInvocation1) interface{}
-    VisitExplicitConstructorInvocation2WithResult(n  *ExplicitConstructorInvocation2) interface{}
-    VisitInterfaceModifier0WithResult(n  *InterfaceModifier0) interface{}
-    VisitInterfaceModifier1WithResult(n  *InterfaceModifier1) interface{}
-    VisitInterfaceModifier2WithResult(n  *InterfaceModifier2) interface{}
-    VisitInterfaceModifier3WithResult(n  *InterfaceModifier3) interface{}
-    VisitInterfaceModifier4WithResult(n  *InterfaceModifier4) interface{}
-    VisitInterfaceModifier5WithResult(n  *InterfaceModifier5) interface{}
-    VisitExtendsInterfaces0WithResult(n  *ExtendsInterfaces0) interface{}
-    VisitExtendsInterfaces1WithResult(n  *ExtendsInterfaces1) interface{}
-    VisitConstantModifier0WithResult(n  *ConstantModifier0) interface{}
-    VisitConstantModifier1WithResult(n  *ConstantModifier1) interface{}
-    VisitConstantModifier2WithResult(n  *ConstantModifier2) interface{}
-    VisitAbstractMethodModifier0WithResult(n  *AbstractMethodModifier0) interface{}
-    VisitAbstractMethodModifier1WithResult(n  *AbstractMethodModifier1) interface{}
-    VisitAnnotationTypeElementDeclaration0WithResult(n  *AnnotationTypeElementDeclaration0) interface{}
-    VisitAnnotationTypeElementDeclaration1WithResult(n  *AnnotationTypeElementDeclaration1) interface{}
-    VisitAssertStatement0WithResult(n  *AssertStatement0) interface{}
-    VisitAssertStatement1WithResult(n  *AssertStatement1) interface{}
-    VisitSwitchLabel0WithResult(n  *SwitchLabel0) interface{}
-    VisitSwitchLabel1WithResult(n  *SwitchLabel1) interface{}
-    VisitSwitchLabel2WithResult(n  *SwitchLabel2) interface{}
-    VisitTryStatement0WithResult(n  *TryStatement0) interface{}
-    VisitTryStatement1WithResult(n  *TryStatement1) interface{}
-    VisitPrimaryNoNewArray0WithResult(n  *PrimaryNoNewArray0) interface{}
-    VisitPrimaryNoNewArray1WithResult(n  *PrimaryNoNewArray1) interface{}
-    VisitPrimaryNoNewArray2WithResult(n  *PrimaryNoNewArray2) interface{}
-    VisitPrimaryNoNewArray3WithResult(n  *PrimaryNoNewArray3) interface{}
-    VisitPrimaryNoNewArray4WithResult(n  *PrimaryNoNewArray4) interface{}
-    VisitLiteral0WithResult(n  *Literal0) interface{}
-    VisitLiteral1WithResult(n  *Literal1) interface{}
-    VisitLiteral2WithResult(n  *Literal2) interface{}
-    VisitLiteral3WithResult(n  *Literal3) interface{}
-    VisitLiteral4WithResult(n  *Literal4) interface{}
-    VisitLiteral5WithResult(n  *Literal5) interface{}
-    VisitLiteral6WithResult(n  *Literal6) interface{}
-    VisitBooleanLiteral0WithResult(n  *BooleanLiteral0) interface{}
-    VisitBooleanLiteral1WithResult(n  *BooleanLiteral1) interface{}
-    VisitClassInstanceCreationExpression0WithResult(n  *ClassInstanceCreationExpression0) interface{}
-    VisitClassInstanceCreationExpression1WithResult(n  *ClassInstanceCreationExpression1) interface{}
-    VisitArrayCreationExpression0WithResult(n  *ArrayCreationExpression0) interface{}
-    VisitArrayCreationExpression1WithResult(n  *ArrayCreationExpression1) interface{}
-    VisitArrayCreationExpression2WithResult(n  *ArrayCreationExpression2) interface{}
-    VisitArrayCreationExpression3WithResult(n  *ArrayCreationExpression3) interface{}
-    VisitDims0WithResult(n  *Dims0) interface{}
-    VisitDims1WithResult(n  *Dims1) interface{}
-    VisitFieldAccess0WithResult(n  *FieldAccess0) interface{}
-    VisitFieldAccess1WithResult(n  *FieldAccess1) interface{}
-    VisitFieldAccess2WithResult(n  *FieldAccess2) interface{}
-    VisitMethodInvocation0WithResult(n  *MethodInvocation0) interface{}
-    VisitMethodInvocation1WithResult(n  *MethodInvocation1) interface{}
-    VisitMethodInvocation2WithResult(n  *MethodInvocation2) interface{}
-    VisitMethodInvocation3WithResult(n  *MethodInvocation3) interface{}
-    VisitMethodInvocation4WithResult(n  *MethodInvocation4) interface{}
-    VisitArrayAccess0WithResult(n  *ArrayAccess0) interface{}
-    VisitArrayAccess1WithResult(n  *ArrayAccess1) interface{}
-    VisitUnaryExpression0WithResult(n  *UnaryExpression0) interface{}
-    VisitUnaryExpression1WithResult(n  *UnaryExpression1) interface{}
-    VisitUnaryExpressionNotPlusMinus0WithResult(n  *UnaryExpressionNotPlusMinus0) interface{}
-    VisitUnaryExpressionNotPlusMinus1WithResult(n  *UnaryExpressionNotPlusMinus1) interface{}
-    VisitCastExpression0WithResult(n  *CastExpression0) interface{}
-    VisitCastExpression1WithResult(n  *CastExpression1) interface{}
-    VisitMultiplicativeExpression0WithResult(n  *MultiplicativeExpression0) interface{}
-    VisitMultiplicativeExpression1WithResult(n  *MultiplicativeExpression1) interface{}
-    VisitMultiplicativeExpression2WithResult(n  *MultiplicativeExpression2) interface{}
-    VisitAdditiveExpression0WithResult(n  *AdditiveExpression0) interface{}
-    VisitAdditiveExpression1WithResult(n  *AdditiveExpression1) interface{}
-    VisitShiftExpression0WithResult(n  *ShiftExpression0) interface{}
-    VisitShiftExpression1WithResult(n  *ShiftExpression1) interface{}
-    VisitShiftExpression2WithResult(n  *ShiftExpression2) interface{}
-    VisitRelationalExpression0WithResult(n  *RelationalExpression0) interface{}
-    VisitRelationalExpression1WithResult(n  *RelationalExpression1) interface{}
-    VisitRelationalExpression2WithResult(n  *RelationalExpression2) interface{}
-    VisitRelationalExpression3WithResult(n  *RelationalExpression3) interface{}
-    VisitRelationalExpression4WithResult(n  *RelationalExpression4) interface{}
-    VisitEqualityExpression0WithResult(n  *EqualityExpression0) interface{}
-    VisitEqualityExpression1WithResult(n  *EqualityExpression1) interface{}
-    VisitAssignmentOperator0WithResult(n  *AssignmentOperator0) interface{}
-    VisitAssignmentOperator1WithResult(n  *AssignmentOperator1) interface{}
-    VisitAssignmentOperator2WithResult(n  *AssignmentOperator2) interface{}
-    VisitAssignmentOperator3WithResult(n  *AssignmentOperator3) interface{}
-    VisitAssignmentOperator4WithResult(n  *AssignmentOperator4) interface{}
-    VisitAssignmentOperator5WithResult(n  *AssignmentOperator5) interface{}
-    VisitAssignmentOperator6WithResult(n  *AssignmentOperator6) interface{}
-    VisitAssignmentOperator7WithResult(n  *AssignmentOperator7) interface{}
-    VisitAssignmentOperator8WithResult(n  *AssignmentOperator8) interface{}
-    VisitAssignmentOperator9WithResult(n  *AssignmentOperator9) interface{}
-    VisitAssignmentOperator10WithResult(n  *AssignmentOperator10) interface{}
-    VisitAssignmentOperator11WithResult(n  *AssignmentOperator11) interface{}
-
-    VisitWithResult(n  IAst) interface{}
-}
-func AnyCastToResultVisitor(i interface{}) ResultVisitor {
-	  if nil == i{
-		 return nil
-	  }else{
-		 return i.(ResultVisitor)
-	  }
-}
-type ResultArgumentVisitor interface{
-    VisitAstTokenWithResultArgument(n  *AstToken, o interface{}) interface{}
-    VisitidentifierWithResultArgument(n  *identifier, o interface{}) interface{}
-    VisitPrimitiveTypeWithResultArgument(n  *PrimitiveType, o interface{}) interface{}
-    VisitClassTypeWithResultArgument(n  *ClassType, o interface{}) interface{}
-    VisitInterfaceTypeWithResultArgument(n  *InterfaceType, o interface{}) interface{}
-    VisitTypeNameWithResultArgument(n  *TypeName, o interface{}) interface{}
-    VisitArrayTypeWithResultArgument(n  *ArrayType, o interface{}) interface{}
-    VisitTypeParameterWithResultArgument(n  *TypeParameter, o interface{}) interface{}
-    VisitTypeBoundWithResultArgument(n  *TypeBound, o interface{}) interface{}
-    VisitAdditionalBoundListWithResultArgument(n  *AdditionalBoundList, o interface{}) interface{}
-    VisitAdditionalBoundWithResultArgument(n  *AdditionalBound, o interface{}) interface{}
-    VisitTypeArgumentsWithResultArgument(n  *TypeArguments, o interface{}) interface{}
-    VisitActualTypeArgumentListWithResultArgument(n  *ActualTypeArgumentList, o interface{}) interface{}
-    VisitWildcardWithResultArgument(n  *Wildcard, o interface{}) interface{}
-    VisitPackageNameWithResultArgument(n  *PackageName, o interface{}) interface{}
-    VisitExpressionNameWithResultArgument(n  *ExpressionName, o interface{}) interface{}
-    VisitMethodNameWithResultArgument(n  *MethodName, o interface{}) interface{}
-    VisitPackageOrTypeNameWithResultArgument(n  *PackageOrTypeName, o interface{}) interface{}
-    VisitAmbiguousNameWithResultArgument(n  *AmbiguousName, o interface{}) interface{}
-    VisitCompilationUnitWithResultArgument(n  *CompilationUnit, o interface{}) interface{}
-    VisitImportDeclarationsWithResultArgument(n  *ImportDeclarations, o interface{}) interface{}
-    VisitTypeDeclarationsWithResultArgument(n  *TypeDeclarations, o interface{}) interface{}
-    VisitPackageDeclarationWithResultArgument(n  *PackageDeclaration, o interface{}) interface{}
-    VisitSingleTypeImportDeclarationWithResultArgument(n  *SingleTypeImportDeclaration, o interface{}) interface{}
-    VisitTypeImportOnDemandDeclarationWithResultArgument(n  *TypeImportOnDemandDeclaration, o interface{}) interface{}
-    VisitSingleStaticImportDeclarationWithResultArgument(n  *SingleStaticImportDeclaration, o interface{}) interface{}
-    VisitStaticImportOnDemandDeclarationWithResultArgument(n  *StaticImportOnDemandDeclaration, o interface{}) interface{}
-    VisitTypeDeclarationWithResultArgument(n  *TypeDeclaration, o interface{}) interface{}
-    VisitNormalClassDeclarationWithResultArgument(n  *NormalClassDeclaration, o interface{}) interface{}
-    VisitClassModifiersWithResultArgument(n  *ClassModifiers, o interface{}) interface{}
-    VisitTypeParametersWithResultArgument(n  *TypeParameters, o interface{}) interface{}
-    VisitTypeParameterListWithResultArgument(n  *TypeParameterList, o interface{}) interface{}
-    VisitSuperWithResultArgument(n  *Super, o interface{}) interface{}
-    VisitInterfacesWithResultArgument(n  *Interfaces, o interface{}) interface{}
-    VisitInterfaceTypeListWithResultArgument(n  *InterfaceTypeList, o interface{}) interface{}
-    VisitClassBodyWithResultArgument(n  *ClassBody, o interface{}) interface{}
-    VisitClassBodyDeclarationsWithResultArgument(n  *ClassBodyDeclarations, o interface{}) interface{}
-    VisitClassMemberDeclarationWithResultArgument(n  *ClassMemberDeclaration, o interface{}) interface{}
-    VisitFieldDeclarationWithResultArgument(n  *FieldDeclaration, o interface{}) interface{}
-    VisitVariableDeclaratorsWithResultArgument(n  *VariableDeclarators, o interface{}) interface{}
-    VisitVariableDeclaratorWithResultArgument(n  *VariableDeclarator, o interface{}) interface{}
-    VisitVariableDeclaratorIdWithResultArgument(n  *VariableDeclaratorId, o interface{}) interface{}
-    VisitFieldModifiersWithResultArgument(n  *FieldModifiers, o interface{}) interface{}
-    VisitMethodDeclarationWithResultArgument(n  *MethodDeclaration, o interface{}) interface{}
-    VisitMethodHeaderWithResultArgument(n  *MethodHeader, o interface{}) interface{}
-    VisitResultTypeWithResultArgument(n  *ResultType, o interface{}) interface{}
-    VisitFormalParameterListWithResultArgument(n  *FormalParameterList, o interface{}) interface{}
-    VisitFormalParametersWithResultArgument(n  *FormalParameters, o interface{}) interface{}
-    VisitFormalParameterWithResultArgument(n  *FormalParameter, o interface{}) interface{}
-    VisitVariableModifiersWithResultArgument(n  *VariableModifiers, o interface{}) interface{}
-    VisitVariableModifierWithResultArgument(n  *VariableModifier, o interface{}) interface{}
-    VisitLastFormalParameterWithResultArgument(n  *LastFormalParameter, o interface{}) interface{}
-    VisitMethodModifiersWithResultArgument(n  *MethodModifiers, o interface{}) interface{}
-    VisitThrowsWithResultArgument(n  *Throws, o interface{}) interface{}
-    VisitExceptionTypeListWithResultArgument(n  *ExceptionTypeList, o interface{}) interface{}
-    VisitMethodBodyWithResultArgument(n  *MethodBody, o interface{}) interface{}
-    VisitStaticInitializerWithResultArgument(n  *StaticInitializer, o interface{}) interface{}
-    VisitConstructorDeclarationWithResultArgument(n  *ConstructorDeclaration, o interface{}) interface{}
-    VisitConstructorDeclaratorWithResultArgument(n  *ConstructorDeclarator, o interface{}) interface{}
-    VisitConstructorModifiersWithResultArgument(n  *ConstructorModifiers, o interface{}) interface{}
-    VisitConstructorBodyWithResultArgument(n  *ConstructorBody, o interface{}) interface{}
-    VisitEnumDeclarationWithResultArgument(n  *EnumDeclaration, o interface{}) interface{}
-    VisitEnumBodyWithResultArgument(n  *EnumBody, o interface{}) interface{}
-    VisitEnumConstantsWithResultArgument(n  *EnumConstants, o interface{}) interface{}
-    VisitEnumConstantWithResultArgument(n  *EnumConstant, o interface{}) interface{}
-    VisitArgumentsWithResultArgument(n  *Arguments, o interface{}) interface{}
-    VisitEnumBodyDeclarationsWithResultArgument(n  *EnumBodyDeclarations, o interface{}) interface{}
-    VisitNormalInterfaceDeclarationWithResultArgument(n  *NormalInterfaceDeclaration, o interface{}) interface{}
-    VisitInterfaceModifiersWithResultArgument(n  *InterfaceModifiers, o interface{}) interface{}
-    VisitInterfaceBodyWithResultArgument(n  *InterfaceBody, o interface{}) interface{}
-    VisitInterfaceMemberDeclarationsWithResultArgument(n  *InterfaceMemberDeclarations, o interface{}) interface{}
-    VisitInterfaceMemberDeclarationWithResultArgument(n  *InterfaceMemberDeclaration, o interface{}) interface{}
-    VisitConstantDeclarationWithResultArgument(n  *ConstantDeclaration, o interface{}) interface{}
-    VisitConstantModifiersWithResultArgument(n  *ConstantModifiers, o interface{}) interface{}
-    VisitAbstractMethodDeclarationWithResultArgument(n  *AbstractMethodDeclaration, o interface{}) interface{}
-    VisitAbstractMethodModifiersWithResultArgument(n  *AbstractMethodModifiers, o interface{}) interface{}
-    VisitAnnotationTypeDeclarationWithResultArgument(n  *AnnotationTypeDeclaration, o interface{}) interface{}
-    VisitAnnotationTypeBodyWithResultArgument(n  *AnnotationTypeBody, o interface{}) interface{}
-    VisitAnnotationTypeElementDeclarationsWithResultArgument(n  *AnnotationTypeElementDeclarations, o interface{}) interface{}
-    VisitDefaultValueWithResultArgument(n  *DefaultValue, o interface{}) interface{}
-    VisitAnnotationsWithResultArgument(n  *Annotations, o interface{}) interface{}
-    VisitNormalAnnotationWithResultArgument(n  *NormalAnnotation, o interface{}) interface{}
-    VisitElementValuePairsWithResultArgument(n  *ElementValuePairs, o interface{}) interface{}
-    VisitElementValuePairWithResultArgument(n  *ElementValuePair, o interface{}) interface{}
-    VisitElementValueArrayInitializerWithResultArgument(n  *ElementValueArrayInitializer, o interface{}) interface{}
-    VisitElementValuesWithResultArgument(n  *ElementValues, o interface{}) interface{}
-    VisitMarkerAnnotationWithResultArgument(n  *MarkerAnnotation, o interface{}) interface{}
-    VisitSingleElementAnnotationWithResultArgument(n  *SingleElementAnnotation, o interface{}) interface{}
-    VisitArrayInitializerWithResultArgument(n  *ArrayInitializer, o interface{}) interface{}
-    VisitVariableInitializersWithResultArgument(n  *VariableInitializers, o interface{}) interface{}
-    VisitBlockWithResultArgument(n  *Block, o interface{}) interface{}
-    VisitBlockStatementsWithResultArgument(n  *BlockStatements, o interface{}) interface{}
-    VisitLocalVariableDeclarationStatementWithResultArgument(n  *LocalVariableDeclarationStatement, o interface{}) interface{}
-    VisitLocalVariableDeclarationWithResultArgument(n  *LocalVariableDeclaration, o interface{}) interface{}
-    VisitIfThenStatementWithResultArgument(n  *IfThenStatement, o interface{}) interface{}
-    VisitIfThenElseStatementWithResultArgument(n  *IfThenElseStatement, o interface{}) interface{}
-    VisitIfThenElseStatementNoShortIfWithResultArgument(n  *IfThenElseStatementNoShortIf, o interface{}) interface{}
-    VisitEmptyStatementWithResultArgument(n  *EmptyStatement, o interface{}) interface{}
-    VisitLabeledStatementWithResultArgument(n  *LabeledStatement, o interface{}) interface{}
-    VisitLabeledStatementNoShortIfWithResultArgument(n  *LabeledStatementNoShortIf, o interface{}) interface{}
-    VisitExpressionStatementWithResultArgument(n  *ExpressionStatement, o interface{}) interface{}
-    VisitSwitchStatementWithResultArgument(n  *SwitchStatement, o interface{}) interface{}
-    VisitSwitchBlockWithResultArgument(n  *SwitchBlock, o interface{}) interface{}
-    VisitSwitchBlockStatementGroupsWithResultArgument(n  *SwitchBlockStatementGroups, o interface{}) interface{}
-    VisitSwitchBlockStatementGroupWithResultArgument(n  *SwitchBlockStatementGroup, o interface{}) interface{}
-    VisitSwitchLabelsWithResultArgument(n  *SwitchLabels, o interface{}) interface{}
-    VisitWhileStatementWithResultArgument(n  *WhileStatement, o interface{}) interface{}
-    VisitWhileStatementNoShortIfWithResultArgument(n  *WhileStatementNoShortIf, o interface{}) interface{}
-    VisitDoStatementWithResultArgument(n  *DoStatement, o interface{}) interface{}
-    VisitBasicForStatementWithResultArgument(n  *BasicForStatement, o interface{}) interface{}
-    VisitForStatementNoShortIfWithResultArgument(n  *ForStatementNoShortIf, o interface{}) interface{}
-    VisitStatementExpressionListWithResultArgument(n  *StatementExpressionList, o interface{}) interface{}
-    VisitEnhancedForStatementWithResultArgument(n  *EnhancedForStatement, o interface{}) interface{}
-    VisitBreakStatementWithResultArgument(n  *BreakStatement, o interface{}) interface{}
-    VisitContinueStatementWithResultArgument(n  *ContinueStatement, o interface{}) interface{}
-    VisitReturnStatementWithResultArgument(n  *ReturnStatement, o interface{}) interface{}
-    VisitThrowStatementWithResultArgument(n  *ThrowStatement, o interface{}) interface{}
-    VisitSynchronizedStatementWithResultArgument(n  *SynchronizedStatement, o interface{}) interface{}
-    VisitCatchesWithResultArgument(n  *Catches, o interface{}) interface{}
-    VisitCatchClauseWithResultArgument(n  *CatchClause, o interface{}) interface{}
-    VisitFinallyWithResultArgument(n  *Finally, o interface{}) interface{}
-    VisitArgumentListWithResultArgument(n  *ArgumentList, o interface{}) interface{}
-    VisitDimExprsWithResultArgument(n  *DimExprs, o interface{}) interface{}
-    VisitDimExprWithResultArgument(n  *DimExpr, o interface{}) interface{}
-    VisitPostIncrementExpressionWithResultArgument(n  *PostIncrementExpression, o interface{}) interface{}
-    VisitPostDecrementExpressionWithResultArgument(n  *PostDecrementExpression, o interface{}) interface{}
-    VisitPreIncrementExpressionWithResultArgument(n  *PreIncrementExpression, o interface{}) interface{}
-    VisitPreDecrementExpressionWithResultArgument(n  *PreDecrementExpression, o interface{}) interface{}
-    VisitAndExpressionWithResultArgument(n  *AndExpression, o interface{}) interface{}
-    VisitExclusiveOrExpressionWithResultArgument(n  *ExclusiveOrExpression, o interface{}) interface{}
-    VisitInclusiveOrExpressionWithResultArgument(n  *InclusiveOrExpression, o interface{}) interface{}
-    VisitConditionalAndExpressionWithResultArgument(n  *ConditionalAndExpression, o interface{}) interface{}
-    VisitConditionalOrExpressionWithResultArgument(n  *ConditionalOrExpression, o interface{}) interface{}
-    VisitConditionalExpressionWithResultArgument(n  *ConditionalExpression, o interface{}) interface{}
-    VisitAssignmentWithResultArgument(n  *Assignment, o interface{}) interface{}
-    VisitCommaoptWithResultArgument(n  *Commaopt, o interface{}) interface{}
-    VisitEllipsisoptWithResultArgument(n  *Ellipsisopt, o interface{}) interface{}
-    VisitLPGUserAction0WithResultArgument(n  *LPGUserAction0, o interface{}) interface{}
-    VisitLPGUserAction1WithResultArgument(n  *LPGUserAction1, o interface{}) interface{}
-    VisitLPGUserAction2WithResultArgument(n  *LPGUserAction2, o interface{}) interface{}
-    VisitLPGUserAction3WithResultArgument(n  *LPGUserAction3, o interface{}) interface{}
-    VisitLPGUserAction4WithResultArgument(n  *LPGUserAction4, o interface{}) interface{}
-    VisitIntegralType0WithResultArgument(n  *IntegralType0, o interface{}) interface{}
-    VisitIntegralType1WithResultArgument(n  *IntegralType1, o interface{}) interface{}
-    VisitIntegralType2WithResultArgument(n  *IntegralType2, o interface{}) interface{}
-    VisitIntegralType3WithResultArgument(n  *IntegralType3, o interface{}) interface{}
-    VisitIntegralType4WithResultArgument(n  *IntegralType4, o interface{}) interface{}
-    VisitFloatingPointType0WithResultArgument(n  *FloatingPointType0, o interface{}) interface{}
-    VisitFloatingPointType1WithResultArgument(n  *FloatingPointType1, o interface{}) interface{}
-    VisitWildcardBounds0WithResultArgument(n  *WildcardBounds0, o interface{}) interface{}
-    VisitWildcardBounds1WithResultArgument(n  *WildcardBounds1, o interface{}) interface{}
-    VisitClassModifier0WithResultArgument(n  *ClassModifier0, o interface{}) interface{}
-    VisitClassModifier1WithResultArgument(n  *ClassModifier1, o interface{}) interface{}
-    VisitClassModifier2WithResultArgument(n  *ClassModifier2, o interface{}) interface{}
-    VisitClassModifier3WithResultArgument(n  *ClassModifier3, o interface{}) interface{}
-    VisitClassModifier4WithResultArgument(n  *ClassModifier4, o interface{}) interface{}
-    VisitClassModifier5WithResultArgument(n  *ClassModifier5, o interface{}) interface{}
-    VisitClassModifier6WithResultArgument(n  *ClassModifier6, o interface{}) interface{}
-    VisitFieldModifier0WithResultArgument(n  *FieldModifier0, o interface{}) interface{}
-    VisitFieldModifier1WithResultArgument(n  *FieldModifier1, o interface{}) interface{}
-    VisitFieldModifier2WithResultArgument(n  *FieldModifier2, o interface{}) interface{}
-    VisitFieldModifier3WithResultArgument(n  *FieldModifier3, o interface{}) interface{}
-    VisitFieldModifier4WithResultArgument(n  *FieldModifier4, o interface{}) interface{}
-    VisitFieldModifier5WithResultArgument(n  *FieldModifier5, o interface{}) interface{}
-    VisitFieldModifier6WithResultArgument(n  *FieldModifier6, o interface{}) interface{}
-    VisitMethodDeclarator0WithResultArgument(n  *MethodDeclarator0, o interface{}) interface{}
-    VisitMethodDeclarator1WithResultArgument(n  *MethodDeclarator1, o interface{}) interface{}
-    VisitMethodModifier0WithResultArgument(n  *MethodModifier0, o interface{}) interface{}
-    VisitMethodModifier1WithResultArgument(n  *MethodModifier1, o interface{}) interface{}
-    VisitMethodModifier2WithResultArgument(n  *MethodModifier2, o interface{}) interface{}
-    VisitMethodModifier3WithResultArgument(n  *MethodModifier3, o interface{}) interface{}
-    VisitMethodModifier4WithResultArgument(n  *MethodModifier4, o interface{}) interface{}
-    VisitMethodModifier5WithResultArgument(n  *MethodModifier5, o interface{}) interface{}
-    VisitMethodModifier6WithResultArgument(n  *MethodModifier6, o interface{}) interface{}
-    VisitMethodModifier7WithResultArgument(n  *MethodModifier7, o interface{}) interface{}
-    VisitMethodModifier8WithResultArgument(n  *MethodModifier8, o interface{}) interface{}
-    VisitConstructorModifier0WithResultArgument(n  *ConstructorModifier0, o interface{}) interface{}
-    VisitConstructorModifier1WithResultArgument(n  *ConstructorModifier1, o interface{}) interface{}
-    VisitConstructorModifier2WithResultArgument(n  *ConstructorModifier2, o interface{}) interface{}
-    VisitExplicitConstructorInvocation0WithResultArgument(n  *ExplicitConstructorInvocation0, o interface{}) interface{}
-    VisitExplicitConstructorInvocation1WithResultArgument(n  *ExplicitConstructorInvocation1, o interface{}) interface{}
-    VisitExplicitConstructorInvocation2WithResultArgument(n  *ExplicitConstructorInvocation2, o interface{}) interface{}
-    VisitInterfaceModifier0WithResultArgument(n  *InterfaceModifier0, o interface{}) interface{}
-    VisitInterfaceModifier1WithResultArgument(n  *InterfaceModifier1, o interface{}) interface{}
-    VisitInterfaceModifier2WithResultArgument(n  *InterfaceModifier2, o interface{}) interface{}
-    VisitInterfaceModifier3WithResultArgument(n  *InterfaceModifier3, o interface{}) interface{}
-    VisitInterfaceModifier4WithResultArgument(n  *InterfaceModifier4, o interface{}) interface{}
-    VisitInterfaceModifier5WithResultArgument(n  *InterfaceModifier5, o interface{}) interface{}
-    VisitExtendsInterfaces0WithResultArgument(n  *ExtendsInterfaces0, o interface{}) interface{}
-    VisitExtendsInterfaces1WithResultArgument(n  *ExtendsInterfaces1, o interface{}) interface{}
-    VisitConstantModifier0WithResultArgument(n  *ConstantModifier0, o interface{}) interface{}
-    VisitConstantModifier1WithResultArgument(n  *ConstantModifier1, o interface{}) interface{}
-    VisitConstantModifier2WithResultArgument(n  *ConstantModifier2, o interface{}) interface{}
-    VisitAbstractMethodModifier0WithResultArgument(n  *AbstractMethodModifier0, o interface{}) interface{}
-    VisitAbstractMethodModifier1WithResultArgument(n  *AbstractMethodModifier1, o interface{}) interface{}
-    VisitAnnotationTypeElementDeclaration0WithResultArgument(n  *AnnotationTypeElementDeclaration0, o interface{}) interface{}
-    VisitAnnotationTypeElementDeclaration1WithResultArgument(n  *AnnotationTypeElementDeclaration1, o interface{}) interface{}
-    VisitAssertStatement0WithResultArgument(n  *AssertStatement0, o interface{}) interface{}
-    VisitAssertStatement1WithResultArgument(n  *AssertStatement1, o interface{}) interface{}
-    VisitSwitchLabel0WithResultArgument(n  *SwitchLabel0, o interface{}) interface{}
-    VisitSwitchLabel1WithResultArgument(n  *SwitchLabel1, o interface{}) interface{}
-    VisitSwitchLabel2WithResultArgument(n  *SwitchLabel2, o interface{}) interface{}
-    VisitTryStatement0WithResultArgument(n  *TryStatement0, o interface{}) interface{}
-    VisitTryStatement1WithResultArgument(n  *TryStatement1, o interface{}) interface{}
-    VisitPrimaryNoNewArray0WithResultArgument(n  *PrimaryNoNewArray0, o interface{}) interface{}
-    VisitPrimaryNoNewArray1WithResultArgument(n  *PrimaryNoNewArray1, o interface{}) interface{}
-    VisitPrimaryNoNewArray2WithResultArgument(n  *PrimaryNoNewArray2, o interface{}) interface{}
-    VisitPrimaryNoNewArray3WithResultArgument(n  *PrimaryNoNewArray3, o interface{}) interface{}
-    VisitPrimaryNoNewArray4WithResultArgument(n  *PrimaryNoNewArray4, o interface{}) interface{}
-    VisitLiteral0WithResultArgument(n  *Literal0, o interface{}) interface{}
-    VisitLiteral1WithResultArgument(n  *Literal1, o interface{}) interface{}
-    VisitLiteral2WithResultArgument(n  *Literal2, o interface{}) interface{}
-    VisitLiteral3WithResultArgument(n  *Literal3, o interface{}) interface{}
-    VisitLiteral4WithResultArgument(n  *Literal4, o interface{}) interface{}
-    VisitLiteral5WithResultArgument(n  *Literal5, o interface{}) interface{}
-    VisitLiteral6WithResultArgument(n  *Literal6, o interface{}) interface{}
-    VisitBooleanLiteral0WithResultArgument(n  *BooleanLiteral0, o interface{}) interface{}
-    VisitBooleanLiteral1WithResultArgument(n  *BooleanLiteral1, o interface{}) interface{}
-    VisitClassInstanceCreationExpression0WithResultArgument(n  *ClassInstanceCreationExpression0, o interface{}) interface{}
-    VisitClassInstanceCreationExpression1WithResultArgument(n  *ClassInstanceCreationExpression1, o interface{}) interface{}
-    VisitArrayCreationExpression0WithResultArgument(n  *ArrayCreationExpression0, o interface{}) interface{}
-    VisitArrayCreationExpression1WithResultArgument(n  *ArrayCreationExpression1, o interface{}) interface{}
-    VisitArrayCreationExpression2WithResultArgument(n  *ArrayCreationExpression2, o interface{}) interface{}
-    VisitArrayCreationExpression3WithResultArgument(n  *ArrayCreationExpression3, o interface{}) interface{}
-    VisitDims0WithResultArgument(n  *Dims0, o interface{}) interface{}
-    VisitDims1WithResultArgument(n  *Dims1, o interface{}) interface{}
-    VisitFieldAccess0WithResultArgument(n  *FieldAccess0, o interface{}) interface{}
-    VisitFieldAccess1WithResultArgument(n  *FieldAccess1, o interface{}) interface{}
-    VisitFieldAccess2WithResultArgument(n  *FieldAccess2, o interface{}) interface{}
-    VisitMethodInvocation0WithResultArgument(n  *MethodInvocation0, o interface{}) interface{}
-    VisitMethodInvocation1WithResultArgument(n  *MethodInvocation1, o interface{}) interface{}
-    VisitMethodInvocation2WithResultArgument(n  *MethodInvocation2, o interface{}) interface{}
-    VisitMethodInvocation3WithResultArgument(n  *MethodInvocation3, o interface{}) interface{}
-    VisitMethodInvocation4WithResultArgument(n  *MethodInvocation4, o interface{}) interface{}
-    VisitArrayAccess0WithResultArgument(n  *ArrayAccess0, o interface{}) interface{}
-    VisitArrayAccess1WithResultArgument(n  *ArrayAccess1, o interface{}) interface{}
-    VisitUnaryExpression0WithResultArgument(n  *UnaryExpression0, o interface{}) interface{}
-    VisitUnaryExpression1WithResultArgument(n  *UnaryExpression1, o interface{}) interface{}
-    VisitUnaryExpressionNotPlusMinus0WithResultArgument(n  *UnaryExpressionNotPlusMinus0, o interface{}) interface{}
-    VisitUnaryExpressionNotPlusMinus1WithResultArgument(n  *UnaryExpressionNotPlusMinus1, o interface{}) interface{}
-    VisitCastExpression0WithResultArgument(n  *CastExpression0, o interface{}) interface{}
-    VisitCastExpression1WithResultArgument(n  *CastExpression1, o interface{}) interface{}
-    VisitMultiplicativeExpression0WithResultArgument(n  *MultiplicativeExpression0, o interface{}) interface{}
-    VisitMultiplicativeExpression1WithResultArgument(n  *MultiplicativeExpression1, o interface{}) interface{}
-    VisitMultiplicativeExpression2WithResultArgument(n  *MultiplicativeExpression2, o interface{}) interface{}
-    VisitAdditiveExpression0WithResultArgument(n  *AdditiveExpression0, o interface{}) interface{}
-    VisitAdditiveExpression1WithResultArgument(n  *AdditiveExpression1, o interface{}) interface{}
-    VisitShiftExpression0WithResultArgument(n  *ShiftExpression0, o interface{}) interface{}
-    VisitShiftExpression1WithResultArgument(n  *ShiftExpression1, o interface{}) interface{}
-    VisitShiftExpression2WithResultArgument(n  *ShiftExpression2, o interface{}) interface{}
-    VisitRelationalExpression0WithResultArgument(n  *RelationalExpression0, o interface{}) interface{}
-    VisitRelationalExpression1WithResultArgument(n  *RelationalExpression1, o interface{}) interface{}
-    VisitRelationalExpression2WithResultArgument(n  *RelationalExpression2, o interface{}) interface{}
-    VisitRelationalExpression3WithResultArgument(n  *RelationalExpression3, o interface{}) interface{}
-    VisitRelationalExpression4WithResultArgument(n  *RelationalExpression4, o interface{}) interface{}
-    VisitEqualityExpression0WithResultArgument(n  *EqualityExpression0, o interface{}) interface{}
-    VisitEqualityExpression1WithResultArgument(n  *EqualityExpression1, o interface{}) interface{}
-    VisitAssignmentOperator0WithResultArgument(n  *AssignmentOperator0, o interface{}) interface{}
-    VisitAssignmentOperator1WithResultArgument(n  *AssignmentOperator1, o interface{}) interface{}
-    VisitAssignmentOperator2WithResultArgument(n  *AssignmentOperator2, o interface{}) interface{}
-    VisitAssignmentOperator3WithResultArgument(n  *AssignmentOperator3, o interface{}) interface{}
-    VisitAssignmentOperator4WithResultArgument(n  *AssignmentOperator4, o interface{}) interface{}
-    VisitAssignmentOperator5WithResultArgument(n  *AssignmentOperator5, o interface{}) interface{}
-    VisitAssignmentOperator6WithResultArgument(n  *AssignmentOperator6, o interface{}) interface{}
-    VisitAssignmentOperator7WithResultArgument(n  *AssignmentOperator7, o interface{}) interface{}
-    VisitAssignmentOperator8WithResultArgument(n  *AssignmentOperator8, o interface{}) interface{}
-    VisitAssignmentOperator9WithResultArgument(n  *AssignmentOperator9, o interface{}) interface{}
-    VisitAssignmentOperator10WithResultArgument(n  *AssignmentOperator10, o interface{}) interface{}
-    VisitAssignmentOperator11WithResultArgument(n  *AssignmentOperator11, o interface{}) interface{}
-
-    VisitWithResultArgument(n IAst, o interface{}) interface{}
-}
-func AnyCastToResultArgumentVisitor(i interface{}) ResultArgumentVisitor {
-	  if nil == i{
-		 return nil
-	  }else{
-		 return i.(ResultArgumentVisitor)
-	  }
-}
-type VisitorArgumentVisitor interface{
-   Visitor
-   ArgumentVisitor
-   }
 type AbstractVisitor struct{
-   dispatch VisitorArgumentVisitor
+   dispatch Visitor
    }
-func NewAbstractVisitor(dispatch VisitorArgumentVisitor) *AbstractVisitor{
+func NewAbstractVisitor(dispatch Visitor) *AbstractVisitor{
          my := new(AbstractVisitor)
          if dispatch != nil{
            my.dispatch = dispatch
@@ -30832,9197 +33454,2449 @@ func NewAbstractVisitor(dispatch VisitorArgumentVisitor) *AbstractVisitor{
         return my
 }
 
-func (my *AbstractVisitor)      UnimplementedVisitor(s  string){}
+func (my *AbstractVisitor)     UnimplementedVisitor(s  string)bool { return true }
 
-func (my *AbstractVisitor)      VisitAstToken(n *AstToken)  { my.UnimplementedVisitor("VisitAstToken(AstToken)") }
+func (my *AbstractVisitor)     PreVisit(element IAst) bool{ return true }
 
-func (my *AbstractVisitor)      VisitAstTokenWithArg(n *AstToken, o interface{})  { my.UnimplementedVisitor("VisitAstTokenWithArg(AstToken, interface{})") }
+func (my *AbstractVisitor)     PostVisit(element  IAst) {}
 
-func (my *AbstractVisitor)      Visitidentifier(n *identifier)  { my.UnimplementedVisitor("Visitidentifier(identifier)") }
+func (my *AbstractVisitor)     VisitAstToken(n  *AstToken) bool{ return my.UnimplementedVisitor("Visit(*AstToken)") }
+func (my *AbstractVisitor)     EndVisitAstToken(n  *AstToken) { my.UnimplementedVisitor("EndVisit(*AstToken)") }
 
-func (my *AbstractVisitor)      VisitidentifierWithArg(n *identifier, o interface{})  { my.UnimplementedVisitor("VisitidentifierWithArg(identifier, interface{})") }
+func (my *AbstractVisitor)     Visitidentifier(n  *identifier) bool{ return my.UnimplementedVisitor("Visit(*identifier)") }
+func (my *AbstractVisitor)     EndVisitidentifier(n  *identifier) { my.UnimplementedVisitor("EndVisit(*identifier)") }
 
-func (my *AbstractVisitor)      VisitPrimitiveType(n *PrimitiveType)  { my.UnimplementedVisitor("VisitPrimitiveType(PrimitiveType)") }
+func (my *AbstractVisitor)     VisitPrimitiveType(n  *PrimitiveType) bool{ return my.UnimplementedVisitor("Visit(*PrimitiveType)") }
+func (my *AbstractVisitor)     EndVisitPrimitiveType(n  *PrimitiveType) { my.UnimplementedVisitor("EndVisit(*PrimitiveType)") }
 
-func (my *AbstractVisitor)      VisitPrimitiveTypeWithArg(n *PrimitiveType, o interface{})  { my.UnimplementedVisitor("VisitPrimitiveTypeWithArg(PrimitiveType, interface{})") }
+func (my *AbstractVisitor)     VisitClassType(n  *ClassType) bool{ return my.UnimplementedVisitor("Visit(*ClassType)") }
+func (my *AbstractVisitor)     EndVisitClassType(n  *ClassType) { my.UnimplementedVisitor("EndVisit(*ClassType)") }
 
-func (my *AbstractVisitor)      VisitClassType(n *ClassType)  { my.UnimplementedVisitor("VisitClassType(ClassType)") }
+func (my *AbstractVisitor)     VisitInterfaceType(n  *InterfaceType) bool{ return my.UnimplementedVisitor("Visit(*InterfaceType)") }
+func (my *AbstractVisitor)     EndVisitInterfaceType(n  *InterfaceType) { my.UnimplementedVisitor("EndVisit(*InterfaceType)") }
 
-func (my *AbstractVisitor)      VisitClassTypeWithArg(n *ClassType, o interface{})  { my.UnimplementedVisitor("VisitClassTypeWithArg(ClassType, interface{})") }
+func (my *AbstractVisitor)     VisitTypeName(n  *TypeName) bool{ return my.UnimplementedVisitor("Visit(*TypeName)") }
+func (my *AbstractVisitor)     EndVisitTypeName(n  *TypeName) { my.UnimplementedVisitor("EndVisit(*TypeName)") }
 
-func (my *AbstractVisitor)      VisitInterfaceType(n *InterfaceType)  { my.UnimplementedVisitor("VisitInterfaceType(InterfaceType)") }
+func (my *AbstractVisitor)     VisitArrayType(n  *ArrayType) bool{ return my.UnimplementedVisitor("Visit(*ArrayType)") }
+func (my *AbstractVisitor)     EndVisitArrayType(n  *ArrayType) { my.UnimplementedVisitor("EndVisit(*ArrayType)") }
 
-func (my *AbstractVisitor)      VisitInterfaceTypeWithArg(n *InterfaceType, o interface{})  { my.UnimplementedVisitor("VisitInterfaceTypeWithArg(InterfaceType, interface{})") }
+func (my *AbstractVisitor)     VisitTypeParameter(n  *TypeParameter) bool{ return my.UnimplementedVisitor("Visit(*TypeParameter)") }
+func (my *AbstractVisitor)     EndVisitTypeParameter(n  *TypeParameter) { my.UnimplementedVisitor("EndVisit(*TypeParameter)") }
 
-func (my *AbstractVisitor)      VisitTypeName(n *TypeName)  { my.UnimplementedVisitor("VisitTypeName(TypeName)") }
+func (my *AbstractVisitor)     VisitTypeBound(n  *TypeBound) bool{ return my.UnimplementedVisitor("Visit(*TypeBound)") }
+func (my *AbstractVisitor)     EndVisitTypeBound(n  *TypeBound) { my.UnimplementedVisitor("EndVisit(*TypeBound)") }
 
-func (my *AbstractVisitor)      VisitTypeNameWithArg(n *TypeName, o interface{})  { my.UnimplementedVisitor("VisitTypeNameWithArg(TypeName, interface{})") }
+func (my *AbstractVisitor)     VisitAdditionalBoundList(n  *AdditionalBoundList) bool{ return my.UnimplementedVisitor("Visit(*AdditionalBoundList)") }
+func (my *AbstractVisitor)     EndVisitAdditionalBoundList(n  *AdditionalBoundList) { my.UnimplementedVisitor("EndVisit(*AdditionalBoundList)") }
 
-func (my *AbstractVisitor)      VisitArrayType(n *ArrayType)  { my.UnimplementedVisitor("VisitArrayType(ArrayType)") }
+func (my *AbstractVisitor)     VisitAdditionalBound(n  *AdditionalBound) bool{ return my.UnimplementedVisitor("Visit(*AdditionalBound)") }
+func (my *AbstractVisitor)     EndVisitAdditionalBound(n  *AdditionalBound) { my.UnimplementedVisitor("EndVisit(*AdditionalBound)") }
 
-func (my *AbstractVisitor)      VisitArrayTypeWithArg(n *ArrayType, o interface{})  { my.UnimplementedVisitor("VisitArrayTypeWithArg(ArrayType, interface{})") }
+func (my *AbstractVisitor)     VisitTypeArguments(n  *TypeArguments) bool{ return my.UnimplementedVisitor("Visit(*TypeArguments)") }
+func (my *AbstractVisitor)     EndVisitTypeArguments(n  *TypeArguments) { my.UnimplementedVisitor("EndVisit(*TypeArguments)") }
 
-func (my *AbstractVisitor)      VisitTypeParameter(n *TypeParameter)  { my.UnimplementedVisitor("VisitTypeParameter(TypeParameter)") }
+func (my *AbstractVisitor)     VisitActualTypeArgumentList(n  *ActualTypeArgumentList) bool{ return my.UnimplementedVisitor("Visit(*ActualTypeArgumentList)") }
+func (my *AbstractVisitor)     EndVisitActualTypeArgumentList(n  *ActualTypeArgumentList) { my.UnimplementedVisitor("EndVisit(*ActualTypeArgumentList)") }
 
-func (my *AbstractVisitor)      VisitTypeParameterWithArg(n *TypeParameter, o interface{})  { my.UnimplementedVisitor("VisitTypeParameterWithArg(TypeParameter, interface{})") }
+func (my *AbstractVisitor)     VisitWildcard(n  *Wildcard) bool{ return my.UnimplementedVisitor("Visit(*Wildcard)") }
+func (my *AbstractVisitor)     EndVisitWildcard(n  *Wildcard) { my.UnimplementedVisitor("EndVisit(*Wildcard)") }
 
-func (my *AbstractVisitor)      VisitTypeBound(n *TypeBound)  { my.UnimplementedVisitor("VisitTypeBound(TypeBound)") }
+func (my *AbstractVisitor)     VisitPackageName(n  *PackageName) bool{ return my.UnimplementedVisitor("Visit(*PackageName)") }
+func (my *AbstractVisitor)     EndVisitPackageName(n  *PackageName) { my.UnimplementedVisitor("EndVisit(*PackageName)") }
 
-func (my *AbstractVisitor)      VisitTypeBoundWithArg(n *TypeBound, o interface{})  { my.UnimplementedVisitor("VisitTypeBoundWithArg(TypeBound, interface{})") }
+func (my *AbstractVisitor)     VisitExpressionName(n  *ExpressionName) bool{ return my.UnimplementedVisitor("Visit(*ExpressionName)") }
+func (my *AbstractVisitor)     EndVisitExpressionName(n  *ExpressionName) { my.UnimplementedVisitor("EndVisit(*ExpressionName)") }
 
-func (my *AbstractVisitor)      VisitAdditionalBoundList(n *AdditionalBoundList)  { my.UnimplementedVisitor("VisitAdditionalBoundList(AdditionalBoundList)") }
+func (my *AbstractVisitor)     VisitMethodName(n  *MethodName) bool{ return my.UnimplementedVisitor("Visit(*MethodName)") }
+func (my *AbstractVisitor)     EndVisitMethodName(n  *MethodName) { my.UnimplementedVisitor("EndVisit(*MethodName)") }
 
-func (my *AbstractVisitor)      VisitAdditionalBoundListWithArg(n *AdditionalBoundList, o interface{})  { my.UnimplementedVisitor("VisitAdditionalBoundListWithArg(AdditionalBoundList, interface{})") }
+func (my *AbstractVisitor)     VisitPackageOrTypeName(n  *PackageOrTypeName) bool{ return my.UnimplementedVisitor("Visit(*PackageOrTypeName)") }
+func (my *AbstractVisitor)     EndVisitPackageOrTypeName(n  *PackageOrTypeName) { my.UnimplementedVisitor("EndVisit(*PackageOrTypeName)") }
 
-func (my *AbstractVisitor)      VisitAdditionalBound(n *AdditionalBound)  { my.UnimplementedVisitor("VisitAdditionalBound(AdditionalBound)") }
+func (my *AbstractVisitor)     VisitAmbiguousName(n  *AmbiguousName) bool{ return my.UnimplementedVisitor("Visit(*AmbiguousName)") }
+func (my *AbstractVisitor)     EndVisitAmbiguousName(n  *AmbiguousName) { my.UnimplementedVisitor("EndVisit(*AmbiguousName)") }
 
-func (my *AbstractVisitor)      VisitAdditionalBoundWithArg(n *AdditionalBound, o interface{})  { my.UnimplementedVisitor("VisitAdditionalBoundWithArg(AdditionalBound, interface{})") }
+func (my *AbstractVisitor)     VisitCompilationUnit(n  *CompilationUnit) bool{ return my.UnimplementedVisitor("Visit(*CompilationUnit)") }
+func (my *AbstractVisitor)     EndVisitCompilationUnit(n  *CompilationUnit) { my.UnimplementedVisitor("EndVisit(*CompilationUnit)") }
 
-func (my *AbstractVisitor)      VisitTypeArguments(n *TypeArguments)  { my.UnimplementedVisitor("VisitTypeArguments(TypeArguments)") }
+func (my *AbstractVisitor)     VisitImportDeclarations(n  *ImportDeclarations) bool{ return my.UnimplementedVisitor("Visit(*ImportDeclarations)") }
+func (my *AbstractVisitor)     EndVisitImportDeclarations(n  *ImportDeclarations) { my.UnimplementedVisitor("EndVisit(*ImportDeclarations)") }
 
-func (my *AbstractVisitor)      VisitTypeArgumentsWithArg(n *TypeArguments, o interface{})  { my.UnimplementedVisitor("VisitTypeArgumentsWithArg(TypeArguments, interface{})") }
+func (my *AbstractVisitor)     VisitTypeDeclarations(n  *TypeDeclarations) bool{ return my.UnimplementedVisitor("Visit(*TypeDeclarations)") }
+func (my *AbstractVisitor)     EndVisitTypeDeclarations(n  *TypeDeclarations) { my.UnimplementedVisitor("EndVisit(*TypeDeclarations)") }
 
-func (my *AbstractVisitor)      VisitActualTypeArgumentList(n *ActualTypeArgumentList)  { my.UnimplementedVisitor("VisitActualTypeArgumentList(ActualTypeArgumentList)") }
+func (my *AbstractVisitor)     VisitPackageDeclaration(n  *PackageDeclaration) bool{ return my.UnimplementedVisitor("Visit(*PackageDeclaration)") }
+func (my *AbstractVisitor)     EndVisitPackageDeclaration(n  *PackageDeclaration) { my.UnimplementedVisitor("EndVisit(*PackageDeclaration)") }
 
-func (my *AbstractVisitor)      VisitActualTypeArgumentListWithArg(n *ActualTypeArgumentList, o interface{})  { my.UnimplementedVisitor("VisitActualTypeArgumentListWithArg(ActualTypeArgumentList, interface{})") }
+func (my *AbstractVisitor)     VisitSingleTypeImportDeclaration(n  *SingleTypeImportDeclaration) bool{ return my.UnimplementedVisitor("Visit(*SingleTypeImportDeclaration)") }
+func (my *AbstractVisitor)     EndVisitSingleTypeImportDeclaration(n  *SingleTypeImportDeclaration) { my.UnimplementedVisitor("EndVisit(*SingleTypeImportDeclaration)") }
 
-func (my *AbstractVisitor)      VisitWildcard(n *Wildcard)  { my.UnimplementedVisitor("VisitWildcard(Wildcard)") }
+func (my *AbstractVisitor)     VisitTypeImportOnDemandDeclaration(n  *TypeImportOnDemandDeclaration) bool{ return my.UnimplementedVisitor("Visit(*TypeImportOnDemandDeclaration)") }
+func (my *AbstractVisitor)     EndVisitTypeImportOnDemandDeclaration(n  *TypeImportOnDemandDeclaration) { my.UnimplementedVisitor("EndVisit(*TypeImportOnDemandDeclaration)") }
 
-func (my *AbstractVisitor)      VisitWildcardWithArg(n *Wildcard, o interface{})  { my.UnimplementedVisitor("VisitWildcardWithArg(Wildcard, interface{})") }
+func (my *AbstractVisitor)     VisitSingleStaticImportDeclaration(n  *SingleStaticImportDeclaration) bool{ return my.UnimplementedVisitor("Visit(*SingleStaticImportDeclaration)") }
+func (my *AbstractVisitor)     EndVisitSingleStaticImportDeclaration(n  *SingleStaticImportDeclaration) { my.UnimplementedVisitor("EndVisit(*SingleStaticImportDeclaration)") }
 
-func (my *AbstractVisitor)      VisitPackageName(n *PackageName)  { my.UnimplementedVisitor("VisitPackageName(PackageName)") }
+func (my *AbstractVisitor)     VisitStaticImportOnDemandDeclaration(n  *StaticImportOnDemandDeclaration) bool{ return my.UnimplementedVisitor("Visit(*StaticImportOnDemandDeclaration)") }
+func (my *AbstractVisitor)     EndVisitStaticImportOnDemandDeclaration(n  *StaticImportOnDemandDeclaration) { my.UnimplementedVisitor("EndVisit(*StaticImportOnDemandDeclaration)") }
 
-func (my *AbstractVisitor)      VisitPackageNameWithArg(n *PackageName, o interface{})  { my.UnimplementedVisitor("VisitPackageNameWithArg(PackageName, interface{})") }
+func (my *AbstractVisitor)     VisitTypeDeclaration(n  *TypeDeclaration) bool{ return my.UnimplementedVisitor("Visit(*TypeDeclaration)") }
+func (my *AbstractVisitor)     EndVisitTypeDeclaration(n  *TypeDeclaration) { my.UnimplementedVisitor("EndVisit(*TypeDeclaration)") }
 
-func (my *AbstractVisitor)      VisitExpressionName(n *ExpressionName)  { my.UnimplementedVisitor("VisitExpressionName(ExpressionName)") }
+func (my *AbstractVisitor)     VisitNormalClassDeclaration(n  *NormalClassDeclaration) bool{ return my.UnimplementedVisitor("Visit(*NormalClassDeclaration)") }
+func (my *AbstractVisitor)     EndVisitNormalClassDeclaration(n  *NormalClassDeclaration) { my.UnimplementedVisitor("EndVisit(*NormalClassDeclaration)") }
 
-func (my *AbstractVisitor)      VisitExpressionNameWithArg(n *ExpressionName, o interface{})  { my.UnimplementedVisitor("VisitExpressionNameWithArg(ExpressionName, interface{})") }
+func (my *AbstractVisitor)     VisitClassModifiers(n  *ClassModifiers) bool{ return my.UnimplementedVisitor("Visit(*ClassModifiers)") }
+func (my *AbstractVisitor)     EndVisitClassModifiers(n  *ClassModifiers) { my.UnimplementedVisitor("EndVisit(*ClassModifiers)") }
 
-func (my *AbstractVisitor)      VisitMethodName(n *MethodName)  { my.UnimplementedVisitor("VisitMethodName(MethodName)") }
+func (my *AbstractVisitor)     VisitTypeParameters(n  *TypeParameters) bool{ return my.UnimplementedVisitor("Visit(*TypeParameters)") }
+func (my *AbstractVisitor)     EndVisitTypeParameters(n  *TypeParameters) { my.UnimplementedVisitor("EndVisit(*TypeParameters)") }
 
-func (my *AbstractVisitor)      VisitMethodNameWithArg(n *MethodName, o interface{})  { my.UnimplementedVisitor("VisitMethodNameWithArg(MethodName, interface{})") }
+func (my *AbstractVisitor)     VisitTypeParameterList(n  *TypeParameterList) bool{ return my.UnimplementedVisitor("Visit(*TypeParameterList)") }
+func (my *AbstractVisitor)     EndVisitTypeParameterList(n  *TypeParameterList) { my.UnimplementedVisitor("EndVisit(*TypeParameterList)") }
 
-func (my *AbstractVisitor)      VisitPackageOrTypeName(n *PackageOrTypeName)  { my.UnimplementedVisitor("VisitPackageOrTypeName(PackageOrTypeName)") }
+func (my *AbstractVisitor)     VisitSuper(n  *Super) bool{ return my.UnimplementedVisitor("Visit(*Super)") }
+func (my *AbstractVisitor)     EndVisitSuper(n  *Super) { my.UnimplementedVisitor("EndVisit(*Super)") }
 
-func (my *AbstractVisitor)      VisitPackageOrTypeNameWithArg(n *PackageOrTypeName, o interface{})  { my.UnimplementedVisitor("VisitPackageOrTypeNameWithArg(PackageOrTypeName, interface{})") }
+func (my *AbstractVisitor)     VisitInterfaces(n  *Interfaces) bool{ return my.UnimplementedVisitor("Visit(*Interfaces)") }
+func (my *AbstractVisitor)     EndVisitInterfaces(n  *Interfaces) { my.UnimplementedVisitor("EndVisit(*Interfaces)") }
 
-func (my *AbstractVisitor)      VisitAmbiguousName(n *AmbiguousName)  { my.UnimplementedVisitor("VisitAmbiguousName(AmbiguousName)") }
+func (my *AbstractVisitor)     VisitInterfaceTypeList(n  *InterfaceTypeList) bool{ return my.UnimplementedVisitor("Visit(*InterfaceTypeList)") }
+func (my *AbstractVisitor)     EndVisitInterfaceTypeList(n  *InterfaceTypeList) { my.UnimplementedVisitor("EndVisit(*InterfaceTypeList)") }
 
-func (my *AbstractVisitor)      VisitAmbiguousNameWithArg(n *AmbiguousName, o interface{})  { my.UnimplementedVisitor("VisitAmbiguousNameWithArg(AmbiguousName, interface{})") }
+func (my *AbstractVisitor)     VisitClassBody(n  *ClassBody) bool{ return my.UnimplementedVisitor("Visit(*ClassBody)") }
+func (my *AbstractVisitor)     EndVisitClassBody(n  *ClassBody) { my.UnimplementedVisitor("EndVisit(*ClassBody)") }
 
-func (my *AbstractVisitor)      VisitCompilationUnit(n *CompilationUnit)  { my.UnimplementedVisitor("VisitCompilationUnit(CompilationUnit)") }
+func (my *AbstractVisitor)     VisitClassBodyDeclarations(n  *ClassBodyDeclarations) bool{ return my.UnimplementedVisitor("Visit(*ClassBodyDeclarations)") }
+func (my *AbstractVisitor)     EndVisitClassBodyDeclarations(n  *ClassBodyDeclarations) { my.UnimplementedVisitor("EndVisit(*ClassBodyDeclarations)") }
 
-func (my *AbstractVisitor)      VisitCompilationUnitWithArg(n *CompilationUnit, o interface{})  { my.UnimplementedVisitor("VisitCompilationUnitWithArg(CompilationUnit, interface{})") }
+func (my *AbstractVisitor)     VisitClassMemberDeclaration(n  *ClassMemberDeclaration) bool{ return my.UnimplementedVisitor("Visit(*ClassMemberDeclaration)") }
+func (my *AbstractVisitor)     EndVisitClassMemberDeclaration(n  *ClassMemberDeclaration) { my.UnimplementedVisitor("EndVisit(*ClassMemberDeclaration)") }
 
-func (my *AbstractVisitor)      VisitImportDeclarations(n *ImportDeclarations)  { my.UnimplementedVisitor("VisitImportDeclarations(ImportDeclarations)") }
+func (my *AbstractVisitor)     VisitFieldDeclaration(n  *FieldDeclaration) bool{ return my.UnimplementedVisitor("Visit(*FieldDeclaration)") }
+func (my *AbstractVisitor)     EndVisitFieldDeclaration(n  *FieldDeclaration) { my.UnimplementedVisitor("EndVisit(*FieldDeclaration)") }
 
-func (my *AbstractVisitor)      VisitImportDeclarationsWithArg(n *ImportDeclarations, o interface{})  { my.UnimplementedVisitor("VisitImportDeclarationsWithArg(ImportDeclarations, interface{})") }
+func (my *AbstractVisitor)     VisitVariableDeclarators(n  *VariableDeclarators) bool{ return my.UnimplementedVisitor("Visit(*VariableDeclarators)") }
+func (my *AbstractVisitor)     EndVisitVariableDeclarators(n  *VariableDeclarators) { my.UnimplementedVisitor("EndVisit(*VariableDeclarators)") }
 
-func (my *AbstractVisitor)      VisitTypeDeclarations(n *TypeDeclarations)  { my.UnimplementedVisitor("VisitTypeDeclarations(TypeDeclarations)") }
+func (my *AbstractVisitor)     VisitVariableDeclarator(n  *VariableDeclarator) bool{ return my.UnimplementedVisitor("Visit(*VariableDeclarator)") }
+func (my *AbstractVisitor)     EndVisitVariableDeclarator(n  *VariableDeclarator) { my.UnimplementedVisitor("EndVisit(*VariableDeclarator)") }
 
-func (my *AbstractVisitor)      VisitTypeDeclarationsWithArg(n *TypeDeclarations, o interface{})  { my.UnimplementedVisitor("VisitTypeDeclarationsWithArg(TypeDeclarations, interface{})") }
+func (my *AbstractVisitor)     VisitVariableDeclaratorId(n  *VariableDeclaratorId) bool{ return my.UnimplementedVisitor("Visit(*VariableDeclaratorId)") }
+func (my *AbstractVisitor)     EndVisitVariableDeclaratorId(n  *VariableDeclaratorId) { my.UnimplementedVisitor("EndVisit(*VariableDeclaratorId)") }
 
-func (my *AbstractVisitor)      VisitPackageDeclaration(n *PackageDeclaration)  { my.UnimplementedVisitor("VisitPackageDeclaration(PackageDeclaration)") }
+func (my *AbstractVisitor)     VisitFieldModifiers(n  *FieldModifiers) bool{ return my.UnimplementedVisitor("Visit(*FieldModifiers)") }
+func (my *AbstractVisitor)     EndVisitFieldModifiers(n  *FieldModifiers) { my.UnimplementedVisitor("EndVisit(*FieldModifiers)") }
 
-func (my *AbstractVisitor)      VisitPackageDeclarationWithArg(n *PackageDeclaration, o interface{})  { my.UnimplementedVisitor("VisitPackageDeclarationWithArg(PackageDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitMethodDeclaration(n  *MethodDeclaration) bool{ return my.UnimplementedVisitor("Visit(*MethodDeclaration)") }
+func (my *AbstractVisitor)     EndVisitMethodDeclaration(n  *MethodDeclaration) { my.UnimplementedVisitor("EndVisit(*MethodDeclaration)") }
 
-func (my *AbstractVisitor)      VisitSingleTypeImportDeclaration(n *SingleTypeImportDeclaration)  { my.UnimplementedVisitor("VisitSingleTypeImportDeclaration(SingleTypeImportDeclaration)") }
+func (my *AbstractVisitor)     VisitMethodHeader(n  *MethodHeader) bool{ return my.UnimplementedVisitor("Visit(*MethodHeader)") }
+func (my *AbstractVisitor)     EndVisitMethodHeader(n  *MethodHeader) { my.UnimplementedVisitor("EndVisit(*MethodHeader)") }
 
-func (my *AbstractVisitor)      VisitSingleTypeImportDeclarationWithArg(n *SingleTypeImportDeclaration, o interface{})  { my.UnimplementedVisitor("VisitSingleTypeImportDeclarationWithArg(SingleTypeImportDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitResultType(n  *ResultType) bool{ return my.UnimplementedVisitor("Visit(*ResultType)") }
+func (my *AbstractVisitor)     EndVisitResultType(n  *ResultType) { my.UnimplementedVisitor("EndVisit(*ResultType)") }
 
-func (my *AbstractVisitor)      VisitTypeImportOnDemandDeclaration(n *TypeImportOnDemandDeclaration)  { my.UnimplementedVisitor("VisitTypeImportOnDemandDeclaration(TypeImportOnDemandDeclaration)") }
+func (my *AbstractVisitor)     VisitFormalParameterList(n  *FormalParameterList) bool{ return my.UnimplementedVisitor("Visit(*FormalParameterList)") }
+func (my *AbstractVisitor)     EndVisitFormalParameterList(n  *FormalParameterList) { my.UnimplementedVisitor("EndVisit(*FormalParameterList)") }
 
-func (my *AbstractVisitor)      VisitTypeImportOnDemandDeclarationWithArg(n *TypeImportOnDemandDeclaration, o interface{})  { my.UnimplementedVisitor("VisitTypeImportOnDemandDeclarationWithArg(TypeImportOnDemandDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitFormalParameters(n  *FormalParameters) bool{ return my.UnimplementedVisitor("Visit(*FormalParameters)") }
+func (my *AbstractVisitor)     EndVisitFormalParameters(n  *FormalParameters) { my.UnimplementedVisitor("EndVisit(*FormalParameters)") }
 
-func (my *AbstractVisitor)      VisitSingleStaticImportDeclaration(n *SingleStaticImportDeclaration)  { my.UnimplementedVisitor("VisitSingleStaticImportDeclaration(SingleStaticImportDeclaration)") }
+func (my *AbstractVisitor)     VisitFormalParameter(n  *FormalParameter) bool{ return my.UnimplementedVisitor("Visit(*FormalParameter)") }
+func (my *AbstractVisitor)     EndVisitFormalParameter(n  *FormalParameter) { my.UnimplementedVisitor("EndVisit(*FormalParameter)") }
 
-func (my *AbstractVisitor)      VisitSingleStaticImportDeclarationWithArg(n *SingleStaticImportDeclaration, o interface{})  { my.UnimplementedVisitor("VisitSingleStaticImportDeclarationWithArg(SingleStaticImportDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitVariableModifiers(n  *VariableModifiers) bool{ return my.UnimplementedVisitor("Visit(*VariableModifiers)") }
+func (my *AbstractVisitor)     EndVisitVariableModifiers(n  *VariableModifiers) { my.UnimplementedVisitor("EndVisit(*VariableModifiers)") }
 
-func (my *AbstractVisitor)      VisitStaticImportOnDemandDeclaration(n *StaticImportOnDemandDeclaration)  { my.UnimplementedVisitor("VisitStaticImportOnDemandDeclaration(StaticImportOnDemandDeclaration)") }
+func (my *AbstractVisitor)     VisitVariableModifier(n  *VariableModifier) bool{ return my.UnimplementedVisitor("Visit(*VariableModifier)") }
+func (my *AbstractVisitor)     EndVisitVariableModifier(n  *VariableModifier) { my.UnimplementedVisitor("EndVisit(*VariableModifier)") }
 
-func (my *AbstractVisitor)      VisitStaticImportOnDemandDeclarationWithArg(n *StaticImportOnDemandDeclaration, o interface{})  { my.UnimplementedVisitor("VisitStaticImportOnDemandDeclarationWithArg(StaticImportOnDemandDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitLastFormalParameter(n  *LastFormalParameter) bool{ return my.UnimplementedVisitor("Visit(*LastFormalParameter)") }
+func (my *AbstractVisitor)     EndVisitLastFormalParameter(n  *LastFormalParameter) { my.UnimplementedVisitor("EndVisit(*LastFormalParameter)") }
 
-func (my *AbstractVisitor)      VisitTypeDeclaration(n *TypeDeclaration)  { my.UnimplementedVisitor("VisitTypeDeclaration(TypeDeclaration)") }
+func (my *AbstractVisitor)     VisitMethodModifiers(n  *MethodModifiers) bool{ return my.UnimplementedVisitor("Visit(*MethodModifiers)") }
+func (my *AbstractVisitor)     EndVisitMethodModifiers(n  *MethodModifiers) { my.UnimplementedVisitor("EndVisit(*MethodModifiers)") }
 
-func (my *AbstractVisitor)      VisitTypeDeclarationWithArg(n *TypeDeclaration, o interface{})  { my.UnimplementedVisitor("VisitTypeDeclarationWithArg(TypeDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitThrows(n  *Throws) bool{ return my.UnimplementedVisitor("Visit(*Throws)") }
+func (my *AbstractVisitor)     EndVisitThrows(n  *Throws) { my.UnimplementedVisitor("EndVisit(*Throws)") }
 
-func (my *AbstractVisitor)      VisitNormalClassDeclaration(n *NormalClassDeclaration)  { my.UnimplementedVisitor("VisitNormalClassDeclaration(NormalClassDeclaration)") }
+func (my *AbstractVisitor)     VisitExceptionTypeList(n  *ExceptionTypeList) bool{ return my.UnimplementedVisitor("Visit(*ExceptionTypeList)") }
+func (my *AbstractVisitor)     EndVisitExceptionTypeList(n  *ExceptionTypeList) { my.UnimplementedVisitor("EndVisit(*ExceptionTypeList)") }
 
-func (my *AbstractVisitor)      VisitNormalClassDeclarationWithArg(n *NormalClassDeclaration, o interface{})  { my.UnimplementedVisitor("VisitNormalClassDeclarationWithArg(NormalClassDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitMethodBody(n  *MethodBody) bool{ return my.UnimplementedVisitor("Visit(*MethodBody)") }
+func (my *AbstractVisitor)     EndVisitMethodBody(n  *MethodBody) { my.UnimplementedVisitor("EndVisit(*MethodBody)") }
 
-func (my *AbstractVisitor)      VisitClassModifiers(n *ClassModifiers)  { my.UnimplementedVisitor("VisitClassModifiers(ClassModifiers)") }
+func (my *AbstractVisitor)     VisitStaticInitializer(n  *StaticInitializer) bool{ return my.UnimplementedVisitor("Visit(*StaticInitializer)") }
+func (my *AbstractVisitor)     EndVisitStaticInitializer(n  *StaticInitializer) { my.UnimplementedVisitor("EndVisit(*StaticInitializer)") }
 
-func (my *AbstractVisitor)      VisitClassModifiersWithArg(n *ClassModifiers, o interface{})  { my.UnimplementedVisitor("VisitClassModifiersWithArg(ClassModifiers, interface{})") }
+func (my *AbstractVisitor)     VisitConstructorDeclaration(n  *ConstructorDeclaration) bool{ return my.UnimplementedVisitor("Visit(*ConstructorDeclaration)") }
+func (my *AbstractVisitor)     EndVisitConstructorDeclaration(n  *ConstructorDeclaration) { my.UnimplementedVisitor("EndVisit(*ConstructorDeclaration)") }
 
-func (my *AbstractVisitor)      VisitTypeParameters(n *TypeParameters)  { my.UnimplementedVisitor("VisitTypeParameters(TypeParameters)") }
+func (my *AbstractVisitor)     VisitConstructorDeclarator(n  *ConstructorDeclarator) bool{ return my.UnimplementedVisitor("Visit(*ConstructorDeclarator)") }
+func (my *AbstractVisitor)     EndVisitConstructorDeclarator(n  *ConstructorDeclarator) { my.UnimplementedVisitor("EndVisit(*ConstructorDeclarator)") }
 
-func (my *AbstractVisitor)      VisitTypeParametersWithArg(n *TypeParameters, o interface{})  { my.UnimplementedVisitor("VisitTypeParametersWithArg(TypeParameters, interface{})") }
+func (my *AbstractVisitor)     VisitConstructorModifiers(n  *ConstructorModifiers) bool{ return my.UnimplementedVisitor("Visit(*ConstructorModifiers)") }
+func (my *AbstractVisitor)     EndVisitConstructorModifiers(n  *ConstructorModifiers) { my.UnimplementedVisitor("EndVisit(*ConstructorModifiers)") }
 
-func (my *AbstractVisitor)      VisitTypeParameterList(n *TypeParameterList)  { my.UnimplementedVisitor("VisitTypeParameterList(TypeParameterList)") }
+func (my *AbstractVisitor)     VisitConstructorBody(n  *ConstructorBody) bool{ return my.UnimplementedVisitor("Visit(*ConstructorBody)") }
+func (my *AbstractVisitor)     EndVisitConstructorBody(n  *ConstructorBody) { my.UnimplementedVisitor("EndVisit(*ConstructorBody)") }
 
-func (my *AbstractVisitor)      VisitTypeParameterListWithArg(n *TypeParameterList, o interface{})  { my.UnimplementedVisitor("VisitTypeParameterListWithArg(TypeParameterList, interface{})") }
+func (my *AbstractVisitor)     VisitEnumDeclaration(n  *EnumDeclaration) bool{ return my.UnimplementedVisitor("Visit(*EnumDeclaration)") }
+func (my *AbstractVisitor)     EndVisitEnumDeclaration(n  *EnumDeclaration) { my.UnimplementedVisitor("EndVisit(*EnumDeclaration)") }
 
-func (my *AbstractVisitor)      VisitSuper(n *Super)  { my.UnimplementedVisitor("VisitSuper(Super)") }
+func (my *AbstractVisitor)     VisitEnumBody(n  *EnumBody) bool{ return my.UnimplementedVisitor("Visit(*EnumBody)") }
+func (my *AbstractVisitor)     EndVisitEnumBody(n  *EnumBody) { my.UnimplementedVisitor("EndVisit(*EnumBody)") }
 
-func (my *AbstractVisitor)      VisitSuperWithArg(n *Super, o interface{})  { my.UnimplementedVisitor("VisitSuperWithArg(Super, interface{})") }
+func (my *AbstractVisitor)     VisitEnumConstants(n  *EnumConstants) bool{ return my.UnimplementedVisitor("Visit(*EnumConstants)") }
+func (my *AbstractVisitor)     EndVisitEnumConstants(n  *EnumConstants) { my.UnimplementedVisitor("EndVisit(*EnumConstants)") }
 
-func (my *AbstractVisitor)      VisitInterfaces(n *Interfaces)  { my.UnimplementedVisitor("VisitInterfaces(Interfaces)") }
+func (my *AbstractVisitor)     VisitEnumConstant(n  *EnumConstant) bool{ return my.UnimplementedVisitor("Visit(*EnumConstant)") }
+func (my *AbstractVisitor)     EndVisitEnumConstant(n  *EnumConstant) { my.UnimplementedVisitor("EndVisit(*EnumConstant)") }
 
-func (my *AbstractVisitor)      VisitInterfacesWithArg(n *Interfaces, o interface{})  { my.UnimplementedVisitor("VisitInterfacesWithArg(Interfaces, interface{})") }
+func (my *AbstractVisitor)     VisitArguments(n  *Arguments) bool{ return my.UnimplementedVisitor("Visit(*Arguments)") }
+func (my *AbstractVisitor)     EndVisitArguments(n  *Arguments) { my.UnimplementedVisitor("EndVisit(*Arguments)") }
 
-func (my *AbstractVisitor)      VisitInterfaceTypeList(n *InterfaceTypeList)  { my.UnimplementedVisitor("VisitInterfaceTypeList(InterfaceTypeList)") }
+func (my *AbstractVisitor)     VisitEnumBodyDeclarations(n  *EnumBodyDeclarations) bool{ return my.UnimplementedVisitor("Visit(*EnumBodyDeclarations)") }
+func (my *AbstractVisitor)     EndVisitEnumBodyDeclarations(n  *EnumBodyDeclarations) { my.UnimplementedVisitor("EndVisit(*EnumBodyDeclarations)") }
 
-func (my *AbstractVisitor)      VisitInterfaceTypeListWithArg(n *InterfaceTypeList, o interface{})  { my.UnimplementedVisitor("VisitInterfaceTypeListWithArg(InterfaceTypeList, interface{})") }
+func (my *AbstractVisitor)     VisitNormalInterfaceDeclaration(n  *NormalInterfaceDeclaration) bool{ return my.UnimplementedVisitor("Visit(*NormalInterfaceDeclaration)") }
+func (my *AbstractVisitor)     EndVisitNormalInterfaceDeclaration(n  *NormalInterfaceDeclaration) { my.UnimplementedVisitor("EndVisit(*NormalInterfaceDeclaration)") }
 
-func (my *AbstractVisitor)      VisitClassBody(n *ClassBody)  { my.UnimplementedVisitor("VisitClassBody(ClassBody)") }
+func (my *AbstractVisitor)     VisitInterfaceModifiers(n  *InterfaceModifiers) bool{ return my.UnimplementedVisitor("Visit(*InterfaceModifiers)") }
+func (my *AbstractVisitor)     EndVisitInterfaceModifiers(n  *InterfaceModifiers) { my.UnimplementedVisitor("EndVisit(*InterfaceModifiers)") }
 
-func (my *AbstractVisitor)      VisitClassBodyWithArg(n *ClassBody, o interface{})  { my.UnimplementedVisitor("VisitClassBodyWithArg(ClassBody, interface{})") }
+func (my *AbstractVisitor)     VisitInterfaceBody(n  *InterfaceBody) bool{ return my.UnimplementedVisitor("Visit(*InterfaceBody)") }
+func (my *AbstractVisitor)     EndVisitInterfaceBody(n  *InterfaceBody) { my.UnimplementedVisitor("EndVisit(*InterfaceBody)") }
 
-func (my *AbstractVisitor)      VisitClassBodyDeclarations(n *ClassBodyDeclarations)  { my.UnimplementedVisitor("VisitClassBodyDeclarations(ClassBodyDeclarations)") }
+func (my *AbstractVisitor)     VisitInterfaceMemberDeclarations(n  *InterfaceMemberDeclarations) bool{ return my.UnimplementedVisitor("Visit(*InterfaceMemberDeclarations)") }
+func (my *AbstractVisitor)     EndVisitInterfaceMemberDeclarations(n  *InterfaceMemberDeclarations) { my.UnimplementedVisitor("EndVisit(*InterfaceMemberDeclarations)") }
 
-func (my *AbstractVisitor)      VisitClassBodyDeclarationsWithArg(n *ClassBodyDeclarations, o interface{})  { my.UnimplementedVisitor("VisitClassBodyDeclarationsWithArg(ClassBodyDeclarations, interface{})") }
+func (my *AbstractVisitor)     VisitInterfaceMemberDeclaration(n  *InterfaceMemberDeclaration) bool{ return my.UnimplementedVisitor("Visit(*InterfaceMemberDeclaration)") }
+func (my *AbstractVisitor)     EndVisitInterfaceMemberDeclaration(n  *InterfaceMemberDeclaration) { my.UnimplementedVisitor("EndVisit(*InterfaceMemberDeclaration)") }
 
-func (my *AbstractVisitor)      VisitClassMemberDeclaration(n *ClassMemberDeclaration)  { my.UnimplementedVisitor("VisitClassMemberDeclaration(ClassMemberDeclaration)") }
+func (my *AbstractVisitor)     VisitConstantDeclaration(n  *ConstantDeclaration) bool{ return my.UnimplementedVisitor("Visit(*ConstantDeclaration)") }
+func (my *AbstractVisitor)     EndVisitConstantDeclaration(n  *ConstantDeclaration) { my.UnimplementedVisitor("EndVisit(*ConstantDeclaration)") }
 
-func (my *AbstractVisitor)      VisitClassMemberDeclarationWithArg(n *ClassMemberDeclaration, o interface{})  { my.UnimplementedVisitor("VisitClassMemberDeclarationWithArg(ClassMemberDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitConstantModifiers(n  *ConstantModifiers) bool{ return my.UnimplementedVisitor("Visit(*ConstantModifiers)") }
+func (my *AbstractVisitor)     EndVisitConstantModifiers(n  *ConstantModifiers) { my.UnimplementedVisitor("EndVisit(*ConstantModifiers)") }
 
-func (my *AbstractVisitor)      VisitFieldDeclaration(n *FieldDeclaration)  { my.UnimplementedVisitor("VisitFieldDeclaration(FieldDeclaration)") }
+func (my *AbstractVisitor)     VisitAbstractMethodDeclaration(n  *AbstractMethodDeclaration) bool{ return my.UnimplementedVisitor("Visit(*AbstractMethodDeclaration)") }
+func (my *AbstractVisitor)     EndVisitAbstractMethodDeclaration(n  *AbstractMethodDeclaration) { my.UnimplementedVisitor("EndVisit(*AbstractMethodDeclaration)") }
 
-func (my *AbstractVisitor)      VisitFieldDeclarationWithArg(n *FieldDeclaration, o interface{})  { my.UnimplementedVisitor("VisitFieldDeclarationWithArg(FieldDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitAbstractMethodModifiers(n  *AbstractMethodModifiers) bool{ return my.UnimplementedVisitor("Visit(*AbstractMethodModifiers)") }
+func (my *AbstractVisitor)     EndVisitAbstractMethodModifiers(n  *AbstractMethodModifiers) { my.UnimplementedVisitor("EndVisit(*AbstractMethodModifiers)") }
 
-func (my *AbstractVisitor)      VisitVariableDeclarators(n *VariableDeclarators)  { my.UnimplementedVisitor("VisitVariableDeclarators(VariableDeclarators)") }
+func (my *AbstractVisitor)     VisitAnnotationTypeDeclaration(n  *AnnotationTypeDeclaration) bool{ return my.UnimplementedVisitor("Visit(*AnnotationTypeDeclaration)") }
+func (my *AbstractVisitor)     EndVisitAnnotationTypeDeclaration(n  *AnnotationTypeDeclaration) { my.UnimplementedVisitor("EndVisit(*AnnotationTypeDeclaration)") }
 
-func (my *AbstractVisitor)      VisitVariableDeclaratorsWithArg(n *VariableDeclarators, o interface{})  { my.UnimplementedVisitor("VisitVariableDeclaratorsWithArg(VariableDeclarators, interface{})") }
+func (my *AbstractVisitor)     VisitAnnotationTypeBody(n  *AnnotationTypeBody) bool{ return my.UnimplementedVisitor("Visit(*AnnotationTypeBody)") }
+func (my *AbstractVisitor)     EndVisitAnnotationTypeBody(n  *AnnotationTypeBody) { my.UnimplementedVisitor("EndVisit(*AnnotationTypeBody)") }
 
-func (my *AbstractVisitor)      VisitVariableDeclarator(n *VariableDeclarator)  { my.UnimplementedVisitor("VisitVariableDeclarator(VariableDeclarator)") }
+func (my *AbstractVisitor)     VisitAnnotationTypeElementDeclarations(n  *AnnotationTypeElementDeclarations) bool{ return my.UnimplementedVisitor("Visit(*AnnotationTypeElementDeclarations)") }
+func (my *AbstractVisitor)     EndVisitAnnotationTypeElementDeclarations(n  *AnnotationTypeElementDeclarations) { my.UnimplementedVisitor("EndVisit(*AnnotationTypeElementDeclarations)") }
 
-func (my *AbstractVisitor)      VisitVariableDeclaratorWithArg(n *VariableDeclarator, o interface{})  { my.UnimplementedVisitor("VisitVariableDeclaratorWithArg(VariableDeclarator, interface{})") }
+func (my *AbstractVisitor)     VisitDefaultValue(n  *DefaultValue) bool{ return my.UnimplementedVisitor("Visit(*DefaultValue)") }
+func (my *AbstractVisitor)     EndVisitDefaultValue(n  *DefaultValue) { my.UnimplementedVisitor("EndVisit(*DefaultValue)") }
 
-func (my *AbstractVisitor)      VisitVariableDeclaratorId(n *VariableDeclaratorId)  { my.UnimplementedVisitor("VisitVariableDeclaratorId(VariableDeclaratorId)") }
+func (my *AbstractVisitor)     VisitAnnotations(n  *Annotations) bool{ return my.UnimplementedVisitor("Visit(*Annotations)") }
+func (my *AbstractVisitor)     EndVisitAnnotations(n  *Annotations) { my.UnimplementedVisitor("EndVisit(*Annotations)") }
 
-func (my *AbstractVisitor)      VisitVariableDeclaratorIdWithArg(n *VariableDeclaratorId, o interface{})  { my.UnimplementedVisitor("VisitVariableDeclaratorIdWithArg(VariableDeclaratorId, interface{})") }
+func (my *AbstractVisitor)     VisitNormalAnnotation(n  *NormalAnnotation) bool{ return my.UnimplementedVisitor("Visit(*NormalAnnotation)") }
+func (my *AbstractVisitor)     EndVisitNormalAnnotation(n  *NormalAnnotation) { my.UnimplementedVisitor("EndVisit(*NormalAnnotation)") }
 
-func (my *AbstractVisitor)      VisitFieldModifiers(n *FieldModifiers)  { my.UnimplementedVisitor("VisitFieldModifiers(FieldModifiers)") }
+func (my *AbstractVisitor)     VisitElementValuePairs(n  *ElementValuePairs) bool{ return my.UnimplementedVisitor("Visit(*ElementValuePairs)") }
+func (my *AbstractVisitor)     EndVisitElementValuePairs(n  *ElementValuePairs) { my.UnimplementedVisitor("EndVisit(*ElementValuePairs)") }
 
-func (my *AbstractVisitor)      VisitFieldModifiersWithArg(n *FieldModifiers, o interface{})  { my.UnimplementedVisitor("VisitFieldModifiersWithArg(FieldModifiers, interface{})") }
+func (my *AbstractVisitor)     VisitElementValuePair(n  *ElementValuePair) bool{ return my.UnimplementedVisitor("Visit(*ElementValuePair)") }
+func (my *AbstractVisitor)     EndVisitElementValuePair(n  *ElementValuePair) { my.UnimplementedVisitor("EndVisit(*ElementValuePair)") }
 
-func (my *AbstractVisitor)      VisitMethodDeclaration(n *MethodDeclaration)  { my.UnimplementedVisitor("VisitMethodDeclaration(MethodDeclaration)") }
+func (my *AbstractVisitor)     VisitElementValueArrayInitializer(n  *ElementValueArrayInitializer) bool{ return my.UnimplementedVisitor("Visit(*ElementValueArrayInitializer)") }
+func (my *AbstractVisitor)     EndVisitElementValueArrayInitializer(n  *ElementValueArrayInitializer) { my.UnimplementedVisitor("EndVisit(*ElementValueArrayInitializer)") }
 
-func (my *AbstractVisitor)      VisitMethodDeclarationWithArg(n *MethodDeclaration, o interface{})  { my.UnimplementedVisitor("VisitMethodDeclarationWithArg(MethodDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitElementValues(n  *ElementValues) bool{ return my.UnimplementedVisitor("Visit(*ElementValues)") }
+func (my *AbstractVisitor)     EndVisitElementValues(n  *ElementValues) { my.UnimplementedVisitor("EndVisit(*ElementValues)") }
 
-func (my *AbstractVisitor)      VisitMethodHeader(n *MethodHeader)  { my.UnimplementedVisitor("VisitMethodHeader(MethodHeader)") }
+func (my *AbstractVisitor)     VisitMarkerAnnotation(n  *MarkerAnnotation) bool{ return my.UnimplementedVisitor("Visit(*MarkerAnnotation)") }
+func (my *AbstractVisitor)     EndVisitMarkerAnnotation(n  *MarkerAnnotation) { my.UnimplementedVisitor("EndVisit(*MarkerAnnotation)") }
 
-func (my *AbstractVisitor)      VisitMethodHeaderWithArg(n *MethodHeader, o interface{})  { my.UnimplementedVisitor("VisitMethodHeaderWithArg(MethodHeader, interface{})") }
+func (my *AbstractVisitor)     VisitSingleElementAnnotation(n  *SingleElementAnnotation) bool{ return my.UnimplementedVisitor("Visit(*SingleElementAnnotation)") }
+func (my *AbstractVisitor)     EndVisitSingleElementAnnotation(n  *SingleElementAnnotation) { my.UnimplementedVisitor("EndVisit(*SingleElementAnnotation)") }
 
-func (my *AbstractVisitor)      VisitResultType(n *ResultType)  { my.UnimplementedVisitor("VisitResultType(ResultType)") }
+func (my *AbstractVisitor)     VisitArrayInitializer(n  *ArrayInitializer) bool{ return my.UnimplementedVisitor("Visit(*ArrayInitializer)") }
+func (my *AbstractVisitor)     EndVisitArrayInitializer(n  *ArrayInitializer) { my.UnimplementedVisitor("EndVisit(*ArrayInitializer)") }
 
-func (my *AbstractVisitor)      VisitResultTypeWithArg(n *ResultType, o interface{})  { my.UnimplementedVisitor("VisitResultTypeWithArg(ResultType, interface{})") }
+func (my *AbstractVisitor)     VisitVariableInitializers(n  *VariableInitializers) bool{ return my.UnimplementedVisitor("Visit(*VariableInitializers)") }
+func (my *AbstractVisitor)     EndVisitVariableInitializers(n  *VariableInitializers) { my.UnimplementedVisitor("EndVisit(*VariableInitializers)") }
 
-func (my *AbstractVisitor)      VisitFormalParameterList(n *FormalParameterList)  { my.UnimplementedVisitor("VisitFormalParameterList(FormalParameterList)") }
+func (my *AbstractVisitor)     VisitBlock(n  *Block) bool{ return my.UnimplementedVisitor("Visit(*Block)") }
+func (my *AbstractVisitor)     EndVisitBlock(n  *Block) { my.UnimplementedVisitor("EndVisit(*Block)") }
 
-func (my *AbstractVisitor)      VisitFormalParameterListWithArg(n *FormalParameterList, o interface{})  { my.UnimplementedVisitor("VisitFormalParameterListWithArg(FormalParameterList, interface{})") }
+func (my *AbstractVisitor)     VisitBlockStatements(n  *BlockStatements) bool{ return my.UnimplementedVisitor("Visit(*BlockStatements)") }
+func (my *AbstractVisitor)     EndVisitBlockStatements(n  *BlockStatements) { my.UnimplementedVisitor("EndVisit(*BlockStatements)") }
 
-func (my *AbstractVisitor)      VisitFormalParameters(n *FormalParameters)  { my.UnimplementedVisitor("VisitFormalParameters(FormalParameters)") }
+func (my *AbstractVisitor)     VisitLocalVariableDeclarationStatement(n  *LocalVariableDeclarationStatement) bool{ return my.UnimplementedVisitor("Visit(*LocalVariableDeclarationStatement)") }
+func (my *AbstractVisitor)     EndVisitLocalVariableDeclarationStatement(n  *LocalVariableDeclarationStatement) { my.UnimplementedVisitor("EndVisit(*LocalVariableDeclarationStatement)") }
 
-func (my *AbstractVisitor)      VisitFormalParametersWithArg(n *FormalParameters, o interface{})  { my.UnimplementedVisitor("VisitFormalParametersWithArg(FormalParameters, interface{})") }
+func (my *AbstractVisitor)     VisitLocalVariableDeclaration(n  *LocalVariableDeclaration) bool{ return my.UnimplementedVisitor("Visit(*LocalVariableDeclaration)") }
+func (my *AbstractVisitor)     EndVisitLocalVariableDeclaration(n  *LocalVariableDeclaration) { my.UnimplementedVisitor("EndVisit(*LocalVariableDeclaration)") }
 
-func (my *AbstractVisitor)      VisitFormalParameter(n *FormalParameter)  { my.UnimplementedVisitor("VisitFormalParameter(FormalParameter)") }
+func (my *AbstractVisitor)     VisitIfThenStatement(n  *IfThenStatement) bool{ return my.UnimplementedVisitor("Visit(*IfThenStatement)") }
+func (my *AbstractVisitor)     EndVisitIfThenStatement(n  *IfThenStatement) { my.UnimplementedVisitor("EndVisit(*IfThenStatement)") }
 
-func (my *AbstractVisitor)      VisitFormalParameterWithArg(n *FormalParameter, o interface{})  { my.UnimplementedVisitor("VisitFormalParameterWithArg(FormalParameter, interface{})") }
+func (my *AbstractVisitor)     VisitIfThenElseStatement(n  *IfThenElseStatement) bool{ return my.UnimplementedVisitor("Visit(*IfThenElseStatement)") }
+func (my *AbstractVisitor)     EndVisitIfThenElseStatement(n  *IfThenElseStatement) { my.UnimplementedVisitor("EndVisit(*IfThenElseStatement)") }
 
-func (my *AbstractVisitor)      VisitVariableModifiers(n *VariableModifiers)  { my.UnimplementedVisitor("VisitVariableModifiers(VariableModifiers)") }
+func (my *AbstractVisitor)     VisitIfThenElseStatementNoShortIf(n  *IfThenElseStatementNoShortIf) bool{ return my.UnimplementedVisitor("Visit(*IfThenElseStatementNoShortIf)") }
+func (my *AbstractVisitor)     EndVisitIfThenElseStatementNoShortIf(n  *IfThenElseStatementNoShortIf) { my.UnimplementedVisitor("EndVisit(*IfThenElseStatementNoShortIf)") }
 
-func (my *AbstractVisitor)      VisitVariableModifiersWithArg(n *VariableModifiers, o interface{})  { my.UnimplementedVisitor("VisitVariableModifiersWithArg(VariableModifiers, interface{})") }
+func (my *AbstractVisitor)     VisitEmptyStatement(n  *EmptyStatement) bool{ return my.UnimplementedVisitor("Visit(*EmptyStatement)") }
+func (my *AbstractVisitor)     EndVisitEmptyStatement(n  *EmptyStatement) { my.UnimplementedVisitor("EndVisit(*EmptyStatement)") }
 
-func (my *AbstractVisitor)      VisitVariableModifier(n *VariableModifier)  { my.UnimplementedVisitor("VisitVariableModifier(VariableModifier)") }
+func (my *AbstractVisitor)     VisitLabeledStatement(n  *LabeledStatement) bool{ return my.UnimplementedVisitor("Visit(*LabeledStatement)") }
+func (my *AbstractVisitor)     EndVisitLabeledStatement(n  *LabeledStatement) { my.UnimplementedVisitor("EndVisit(*LabeledStatement)") }
 
-func (my *AbstractVisitor)      VisitVariableModifierWithArg(n *VariableModifier, o interface{})  { my.UnimplementedVisitor("VisitVariableModifierWithArg(VariableModifier, interface{})") }
+func (my *AbstractVisitor)     VisitLabeledStatementNoShortIf(n  *LabeledStatementNoShortIf) bool{ return my.UnimplementedVisitor("Visit(*LabeledStatementNoShortIf)") }
+func (my *AbstractVisitor)     EndVisitLabeledStatementNoShortIf(n  *LabeledStatementNoShortIf) { my.UnimplementedVisitor("EndVisit(*LabeledStatementNoShortIf)") }
 
-func (my *AbstractVisitor)      VisitLastFormalParameter(n *LastFormalParameter)  { my.UnimplementedVisitor("VisitLastFormalParameter(LastFormalParameter)") }
+func (my *AbstractVisitor)     VisitExpressionStatement(n  *ExpressionStatement) bool{ return my.UnimplementedVisitor("Visit(*ExpressionStatement)") }
+func (my *AbstractVisitor)     EndVisitExpressionStatement(n  *ExpressionStatement) { my.UnimplementedVisitor("EndVisit(*ExpressionStatement)") }
 
-func (my *AbstractVisitor)      VisitLastFormalParameterWithArg(n *LastFormalParameter, o interface{})  { my.UnimplementedVisitor("VisitLastFormalParameterWithArg(LastFormalParameter, interface{})") }
+func (my *AbstractVisitor)     VisitSwitchStatement(n  *SwitchStatement) bool{ return my.UnimplementedVisitor("Visit(*SwitchStatement)") }
+func (my *AbstractVisitor)     EndVisitSwitchStatement(n  *SwitchStatement) { my.UnimplementedVisitor("EndVisit(*SwitchStatement)") }
 
-func (my *AbstractVisitor)      VisitMethodModifiers(n *MethodModifiers)  { my.UnimplementedVisitor("VisitMethodModifiers(MethodModifiers)") }
+func (my *AbstractVisitor)     VisitSwitchBlock(n  *SwitchBlock) bool{ return my.UnimplementedVisitor("Visit(*SwitchBlock)") }
+func (my *AbstractVisitor)     EndVisitSwitchBlock(n  *SwitchBlock) { my.UnimplementedVisitor("EndVisit(*SwitchBlock)") }
 
-func (my *AbstractVisitor)      VisitMethodModifiersWithArg(n *MethodModifiers, o interface{})  { my.UnimplementedVisitor("VisitMethodModifiersWithArg(MethodModifiers, interface{})") }
+func (my *AbstractVisitor)     VisitSwitchBlockStatementGroups(n  *SwitchBlockStatementGroups) bool{ return my.UnimplementedVisitor("Visit(*SwitchBlockStatementGroups)") }
+func (my *AbstractVisitor)     EndVisitSwitchBlockStatementGroups(n  *SwitchBlockStatementGroups) { my.UnimplementedVisitor("EndVisit(*SwitchBlockStatementGroups)") }
 
-func (my *AbstractVisitor)      VisitThrows(n *Throws)  { my.UnimplementedVisitor("VisitThrows(Throws)") }
+func (my *AbstractVisitor)     VisitSwitchBlockStatementGroup(n  *SwitchBlockStatementGroup) bool{ return my.UnimplementedVisitor("Visit(*SwitchBlockStatementGroup)") }
+func (my *AbstractVisitor)     EndVisitSwitchBlockStatementGroup(n  *SwitchBlockStatementGroup) { my.UnimplementedVisitor("EndVisit(*SwitchBlockStatementGroup)") }
 
-func (my *AbstractVisitor)      VisitThrowsWithArg(n *Throws, o interface{})  { my.UnimplementedVisitor("VisitThrowsWithArg(Throws, interface{})") }
+func (my *AbstractVisitor)     VisitSwitchLabels(n  *SwitchLabels) bool{ return my.UnimplementedVisitor("Visit(*SwitchLabels)") }
+func (my *AbstractVisitor)     EndVisitSwitchLabels(n  *SwitchLabels) { my.UnimplementedVisitor("EndVisit(*SwitchLabels)") }
 
-func (my *AbstractVisitor)      VisitExceptionTypeList(n *ExceptionTypeList)  { my.UnimplementedVisitor("VisitExceptionTypeList(ExceptionTypeList)") }
+func (my *AbstractVisitor)     VisitWhileStatement(n  *WhileStatement) bool{ return my.UnimplementedVisitor("Visit(*WhileStatement)") }
+func (my *AbstractVisitor)     EndVisitWhileStatement(n  *WhileStatement) { my.UnimplementedVisitor("EndVisit(*WhileStatement)") }
 
-func (my *AbstractVisitor)      VisitExceptionTypeListWithArg(n *ExceptionTypeList, o interface{})  { my.UnimplementedVisitor("VisitExceptionTypeListWithArg(ExceptionTypeList, interface{})") }
+func (my *AbstractVisitor)     VisitWhileStatementNoShortIf(n  *WhileStatementNoShortIf) bool{ return my.UnimplementedVisitor("Visit(*WhileStatementNoShortIf)") }
+func (my *AbstractVisitor)     EndVisitWhileStatementNoShortIf(n  *WhileStatementNoShortIf) { my.UnimplementedVisitor("EndVisit(*WhileStatementNoShortIf)") }
 
-func (my *AbstractVisitor)      VisitMethodBody(n *MethodBody)  { my.UnimplementedVisitor("VisitMethodBody(MethodBody)") }
+func (my *AbstractVisitor)     VisitDoStatement(n  *DoStatement) bool{ return my.UnimplementedVisitor("Visit(*DoStatement)") }
+func (my *AbstractVisitor)     EndVisitDoStatement(n  *DoStatement) { my.UnimplementedVisitor("EndVisit(*DoStatement)") }
 
-func (my *AbstractVisitor)      VisitMethodBodyWithArg(n *MethodBody, o interface{})  { my.UnimplementedVisitor("VisitMethodBodyWithArg(MethodBody, interface{})") }
+func (my *AbstractVisitor)     VisitBasicForStatement(n  *BasicForStatement) bool{ return my.UnimplementedVisitor("Visit(*BasicForStatement)") }
+func (my *AbstractVisitor)     EndVisitBasicForStatement(n  *BasicForStatement) { my.UnimplementedVisitor("EndVisit(*BasicForStatement)") }
 
-func (my *AbstractVisitor)      VisitStaticInitializer(n *StaticInitializer)  { my.UnimplementedVisitor("VisitStaticInitializer(StaticInitializer)") }
+func (my *AbstractVisitor)     VisitForStatementNoShortIf(n  *ForStatementNoShortIf) bool{ return my.UnimplementedVisitor("Visit(*ForStatementNoShortIf)") }
+func (my *AbstractVisitor)     EndVisitForStatementNoShortIf(n  *ForStatementNoShortIf) { my.UnimplementedVisitor("EndVisit(*ForStatementNoShortIf)") }
 
-func (my *AbstractVisitor)      VisitStaticInitializerWithArg(n *StaticInitializer, o interface{})  { my.UnimplementedVisitor("VisitStaticInitializerWithArg(StaticInitializer, interface{})") }
+func (my *AbstractVisitor)     VisitStatementExpressionList(n  *StatementExpressionList) bool{ return my.UnimplementedVisitor("Visit(*StatementExpressionList)") }
+func (my *AbstractVisitor)     EndVisitStatementExpressionList(n  *StatementExpressionList) { my.UnimplementedVisitor("EndVisit(*StatementExpressionList)") }
 
-func (my *AbstractVisitor)      VisitConstructorDeclaration(n *ConstructorDeclaration)  { my.UnimplementedVisitor("VisitConstructorDeclaration(ConstructorDeclaration)") }
+func (my *AbstractVisitor)     VisitEnhancedForStatement(n  *EnhancedForStatement) bool{ return my.UnimplementedVisitor("Visit(*EnhancedForStatement)") }
+func (my *AbstractVisitor)     EndVisitEnhancedForStatement(n  *EnhancedForStatement) { my.UnimplementedVisitor("EndVisit(*EnhancedForStatement)") }
 
-func (my *AbstractVisitor)      VisitConstructorDeclarationWithArg(n *ConstructorDeclaration, o interface{})  { my.UnimplementedVisitor("VisitConstructorDeclarationWithArg(ConstructorDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitBreakStatement(n  *BreakStatement) bool{ return my.UnimplementedVisitor("Visit(*BreakStatement)") }
+func (my *AbstractVisitor)     EndVisitBreakStatement(n  *BreakStatement) { my.UnimplementedVisitor("EndVisit(*BreakStatement)") }
 
-func (my *AbstractVisitor)      VisitConstructorDeclarator(n *ConstructorDeclarator)  { my.UnimplementedVisitor("VisitConstructorDeclarator(ConstructorDeclarator)") }
+func (my *AbstractVisitor)     VisitContinueStatement(n  *ContinueStatement) bool{ return my.UnimplementedVisitor("Visit(*ContinueStatement)") }
+func (my *AbstractVisitor)     EndVisitContinueStatement(n  *ContinueStatement) { my.UnimplementedVisitor("EndVisit(*ContinueStatement)") }
 
-func (my *AbstractVisitor)      VisitConstructorDeclaratorWithArg(n *ConstructorDeclarator, o interface{})  { my.UnimplementedVisitor("VisitConstructorDeclaratorWithArg(ConstructorDeclarator, interface{})") }
+func (my *AbstractVisitor)     VisitReturnStatement(n  *ReturnStatement) bool{ return my.UnimplementedVisitor("Visit(*ReturnStatement)") }
+func (my *AbstractVisitor)     EndVisitReturnStatement(n  *ReturnStatement) { my.UnimplementedVisitor("EndVisit(*ReturnStatement)") }
 
-func (my *AbstractVisitor)      VisitConstructorModifiers(n *ConstructorModifiers)  { my.UnimplementedVisitor("VisitConstructorModifiers(ConstructorModifiers)") }
+func (my *AbstractVisitor)     VisitThrowStatement(n  *ThrowStatement) bool{ return my.UnimplementedVisitor("Visit(*ThrowStatement)") }
+func (my *AbstractVisitor)     EndVisitThrowStatement(n  *ThrowStatement) { my.UnimplementedVisitor("EndVisit(*ThrowStatement)") }
 
-func (my *AbstractVisitor)      VisitConstructorModifiersWithArg(n *ConstructorModifiers, o interface{})  { my.UnimplementedVisitor("VisitConstructorModifiersWithArg(ConstructorModifiers, interface{})") }
+func (my *AbstractVisitor)     VisitSynchronizedStatement(n  *SynchronizedStatement) bool{ return my.UnimplementedVisitor("Visit(*SynchronizedStatement)") }
+func (my *AbstractVisitor)     EndVisitSynchronizedStatement(n  *SynchronizedStatement) { my.UnimplementedVisitor("EndVisit(*SynchronizedStatement)") }
 
-func (my *AbstractVisitor)      VisitConstructorBody(n *ConstructorBody)  { my.UnimplementedVisitor("VisitConstructorBody(ConstructorBody)") }
+func (my *AbstractVisitor)     VisitCatches(n  *Catches) bool{ return my.UnimplementedVisitor("Visit(*Catches)") }
+func (my *AbstractVisitor)     EndVisitCatches(n  *Catches) { my.UnimplementedVisitor("EndVisit(*Catches)") }
 
-func (my *AbstractVisitor)      VisitConstructorBodyWithArg(n *ConstructorBody, o interface{})  { my.UnimplementedVisitor("VisitConstructorBodyWithArg(ConstructorBody, interface{})") }
+func (my *AbstractVisitor)     VisitCatchClause(n  *CatchClause) bool{ return my.UnimplementedVisitor("Visit(*CatchClause)") }
+func (my *AbstractVisitor)     EndVisitCatchClause(n  *CatchClause) { my.UnimplementedVisitor("EndVisit(*CatchClause)") }
 
-func (my *AbstractVisitor)      VisitEnumDeclaration(n *EnumDeclaration)  { my.UnimplementedVisitor("VisitEnumDeclaration(EnumDeclaration)") }
+func (my *AbstractVisitor)     VisitFinally(n  *Finally) bool{ return my.UnimplementedVisitor("Visit(*Finally)") }
+func (my *AbstractVisitor)     EndVisitFinally(n  *Finally) { my.UnimplementedVisitor("EndVisit(*Finally)") }
 
-func (my *AbstractVisitor)      VisitEnumDeclarationWithArg(n *EnumDeclaration, o interface{})  { my.UnimplementedVisitor("VisitEnumDeclarationWithArg(EnumDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitArgumentList(n  *ArgumentList) bool{ return my.UnimplementedVisitor("Visit(*ArgumentList)") }
+func (my *AbstractVisitor)     EndVisitArgumentList(n  *ArgumentList) { my.UnimplementedVisitor("EndVisit(*ArgumentList)") }
 
-func (my *AbstractVisitor)      VisitEnumBody(n *EnumBody)  { my.UnimplementedVisitor("VisitEnumBody(EnumBody)") }
+func (my *AbstractVisitor)     VisitDimExprs(n  *DimExprs) bool{ return my.UnimplementedVisitor("Visit(*DimExprs)") }
+func (my *AbstractVisitor)     EndVisitDimExprs(n  *DimExprs) { my.UnimplementedVisitor("EndVisit(*DimExprs)") }
 
-func (my *AbstractVisitor)      VisitEnumBodyWithArg(n *EnumBody, o interface{})  { my.UnimplementedVisitor("VisitEnumBodyWithArg(EnumBody, interface{})") }
+func (my *AbstractVisitor)     VisitDimExpr(n  *DimExpr) bool{ return my.UnimplementedVisitor("Visit(*DimExpr)") }
+func (my *AbstractVisitor)     EndVisitDimExpr(n  *DimExpr) { my.UnimplementedVisitor("EndVisit(*DimExpr)") }
 
-func (my *AbstractVisitor)      VisitEnumConstants(n *EnumConstants)  { my.UnimplementedVisitor("VisitEnumConstants(EnumConstants)") }
+func (my *AbstractVisitor)     VisitPostIncrementExpression(n  *PostIncrementExpression) bool{ return my.UnimplementedVisitor("Visit(*PostIncrementExpression)") }
+func (my *AbstractVisitor)     EndVisitPostIncrementExpression(n  *PostIncrementExpression) { my.UnimplementedVisitor("EndVisit(*PostIncrementExpression)") }
 
-func (my *AbstractVisitor)      VisitEnumConstantsWithArg(n *EnumConstants, o interface{})  { my.UnimplementedVisitor("VisitEnumConstantsWithArg(EnumConstants, interface{})") }
+func (my *AbstractVisitor)     VisitPostDecrementExpression(n  *PostDecrementExpression) bool{ return my.UnimplementedVisitor("Visit(*PostDecrementExpression)") }
+func (my *AbstractVisitor)     EndVisitPostDecrementExpression(n  *PostDecrementExpression) { my.UnimplementedVisitor("EndVisit(*PostDecrementExpression)") }
 
-func (my *AbstractVisitor)      VisitEnumConstant(n *EnumConstant)  { my.UnimplementedVisitor("VisitEnumConstant(EnumConstant)") }
+func (my *AbstractVisitor)     VisitPreIncrementExpression(n  *PreIncrementExpression) bool{ return my.UnimplementedVisitor("Visit(*PreIncrementExpression)") }
+func (my *AbstractVisitor)     EndVisitPreIncrementExpression(n  *PreIncrementExpression) { my.UnimplementedVisitor("EndVisit(*PreIncrementExpression)") }
 
-func (my *AbstractVisitor)      VisitEnumConstantWithArg(n *EnumConstant, o interface{})  { my.UnimplementedVisitor("VisitEnumConstantWithArg(EnumConstant, interface{})") }
+func (my *AbstractVisitor)     VisitPreDecrementExpression(n  *PreDecrementExpression) bool{ return my.UnimplementedVisitor("Visit(*PreDecrementExpression)") }
+func (my *AbstractVisitor)     EndVisitPreDecrementExpression(n  *PreDecrementExpression) { my.UnimplementedVisitor("EndVisit(*PreDecrementExpression)") }
 
-func (my *AbstractVisitor)      VisitArguments(n *Arguments)  { my.UnimplementedVisitor("VisitArguments(Arguments)") }
+func (my *AbstractVisitor)     VisitAndExpression(n  *AndExpression) bool{ return my.UnimplementedVisitor("Visit(*AndExpression)") }
+func (my *AbstractVisitor)     EndVisitAndExpression(n  *AndExpression) { my.UnimplementedVisitor("EndVisit(*AndExpression)") }
 
-func (my *AbstractVisitor)      VisitArgumentsWithArg(n *Arguments, o interface{})  { my.UnimplementedVisitor("VisitArgumentsWithArg(Arguments, interface{})") }
+func (my *AbstractVisitor)     VisitExclusiveOrExpression(n  *ExclusiveOrExpression) bool{ return my.UnimplementedVisitor("Visit(*ExclusiveOrExpression)") }
+func (my *AbstractVisitor)     EndVisitExclusiveOrExpression(n  *ExclusiveOrExpression) { my.UnimplementedVisitor("EndVisit(*ExclusiveOrExpression)") }
 
-func (my *AbstractVisitor)      VisitEnumBodyDeclarations(n *EnumBodyDeclarations)  { my.UnimplementedVisitor("VisitEnumBodyDeclarations(EnumBodyDeclarations)") }
+func (my *AbstractVisitor)     VisitInclusiveOrExpression(n  *InclusiveOrExpression) bool{ return my.UnimplementedVisitor("Visit(*InclusiveOrExpression)") }
+func (my *AbstractVisitor)     EndVisitInclusiveOrExpression(n  *InclusiveOrExpression) { my.UnimplementedVisitor("EndVisit(*InclusiveOrExpression)") }
 
-func (my *AbstractVisitor)      VisitEnumBodyDeclarationsWithArg(n *EnumBodyDeclarations, o interface{})  { my.UnimplementedVisitor("VisitEnumBodyDeclarationsWithArg(EnumBodyDeclarations, interface{})") }
+func (my *AbstractVisitor)     VisitConditionalAndExpression(n  *ConditionalAndExpression) bool{ return my.UnimplementedVisitor("Visit(*ConditionalAndExpression)") }
+func (my *AbstractVisitor)     EndVisitConditionalAndExpression(n  *ConditionalAndExpression) { my.UnimplementedVisitor("EndVisit(*ConditionalAndExpression)") }
 
-func (my *AbstractVisitor)      VisitNormalInterfaceDeclaration(n *NormalInterfaceDeclaration)  { my.UnimplementedVisitor("VisitNormalInterfaceDeclaration(NormalInterfaceDeclaration)") }
+func (my *AbstractVisitor)     VisitConditionalOrExpression(n  *ConditionalOrExpression) bool{ return my.UnimplementedVisitor("Visit(*ConditionalOrExpression)") }
+func (my *AbstractVisitor)     EndVisitConditionalOrExpression(n  *ConditionalOrExpression) { my.UnimplementedVisitor("EndVisit(*ConditionalOrExpression)") }
 
-func (my *AbstractVisitor)      VisitNormalInterfaceDeclarationWithArg(n *NormalInterfaceDeclaration, o interface{})  { my.UnimplementedVisitor("VisitNormalInterfaceDeclarationWithArg(NormalInterfaceDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitConditionalExpression(n  *ConditionalExpression) bool{ return my.UnimplementedVisitor("Visit(*ConditionalExpression)") }
+func (my *AbstractVisitor)     EndVisitConditionalExpression(n  *ConditionalExpression) { my.UnimplementedVisitor("EndVisit(*ConditionalExpression)") }
 
-func (my *AbstractVisitor)      VisitInterfaceModifiers(n *InterfaceModifiers)  { my.UnimplementedVisitor("VisitInterfaceModifiers(InterfaceModifiers)") }
+func (my *AbstractVisitor)     VisitAssignment(n  *Assignment) bool{ return my.UnimplementedVisitor("Visit(*Assignment)") }
+func (my *AbstractVisitor)     EndVisitAssignment(n  *Assignment) { my.UnimplementedVisitor("EndVisit(*Assignment)") }
 
-func (my *AbstractVisitor)      VisitInterfaceModifiersWithArg(n *InterfaceModifiers, o interface{})  { my.UnimplementedVisitor("VisitInterfaceModifiersWithArg(InterfaceModifiers, interface{})") }
+func (my *AbstractVisitor)     VisitCommaopt(n  *Commaopt) bool{ return my.UnimplementedVisitor("Visit(*Commaopt)") }
+func (my *AbstractVisitor)     EndVisitCommaopt(n  *Commaopt) { my.UnimplementedVisitor("EndVisit(*Commaopt)") }
 
-func (my *AbstractVisitor)      VisitInterfaceBody(n *InterfaceBody)  { my.UnimplementedVisitor("VisitInterfaceBody(InterfaceBody)") }
+func (my *AbstractVisitor)     VisitEllipsisopt(n  *Ellipsisopt) bool{ return my.UnimplementedVisitor("Visit(*Ellipsisopt)") }
+func (my *AbstractVisitor)     EndVisitEllipsisopt(n  *Ellipsisopt) { my.UnimplementedVisitor("EndVisit(*Ellipsisopt)") }
 
-func (my *AbstractVisitor)      VisitInterfaceBodyWithArg(n *InterfaceBody, o interface{})  { my.UnimplementedVisitor("VisitInterfaceBodyWithArg(InterfaceBody, interface{})") }
+func (my *AbstractVisitor)     VisitLPGUserAction0(n  *LPGUserAction0) bool{ return my.UnimplementedVisitor("Visit(*LPGUserAction0)") }
+func (my *AbstractVisitor)     EndVisitLPGUserAction0(n  *LPGUserAction0) { my.UnimplementedVisitor("EndVisit(*LPGUserAction0)") }
 
-func (my *AbstractVisitor)      VisitInterfaceMemberDeclarations(n *InterfaceMemberDeclarations)  { my.UnimplementedVisitor("VisitInterfaceMemberDeclarations(InterfaceMemberDeclarations)") }
+func (my *AbstractVisitor)     VisitLPGUserAction1(n  *LPGUserAction1) bool{ return my.UnimplementedVisitor("Visit(*LPGUserAction1)") }
+func (my *AbstractVisitor)     EndVisitLPGUserAction1(n  *LPGUserAction1) { my.UnimplementedVisitor("EndVisit(*LPGUserAction1)") }
 
-func (my *AbstractVisitor)      VisitInterfaceMemberDeclarationsWithArg(n *InterfaceMemberDeclarations, o interface{})  { my.UnimplementedVisitor("VisitInterfaceMemberDeclarationsWithArg(InterfaceMemberDeclarations, interface{})") }
+func (my *AbstractVisitor)     VisitLPGUserAction2(n  *LPGUserAction2) bool{ return my.UnimplementedVisitor("Visit(*LPGUserAction2)") }
+func (my *AbstractVisitor)     EndVisitLPGUserAction2(n  *LPGUserAction2) { my.UnimplementedVisitor("EndVisit(*LPGUserAction2)") }
 
-func (my *AbstractVisitor)      VisitInterfaceMemberDeclaration(n *InterfaceMemberDeclaration)  { my.UnimplementedVisitor("VisitInterfaceMemberDeclaration(InterfaceMemberDeclaration)") }
+func (my *AbstractVisitor)     VisitLPGUserAction3(n  *LPGUserAction3) bool{ return my.UnimplementedVisitor("Visit(*LPGUserAction3)") }
+func (my *AbstractVisitor)     EndVisitLPGUserAction3(n  *LPGUserAction3) { my.UnimplementedVisitor("EndVisit(*LPGUserAction3)") }
 
-func (my *AbstractVisitor)      VisitInterfaceMemberDeclarationWithArg(n *InterfaceMemberDeclaration, o interface{})  { my.UnimplementedVisitor("VisitInterfaceMemberDeclarationWithArg(InterfaceMemberDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitLPGUserAction4(n  *LPGUserAction4) bool{ return my.UnimplementedVisitor("Visit(*LPGUserAction4)") }
+func (my *AbstractVisitor)     EndVisitLPGUserAction4(n  *LPGUserAction4) { my.UnimplementedVisitor("EndVisit(*LPGUserAction4)") }
 
-func (my *AbstractVisitor)      VisitConstantDeclaration(n *ConstantDeclaration)  { my.UnimplementedVisitor("VisitConstantDeclaration(ConstantDeclaration)") }
+func (my *AbstractVisitor)     VisitIntegralType0(n  *IntegralType0) bool{ return my.UnimplementedVisitor("Visit(*IntegralType0)") }
+func (my *AbstractVisitor)     EndVisitIntegralType0(n  *IntegralType0) { my.UnimplementedVisitor("EndVisit(*IntegralType0)") }
 
-func (my *AbstractVisitor)      VisitConstantDeclarationWithArg(n *ConstantDeclaration, o interface{})  { my.UnimplementedVisitor("VisitConstantDeclarationWithArg(ConstantDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitIntegralType1(n  *IntegralType1) bool{ return my.UnimplementedVisitor("Visit(*IntegralType1)") }
+func (my *AbstractVisitor)     EndVisitIntegralType1(n  *IntegralType1) { my.UnimplementedVisitor("EndVisit(*IntegralType1)") }
 
-func (my *AbstractVisitor)      VisitConstantModifiers(n *ConstantModifiers)  { my.UnimplementedVisitor("VisitConstantModifiers(ConstantModifiers)") }
+func (my *AbstractVisitor)     VisitIntegralType2(n  *IntegralType2) bool{ return my.UnimplementedVisitor("Visit(*IntegralType2)") }
+func (my *AbstractVisitor)     EndVisitIntegralType2(n  *IntegralType2) { my.UnimplementedVisitor("EndVisit(*IntegralType2)") }
 
-func (my *AbstractVisitor)      VisitConstantModifiersWithArg(n *ConstantModifiers, o interface{})  { my.UnimplementedVisitor("VisitConstantModifiersWithArg(ConstantModifiers, interface{})") }
+func (my *AbstractVisitor)     VisitIntegralType3(n  *IntegralType3) bool{ return my.UnimplementedVisitor("Visit(*IntegralType3)") }
+func (my *AbstractVisitor)     EndVisitIntegralType3(n  *IntegralType3) { my.UnimplementedVisitor("EndVisit(*IntegralType3)") }
 
-func (my *AbstractVisitor)      VisitAbstractMethodDeclaration(n *AbstractMethodDeclaration)  { my.UnimplementedVisitor("VisitAbstractMethodDeclaration(AbstractMethodDeclaration)") }
+func (my *AbstractVisitor)     VisitIntegralType4(n  *IntegralType4) bool{ return my.UnimplementedVisitor("Visit(*IntegralType4)") }
+func (my *AbstractVisitor)     EndVisitIntegralType4(n  *IntegralType4) { my.UnimplementedVisitor("EndVisit(*IntegralType4)") }
 
-func (my *AbstractVisitor)      VisitAbstractMethodDeclarationWithArg(n *AbstractMethodDeclaration, o interface{})  { my.UnimplementedVisitor("VisitAbstractMethodDeclarationWithArg(AbstractMethodDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitFloatingPointType0(n  *FloatingPointType0) bool{ return my.UnimplementedVisitor("Visit(*FloatingPointType0)") }
+func (my *AbstractVisitor)     EndVisitFloatingPointType0(n  *FloatingPointType0) { my.UnimplementedVisitor("EndVisit(*FloatingPointType0)") }
 
-func (my *AbstractVisitor)      VisitAbstractMethodModifiers(n *AbstractMethodModifiers)  { my.UnimplementedVisitor("VisitAbstractMethodModifiers(AbstractMethodModifiers)") }
+func (my *AbstractVisitor)     VisitFloatingPointType1(n  *FloatingPointType1) bool{ return my.UnimplementedVisitor("Visit(*FloatingPointType1)") }
+func (my *AbstractVisitor)     EndVisitFloatingPointType1(n  *FloatingPointType1) { my.UnimplementedVisitor("EndVisit(*FloatingPointType1)") }
 
-func (my *AbstractVisitor)      VisitAbstractMethodModifiersWithArg(n *AbstractMethodModifiers, o interface{})  { my.UnimplementedVisitor("VisitAbstractMethodModifiersWithArg(AbstractMethodModifiers, interface{})") }
+func (my *AbstractVisitor)     VisitWildcardBounds0(n  *WildcardBounds0) bool{ return my.UnimplementedVisitor("Visit(*WildcardBounds0)") }
+func (my *AbstractVisitor)     EndVisitWildcardBounds0(n  *WildcardBounds0) { my.UnimplementedVisitor("EndVisit(*WildcardBounds0)") }
 
-func (my *AbstractVisitor)      VisitAnnotationTypeDeclaration(n *AnnotationTypeDeclaration)  { my.UnimplementedVisitor("VisitAnnotationTypeDeclaration(AnnotationTypeDeclaration)") }
+func (my *AbstractVisitor)     VisitWildcardBounds1(n  *WildcardBounds1) bool{ return my.UnimplementedVisitor("Visit(*WildcardBounds1)") }
+func (my *AbstractVisitor)     EndVisitWildcardBounds1(n  *WildcardBounds1) { my.UnimplementedVisitor("EndVisit(*WildcardBounds1)") }
 
-func (my *AbstractVisitor)      VisitAnnotationTypeDeclarationWithArg(n *AnnotationTypeDeclaration, o interface{})  { my.UnimplementedVisitor("VisitAnnotationTypeDeclarationWithArg(AnnotationTypeDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitClassModifier0(n  *ClassModifier0) bool{ return my.UnimplementedVisitor("Visit(*ClassModifier0)") }
+func (my *AbstractVisitor)     EndVisitClassModifier0(n  *ClassModifier0) { my.UnimplementedVisitor("EndVisit(*ClassModifier0)") }
 
-func (my *AbstractVisitor)      VisitAnnotationTypeBody(n *AnnotationTypeBody)  { my.UnimplementedVisitor("VisitAnnotationTypeBody(AnnotationTypeBody)") }
+func (my *AbstractVisitor)     VisitClassModifier1(n  *ClassModifier1) bool{ return my.UnimplementedVisitor("Visit(*ClassModifier1)") }
+func (my *AbstractVisitor)     EndVisitClassModifier1(n  *ClassModifier1) { my.UnimplementedVisitor("EndVisit(*ClassModifier1)") }
 
-func (my *AbstractVisitor)      VisitAnnotationTypeBodyWithArg(n *AnnotationTypeBody, o interface{})  { my.UnimplementedVisitor("VisitAnnotationTypeBodyWithArg(AnnotationTypeBody, interface{})") }
+func (my *AbstractVisitor)     VisitClassModifier2(n  *ClassModifier2) bool{ return my.UnimplementedVisitor("Visit(*ClassModifier2)") }
+func (my *AbstractVisitor)     EndVisitClassModifier2(n  *ClassModifier2) { my.UnimplementedVisitor("EndVisit(*ClassModifier2)") }
 
-func (my *AbstractVisitor)      VisitAnnotationTypeElementDeclarations(n *AnnotationTypeElementDeclarations)  { my.UnimplementedVisitor("VisitAnnotationTypeElementDeclarations(AnnotationTypeElementDeclarations)") }
+func (my *AbstractVisitor)     VisitClassModifier3(n  *ClassModifier3) bool{ return my.UnimplementedVisitor("Visit(*ClassModifier3)") }
+func (my *AbstractVisitor)     EndVisitClassModifier3(n  *ClassModifier3) { my.UnimplementedVisitor("EndVisit(*ClassModifier3)") }
 
-func (my *AbstractVisitor)      VisitAnnotationTypeElementDeclarationsWithArg(n *AnnotationTypeElementDeclarations, o interface{})  { my.UnimplementedVisitor("VisitAnnotationTypeElementDeclarationsWithArg(AnnotationTypeElementDeclarations, interface{})") }
+func (my *AbstractVisitor)     VisitClassModifier4(n  *ClassModifier4) bool{ return my.UnimplementedVisitor("Visit(*ClassModifier4)") }
+func (my *AbstractVisitor)     EndVisitClassModifier4(n  *ClassModifier4) { my.UnimplementedVisitor("EndVisit(*ClassModifier4)") }
 
-func (my *AbstractVisitor)      VisitDefaultValue(n *DefaultValue)  { my.UnimplementedVisitor("VisitDefaultValue(DefaultValue)") }
+func (my *AbstractVisitor)     VisitClassModifier5(n  *ClassModifier5) bool{ return my.UnimplementedVisitor("Visit(*ClassModifier5)") }
+func (my *AbstractVisitor)     EndVisitClassModifier5(n  *ClassModifier5) { my.UnimplementedVisitor("EndVisit(*ClassModifier5)") }
 
-func (my *AbstractVisitor)      VisitDefaultValueWithArg(n *DefaultValue, o interface{})  { my.UnimplementedVisitor("VisitDefaultValueWithArg(DefaultValue, interface{})") }
+func (my *AbstractVisitor)     VisitClassModifier6(n  *ClassModifier6) bool{ return my.UnimplementedVisitor("Visit(*ClassModifier6)") }
+func (my *AbstractVisitor)     EndVisitClassModifier6(n  *ClassModifier6) { my.UnimplementedVisitor("EndVisit(*ClassModifier6)") }
 
-func (my *AbstractVisitor)      VisitAnnotations(n *Annotations)  { my.UnimplementedVisitor("VisitAnnotations(Annotations)") }
+func (my *AbstractVisitor)     VisitFieldModifier0(n  *FieldModifier0) bool{ return my.UnimplementedVisitor("Visit(*FieldModifier0)") }
+func (my *AbstractVisitor)     EndVisitFieldModifier0(n  *FieldModifier0) { my.UnimplementedVisitor("EndVisit(*FieldModifier0)") }
 
-func (my *AbstractVisitor)      VisitAnnotationsWithArg(n *Annotations, o interface{})  { my.UnimplementedVisitor("VisitAnnotationsWithArg(Annotations, interface{})") }
+func (my *AbstractVisitor)     VisitFieldModifier1(n  *FieldModifier1) bool{ return my.UnimplementedVisitor("Visit(*FieldModifier1)") }
+func (my *AbstractVisitor)     EndVisitFieldModifier1(n  *FieldModifier1) { my.UnimplementedVisitor("EndVisit(*FieldModifier1)") }
 
-func (my *AbstractVisitor)      VisitNormalAnnotation(n *NormalAnnotation)  { my.UnimplementedVisitor("VisitNormalAnnotation(NormalAnnotation)") }
+func (my *AbstractVisitor)     VisitFieldModifier2(n  *FieldModifier2) bool{ return my.UnimplementedVisitor("Visit(*FieldModifier2)") }
+func (my *AbstractVisitor)     EndVisitFieldModifier2(n  *FieldModifier2) { my.UnimplementedVisitor("EndVisit(*FieldModifier2)") }
 
-func (my *AbstractVisitor)      VisitNormalAnnotationWithArg(n *NormalAnnotation, o interface{})  { my.UnimplementedVisitor("VisitNormalAnnotationWithArg(NormalAnnotation, interface{})") }
+func (my *AbstractVisitor)     VisitFieldModifier3(n  *FieldModifier3) bool{ return my.UnimplementedVisitor("Visit(*FieldModifier3)") }
+func (my *AbstractVisitor)     EndVisitFieldModifier3(n  *FieldModifier3) { my.UnimplementedVisitor("EndVisit(*FieldModifier3)") }
 
-func (my *AbstractVisitor)      VisitElementValuePairs(n *ElementValuePairs)  { my.UnimplementedVisitor("VisitElementValuePairs(ElementValuePairs)") }
+func (my *AbstractVisitor)     VisitFieldModifier4(n  *FieldModifier4) bool{ return my.UnimplementedVisitor("Visit(*FieldModifier4)") }
+func (my *AbstractVisitor)     EndVisitFieldModifier4(n  *FieldModifier4) { my.UnimplementedVisitor("EndVisit(*FieldModifier4)") }
 
-func (my *AbstractVisitor)      VisitElementValuePairsWithArg(n *ElementValuePairs, o interface{})  { my.UnimplementedVisitor("VisitElementValuePairsWithArg(ElementValuePairs, interface{})") }
+func (my *AbstractVisitor)     VisitFieldModifier5(n  *FieldModifier5) bool{ return my.UnimplementedVisitor("Visit(*FieldModifier5)") }
+func (my *AbstractVisitor)     EndVisitFieldModifier5(n  *FieldModifier5) { my.UnimplementedVisitor("EndVisit(*FieldModifier5)") }
 
-func (my *AbstractVisitor)      VisitElementValuePair(n *ElementValuePair)  { my.UnimplementedVisitor("VisitElementValuePair(ElementValuePair)") }
+func (my *AbstractVisitor)     VisitFieldModifier6(n  *FieldModifier6) bool{ return my.UnimplementedVisitor("Visit(*FieldModifier6)") }
+func (my *AbstractVisitor)     EndVisitFieldModifier6(n  *FieldModifier6) { my.UnimplementedVisitor("EndVisit(*FieldModifier6)") }
 
-func (my *AbstractVisitor)      VisitElementValuePairWithArg(n *ElementValuePair, o interface{})  { my.UnimplementedVisitor("VisitElementValuePairWithArg(ElementValuePair, interface{})") }
+func (my *AbstractVisitor)     VisitMethodDeclarator0(n  *MethodDeclarator0) bool{ return my.UnimplementedVisitor("Visit(*MethodDeclarator0)") }
+func (my *AbstractVisitor)     EndVisitMethodDeclarator0(n  *MethodDeclarator0) { my.UnimplementedVisitor("EndVisit(*MethodDeclarator0)") }
 
-func (my *AbstractVisitor)      VisitElementValueArrayInitializer(n *ElementValueArrayInitializer)  { my.UnimplementedVisitor("VisitElementValueArrayInitializer(ElementValueArrayInitializer)") }
+func (my *AbstractVisitor)     VisitMethodDeclarator1(n  *MethodDeclarator1) bool{ return my.UnimplementedVisitor("Visit(*MethodDeclarator1)") }
+func (my *AbstractVisitor)     EndVisitMethodDeclarator1(n  *MethodDeclarator1) { my.UnimplementedVisitor("EndVisit(*MethodDeclarator1)") }
 
-func (my *AbstractVisitor)      VisitElementValueArrayInitializerWithArg(n *ElementValueArrayInitializer, o interface{})  { my.UnimplementedVisitor("VisitElementValueArrayInitializerWithArg(ElementValueArrayInitializer, interface{})") }
+func (my *AbstractVisitor)     VisitMethodModifier0(n  *MethodModifier0) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier0)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier0(n  *MethodModifier0) { my.UnimplementedVisitor("EndVisit(*MethodModifier0)") }
 
-func (my *AbstractVisitor)      VisitElementValues(n *ElementValues)  { my.UnimplementedVisitor("VisitElementValues(ElementValues)") }
+func (my *AbstractVisitor)     VisitMethodModifier1(n  *MethodModifier1) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier1)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier1(n  *MethodModifier1) { my.UnimplementedVisitor("EndVisit(*MethodModifier1)") }
 
-func (my *AbstractVisitor)      VisitElementValuesWithArg(n *ElementValues, o interface{})  { my.UnimplementedVisitor("VisitElementValuesWithArg(ElementValues, interface{})") }
+func (my *AbstractVisitor)     VisitMethodModifier2(n  *MethodModifier2) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier2)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier2(n  *MethodModifier2) { my.UnimplementedVisitor("EndVisit(*MethodModifier2)") }
 
-func (my *AbstractVisitor)      VisitMarkerAnnotation(n *MarkerAnnotation)  { my.UnimplementedVisitor("VisitMarkerAnnotation(MarkerAnnotation)") }
+func (my *AbstractVisitor)     VisitMethodModifier3(n  *MethodModifier3) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier3)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier3(n  *MethodModifier3) { my.UnimplementedVisitor("EndVisit(*MethodModifier3)") }
 
-func (my *AbstractVisitor)      VisitMarkerAnnotationWithArg(n *MarkerAnnotation, o interface{})  { my.UnimplementedVisitor("VisitMarkerAnnotationWithArg(MarkerAnnotation, interface{})") }
+func (my *AbstractVisitor)     VisitMethodModifier4(n  *MethodModifier4) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier4)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier4(n  *MethodModifier4) { my.UnimplementedVisitor("EndVisit(*MethodModifier4)") }
 
-func (my *AbstractVisitor)      VisitSingleElementAnnotation(n *SingleElementAnnotation)  { my.UnimplementedVisitor("VisitSingleElementAnnotation(SingleElementAnnotation)") }
+func (my *AbstractVisitor)     VisitMethodModifier5(n  *MethodModifier5) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier5)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier5(n  *MethodModifier5) { my.UnimplementedVisitor("EndVisit(*MethodModifier5)") }
 
-func (my *AbstractVisitor)      VisitSingleElementAnnotationWithArg(n *SingleElementAnnotation, o interface{})  { my.UnimplementedVisitor("VisitSingleElementAnnotationWithArg(SingleElementAnnotation, interface{})") }
+func (my *AbstractVisitor)     VisitMethodModifier6(n  *MethodModifier6) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier6)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier6(n  *MethodModifier6) { my.UnimplementedVisitor("EndVisit(*MethodModifier6)") }
 
-func (my *AbstractVisitor)      VisitArrayInitializer(n *ArrayInitializer)  { my.UnimplementedVisitor("VisitArrayInitializer(ArrayInitializer)") }
+func (my *AbstractVisitor)     VisitMethodModifier7(n  *MethodModifier7) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier7)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier7(n  *MethodModifier7) { my.UnimplementedVisitor("EndVisit(*MethodModifier7)") }
 
-func (my *AbstractVisitor)      VisitArrayInitializerWithArg(n *ArrayInitializer, o interface{})  { my.UnimplementedVisitor("VisitArrayInitializerWithArg(ArrayInitializer, interface{})") }
+func (my *AbstractVisitor)     VisitMethodModifier8(n  *MethodModifier8) bool{ return my.UnimplementedVisitor("Visit(*MethodModifier8)") }
+func (my *AbstractVisitor)     EndVisitMethodModifier8(n  *MethodModifier8) { my.UnimplementedVisitor("EndVisit(*MethodModifier8)") }
 
-func (my *AbstractVisitor)      VisitVariableInitializers(n *VariableInitializers)  { my.UnimplementedVisitor("VisitVariableInitializers(VariableInitializers)") }
+func (my *AbstractVisitor)     VisitConstructorModifier0(n  *ConstructorModifier0) bool{ return my.UnimplementedVisitor("Visit(*ConstructorModifier0)") }
+func (my *AbstractVisitor)     EndVisitConstructorModifier0(n  *ConstructorModifier0) { my.UnimplementedVisitor("EndVisit(*ConstructorModifier0)") }
 
-func (my *AbstractVisitor)      VisitVariableInitializersWithArg(n *VariableInitializers, o interface{})  { my.UnimplementedVisitor("VisitVariableInitializersWithArg(VariableInitializers, interface{})") }
+func (my *AbstractVisitor)     VisitConstructorModifier1(n  *ConstructorModifier1) bool{ return my.UnimplementedVisitor("Visit(*ConstructorModifier1)") }
+func (my *AbstractVisitor)     EndVisitConstructorModifier1(n  *ConstructorModifier1) { my.UnimplementedVisitor("EndVisit(*ConstructorModifier1)") }
 
-func (my *AbstractVisitor)      VisitBlock(n *Block)  { my.UnimplementedVisitor("VisitBlock(Block)") }
+func (my *AbstractVisitor)     VisitConstructorModifier2(n  *ConstructorModifier2) bool{ return my.UnimplementedVisitor("Visit(*ConstructorModifier2)") }
+func (my *AbstractVisitor)     EndVisitConstructorModifier2(n  *ConstructorModifier2) { my.UnimplementedVisitor("EndVisit(*ConstructorModifier2)") }
 
-func (my *AbstractVisitor)      VisitBlockWithArg(n *Block, o interface{})  { my.UnimplementedVisitor("VisitBlockWithArg(Block, interface{})") }
+func (my *AbstractVisitor)     VisitExplicitConstructorInvocation0(n  *ExplicitConstructorInvocation0) bool{ return my.UnimplementedVisitor("Visit(*ExplicitConstructorInvocation0)") }
+func (my *AbstractVisitor)     EndVisitExplicitConstructorInvocation0(n  *ExplicitConstructorInvocation0) { my.UnimplementedVisitor("EndVisit(*ExplicitConstructorInvocation0)") }
 
-func (my *AbstractVisitor)      VisitBlockStatements(n *BlockStatements)  { my.UnimplementedVisitor("VisitBlockStatements(BlockStatements)") }
+func (my *AbstractVisitor)     VisitExplicitConstructorInvocation1(n  *ExplicitConstructorInvocation1) bool{ return my.UnimplementedVisitor("Visit(*ExplicitConstructorInvocation1)") }
+func (my *AbstractVisitor)     EndVisitExplicitConstructorInvocation1(n  *ExplicitConstructorInvocation1) { my.UnimplementedVisitor("EndVisit(*ExplicitConstructorInvocation1)") }
 
-func (my *AbstractVisitor)      VisitBlockStatementsWithArg(n *BlockStatements, o interface{})  { my.UnimplementedVisitor("VisitBlockStatementsWithArg(BlockStatements, interface{})") }
+func (my *AbstractVisitor)     VisitExplicitConstructorInvocation2(n  *ExplicitConstructorInvocation2) bool{ return my.UnimplementedVisitor("Visit(*ExplicitConstructorInvocation2)") }
+func (my *AbstractVisitor)     EndVisitExplicitConstructorInvocation2(n  *ExplicitConstructorInvocation2) { my.UnimplementedVisitor("EndVisit(*ExplicitConstructorInvocation2)") }
 
-func (my *AbstractVisitor)      VisitLocalVariableDeclarationStatement(n *LocalVariableDeclarationStatement)  { my.UnimplementedVisitor("VisitLocalVariableDeclarationStatement(LocalVariableDeclarationStatement)") }
+func (my *AbstractVisitor)     VisitInterfaceModifier0(n  *InterfaceModifier0) bool{ return my.UnimplementedVisitor("Visit(*InterfaceModifier0)") }
+func (my *AbstractVisitor)     EndVisitInterfaceModifier0(n  *InterfaceModifier0) { my.UnimplementedVisitor("EndVisit(*InterfaceModifier0)") }
 
-func (my *AbstractVisitor)      VisitLocalVariableDeclarationStatementWithArg(n *LocalVariableDeclarationStatement, o interface{})  { my.UnimplementedVisitor("VisitLocalVariableDeclarationStatementWithArg(LocalVariableDeclarationStatement, interface{})") }
+func (my *AbstractVisitor)     VisitInterfaceModifier1(n  *InterfaceModifier1) bool{ return my.UnimplementedVisitor("Visit(*InterfaceModifier1)") }
+func (my *AbstractVisitor)     EndVisitInterfaceModifier1(n  *InterfaceModifier1) { my.UnimplementedVisitor("EndVisit(*InterfaceModifier1)") }
 
-func (my *AbstractVisitor)      VisitLocalVariableDeclaration(n *LocalVariableDeclaration)  { my.UnimplementedVisitor("VisitLocalVariableDeclaration(LocalVariableDeclaration)") }
+func (my *AbstractVisitor)     VisitInterfaceModifier2(n  *InterfaceModifier2) bool{ return my.UnimplementedVisitor("Visit(*InterfaceModifier2)") }
+func (my *AbstractVisitor)     EndVisitInterfaceModifier2(n  *InterfaceModifier2) { my.UnimplementedVisitor("EndVisit(*InterfaceModifier2)") }
 
-func (my *AbstractVisitor)      VisitLocalVariableDeclarationWithArg(n *LocalVariableDeclaration, o interface{})  { my.UnimplementedVisitor("VisitLocalVariableDeclarationWithArg(LocalVariableDeclaration, interface{})") }
+func (my *AbstractVisitor)     VisitInterfaceModifier3(n  *InterfaceModifier3) bool{ return my.UnimplementedVisitor("Visit(*InterfaceModifier3)") }
+func (my *AbstractVisitor)     EndVisitInterfaceModifier3(n  *InterfaceModifier3) { my.UnimplementedVisitor("EndVisit(*InterfaceModifier3)") }
 
-func (my *AbstractVisitor)      VisitIfThenStatement(n *IfThenStatement)  { my.UnimplementedVisitor("VisitIfThenStatement(IfThenStatement)") }
+func (my *AbstractVisitor)     VisitInterfaceModifier4(n  *InterfaceModifier4) bool{ return my.UnimplementedVisitor("Visit(*InterfaceModifier4)") }
+func (my *AbstractVisitor)     EndVisitInterfaceModifier4(n  *InterfaceModifier4) { my.UnimplementedVisitor("EndVisit(*InterfaceModifier4)") }
 
-func (my *AbstractVisitor)      VisitIfThenStatementWithArg(n *IfThenStatement, o interface{})  { my.UnimplementedVisitor("VisitIfThenStatementWithArg(IfThenStatement, interface{})") }
+func (my *AbstractVisitor)     VisitInterfaceModifier5(n  *InterfaceModifier5) bool{ return my.UnimplementedVisitor("Visit(*InterfaceModifier5)") }
+func (my *AbstractVisitor)     EndVisitInterfaceModifier5(n  *InterfaceModifier5) { my.UnimplementedVisitor("EndVisit(*InterfaceModifier5)") }
 
-func (my *AbstractVisitor)      VisitIfThenElseStatement(n *IfThenElseStatement)  { my.UnimplementedVisitor("VisitIfThenElseStatement(IfThenElseStatement)") }
+func (my *AbstractVisitor)     VisitExtendsInterfaces0(n  *ExtendsInterfaces0) bool{ return my.UnimplementedVisitor("Visit(*ExtendsInterfaces0)") }
+func (my *AbstractVisitor)     EndVisitExtendsInterfaces0(n  *ExtendsInterfaces0) { my.UnimplementedVisitor("EndVisit(*ExtendsInterfaces0)") }
 
-func (my *AbstractVisitor)      VisitIfThenElseStatementWithArg(n *IfThenElseStatement, o interface{})  { my.UnimplementedVisitor("VisitIfThenElseStatementWithArg(IfThenElseStatement, interface{})") }
+func (my *AbstractVisitor)     VisitExtendsInterfaces1(n  *ExtendsInterfaces1) bool{ return my.UnimplementedVisitor("Visit(*ExtendsInterfaces1)") }
+func (my *AbstractVisitor)     EndVisitExtendsInterfaces1(n  *ExtendsInterfaces1) { my.UnimplementedVisitor("EndVisit(*ExtendsInterfaces1)") }
 
-func (my *AbstractVisitor)      VisitIfThenElseStatementNoShortIf(n *IfThenElseStatementNoShortIf)  { my.UnimplementedVisitor("VisitIfThenElseStatementNoShortIf(IfThenElseStatementNoShortIf)") }
+func (my *AbstractVisitor)     VisitConstantModifier0(n  *ConstantModifier0) bool{ return my.UnimplementedVisitor("Visit(*ConstantModifier0)") }
+func (my *AbstractVisitor)     EndVisitConstantModifier0(n  *ConstantModifier0) { my.UnimplementedVisitor("EndVisit(*ConstantModifier0)") }
 
-func (my *AbstractVisitor)      VisitIfThenElseStatementNoShortIfWithArg(n *IfThenElseStatementNoShortIf, o interface{})  { my.UnimplementedVisitor("VisitIfThenElseStatementNoShortIfWithArg(IfThenElseStatementNoShortIf, interface{})") }
+func (my *AbstractVisitor)     VisitConstantModifier1(n  *ConstantModifier1) bool{ return my.UnimplementedVisitor("Visit(*ConstantModifier1)") }
+func (my *AbstractVisitor)     EndVisitConstantModifier1(n  *ConstantModifier1) { my.UnimplementedVisitor("EndVisit(*ConstantModifier1)") }
 
-func (my *AbstractVisitor)      VisitEmptyStatement(n *EmptyStatement)  { my.UnimplementedVisitor("VisitEmptyStatement(EmptyStatement)") }
+func (my *AbstractVisitor)     VisitConstantModifier2(n  *ConstantModifier2) bool{ return my.UnimplementedVisitor("Visit(*ConstantModifier2)") }
+func (my *AbstractVisitor)     EndVisitConstantModifier2(n  *ConstantModifier2) { my.UnimplementedVisitor("EndVisit(*ConstantModifier2)") }
 
-func (my *AbstractVisitor)      VisitEmptyStatementWithArg(n *EmptyStatement, o interface{})  { my.UnimplementedVisitor("VisitEmptyStatementWithArg(EmptyStatement, interface{})") }
+func (my *AbstractVisitor)     VisitAbstractMethodModifier0(n  *AbstractMethodModifier0) bool{ return my.UnimplementedVisitor("Visit(*AbstractMethodModifier0)") }
+func (my *AbstractVisitor)     EndVisitAbstractMethodModifier0(n  *AbstractMethodModifier0) { my.UnimplementedVisitor("EndVisit(*AbstractMethodModifier0)") }
 
-func (my *AbstractVisitor)      VisitLabeledStatement(n *LabeledStatement)  { my.UnimplementedVisitor("VisitLabeledStatement(LabeledStatement)") }
+func (my *AbstractVisitor)     VisitAbstractMethodModifier1(n  *AbstractMethodModifier1) bool{ return my.UnimplementedVisitor("Visit(*AbstractMethodModifier1)") }
+func (my *AbstractVisitor)     EndVisitAbstractMethodModifier1(n  *AbstractMethodModifier1) { my.UnimplementedVisitor("EndVisit(*AbstractMethodModifier1)") }
 
-func (my *AbstractVisitor)      VisitLabeledStatementWithArg(n *LabeledStatement, o interface{})  { my.UnimplementedVisitor("VisitLabeledStatementWithArg(LabeledStatement, interface{})") }
+func (my *AbstractVisitor)     VisitAnnotationTypeElementDeclaration0(n  *AnnotationTypeElementDeclaration0) bool{ return my.UnimplementedVisitor("Visit(*AnnotationTypeElementDeclaration0)") }
+func (my *AbstractVisitor)     EndVisitAnnotationTypeElementDeclaration0(n  *AnnotationTypeElementDeclaration0) { my.UnimplementedVisitor("EndVisit(*AnnotationTypeElementDeclaration0)") }
 
-func (my *AbstractVisitor)      VisitLabeledStatementNoShortIf(n *LabeledStatementNoShortIf)  { my.UnimplementedVisitor("VisitLabeledStatementNoShortIf(LabeledStatementNoShortIf)") }
+func (my *AbstractVisitor)     VisitAnnotationTypeElementDeclaration1(n  *AnnotationTypeElementDeclaration1) bool{ return my.UnimplementedVisitor("Visit(*AnnotationTypeElementDeclaration1)") }
+func (my *AbstractVisitor)     EndVisitAnnotationTypeElementDeclaration1(n  *AnnotationTypeElementDeclaration1) { my.UnimplementedVisitor("EndVisit(*AnnotationTypeElementDeclaration1)") }
 
-func (my *AbstractVisitor)      VisitLabeledStatementNoShortIfWithArg(n *LabeledStatementNoShortIf, o interface{})  { my.UnimplementedVisitor("VisitLabeledStatementNoShortIfWithArg(LabeledStatementNoShortIf, interface{})") }
+func (my *AbstractVisitor)     VisitAssertStatement0(n  *AssertStatement0) bool{ return my.UnimplementedVisitor("Visit(*AssertStatement0)") }
+func (my *AbstractVisitor)     EndVisitAssertStatement0(n  *AssertStatement0) { my.UnimplementedVisitor("EndVisit(*AssertStatement0)") }
 
-func (my *AbstractVisitor)      VisitExpressionStatement(n *ExpressionStatement)  { my.UnimplementedVisitor("VisitExpressionStatement(ExpressionStatement)") }
+func (my *AbstractVisitor)     VisitAssertStatement1(n  *AssertStatement1) bool{ return my.UnimplementedVisitor("Visit(*AssertStatement1)") }
+func (my *AbstractVisitor)     EndVisitAssertStatement1(n  *AssertStatement1) { my.UnimplementedVisitor("EndVisit(*AssertStatement1)") }
 
-func (my *AbstractVisitor)      VisitExpressionStatementWithArg(n *ExpressionStatement, o interface{})  { my.UnimplementedVisitor("VisitExpressionStatementWithArg(ExpressionStatement, interface{})") }
+func (my *AbstractVisitor)     VisitSwitchLabel0(n  *SwitchLabel0) bool{ return my.UnimplementedVisitor("Visit(*SwitchLabel0)") }
+func (my *AbstractVisitor)     EndVisitSwitchLabel0(n  *SwitchLabel0) { my.UnimplementedVisitor("EndVisit(*SwitchLabel0)") }
 
-func (my *AbstractVisitor)      VisitSwitchStatement(n *SwitchStatement)  { my.UnimplementedVisitor("VisitSwitchStatement(SwitchStatement)") }
+func (my *AbstractVisitor)     VisitSwitchLabel1(n  *SwitchLabel1) bool{ return my.UnimplementedVisitor("Visit(*SwitchLabel1)") }
+func (my *AbstractVisitor)     EndVisitSwitchLabel1(n  *SwitchLabel1) { my.UnimplementedVisitor("EndVisit(*SwitchLabel1)") }
 
-func (my *AbstractVisitor)      VisitSwitchStatementWithArg(n *SwitchStatement, o interface{})  { my.UnimplementedVisitor("VisitSwitchStatementWithArg(SwitchStatement, interface{})") }
+func (my *AbstractVisitor)     VisitSwitchLabel2(n  *SwitchLabel2) bool{ return my.UnimplementedVisitor("Visit(*SwitchLabel2)") }
+func (my *AbstractVisitor)     EndVisitSwitchLabel2(n  *SwitchLabel2) { my.UnimplementedVisitor("EndVisit(*SwitchLabel2)") }
 
-func (my *AbstractVisitor)      VisitSwitchBlock(n *SwitchBlock)  { my.UnimplementedVisitor("VisitSwitchBlock(SwitchBlock)") }
+func (my *AbstractVisitor)     VisitTryStatement0(n  *TryStatement0) bool{ return my.UnimplementedVisitor("Visit(*TryStatement0)") }
+func (my *AbstractVisitor)     EndVisitTryStatement0(n  *TryStatement0) { my.UnimplementedVisitor("EndVisit(*TryStatement0)") }
 
-func (my *AbstractVisitor)      VisitSwitchBlockWithArg(n *SwitchBlock, o interface{})  { my.UnimplementedVisitor("VisitSwitchBlockWithArg(SwitchBlock, interface{})") }
+func (my *AbstractVisitor)     VisitTryStatement1(n  *TryStatement1) bool{ return my.UnimplementedVisitor("Visit(*TryStatement1)") }
+func (my *AbstractVisitor)     EndVisitTryStatement1(n  *TryStatement1) { my.UnimplementedVisitor("EndVisit(*TryStatement1)") }
 
-func (my *AbstractVisitor)      VisitSwitchBlockStatementGroups(n *SwitchBlockStatementGroups)  { my.UnimplementedVisitor("VisitSwitchBlockStatementGroups(SwitchBlockStatementGroups)") }
+func (my *AbstractVisitor)     VisitPrimaryNoNewArray0(n  *PrimaryNoNewArray0) bool{ return my.UnimplementedVisitor("Visit(*PrimaryNoNewArray0)") }
+func (my *AbstractVisitor)     EndVisitPrimaryNoNewArray0(n  *PrimaryNoNewArray0) { my.UnimplementedVisitor("EndVisit(*PrimaryNoNewArray0)") }
 
-func (my *AbstractVisitor)      VisitSwitchBlockStatementGroupsWithArg(n *SwitchBlockStatementGroups, o interface{})  { my.UnimplementedVisitor("VisitSwitchBlockStatementGroupsWithArg(SwitchBlockStatementGroups, interface{})") }
+func (my *AbstractVisitor)     VisitPrimaryNoNewArray1(n  *PrimaryNoNewArray1) bool{ return my.UnimplementedVisitor("Visit(*PrimaryNoNewArray1)") }
+func (my *AbstractVisitor)     EndVisitPrimaryNoNewArray1(n  *PrimaryNoNewArray1) { my.UnimplementedVisitor("EndVisit(*PrimaryNoNewArray1)") }
 
-func (my *AbstractVisitor)      VisitSwitchBlockStatementGroup(n *SwitchBlockStatementGroup)  { my.UnimplementedVisitor("VisitSwitchBlockStatementGroup(SwitchBlockStatementGroup)") }
+func (my *AbstractVisitor)     VisitPrimaryNoNewArray2(n  *PrimaryNoNewArray2) bool{ return my.UnimplementedVisitor("Visit(*PrimaryNoNewArray2)") }
+func (my *AbstractVisitor)     EndVisitPrimaryNoNewArray2(n  *PrimaryNoNewArray2) { my.UnimplementedVisitor("EndVisit(*PrimaryNoNewArray2)") }
 
-func (my *AbstractVisitor)      VisitSwitchBlockStatementGroupWithArg(n *SwitchBlockStatementGroup, o interface{})  { my.UnimplementedVisitor("VisitSwitchBlockStatementGroupWithArg(SwitchBlockStatementGroup, interface{})") }
+func (my *AbstractVisitor)     VisitPrimaryNoNewArray3(n  *PrimaryNoNewArray3) bool{ return my.UnimplementedVisitor("Visit(*PrimaryNoNewArray3)") }
+func (my *AbstractVisitor)     EndVisitPrimaryNoNewArray3(n  *PrimaryNoNewArray3) { my.UnimplementedVisitor("EndVisit(*PrimaryNoNewArray3)") }
 
-func (my *AbstractVisitor)      VisitSwitchLabels(n *SwitchLabels)  { my.UnimplementedVisitor("VisitSwitchLabels(SwitchLabels)") }
+func (my *AbstractVisitor)     VisitPrimaryNoNewArray4(n  *PrimaryNoNewArray4) bool{ return my.UnimplementedVisitor("Visit(*PrimaryNoNewArray4)") }
+func (my *AbstractVisitor)     EndVisitPrimaryNoNewArray4(n  *PrimaryNoNewArray4) { my.UnimplementedVisitor("EndVisit(*PrimaryNoNewArray4)") }
 
-func (my *AbstractVisitor)      VisitSwitchLabelsWithArg(n *SwitchLabels, o interface{})  { my.UnimplementedVisitor("VisitSwitchLabelsWithArg(SwitchLabels, interface{})") }
+func (my *AbstractVisitor)     VisitLiteral0(n  *Literal0) bool{ return my.UnimplementedVisitor("Visit(*Literal0)") }
+func (my *AbstractVisitor)     EndVisitLiteral0(n  *Literal0) { my.UnimplementedVisitor("EndVisit(*Literal0)") }
 
-func (my *AbstractVisitor)      VisitWhileStatement(n *WhileStatement)  { my.UnimplementedVisitor("VisitWhileStatement(WhileStatement)") }
+func (my *AbstractVisitor)     VisitLiteral1(n  *Literal1) bool{ return my.UnimplementedVisitor("Visit(*Literal1)") }
+func (my *AbstractVisitor)     EndVisitLiteral1(n  *Literal1) { my.UnimplementedVisitor("EndVisit(*Literal1)") }
 
-func (my *AbstractVisitor)      VisitWhileStatementWithArg(n *WhileStatement, o interface{})  { my.UnimplementedVisitor("VisitWhileStatementWithArg(WhileStatement, interface{})") }
+func (my *AbstractVisitor)     VisitLiteral2(n  *Literal2) bool{ return my.UnimplementedVisitor("Visit(*Literal2)") }
+func (my *AbstractVisitor)     EndVisitLiteral2(n  *Literal2) { my.UnimplementedVisitor("EndVisit(*Literal2)") }
 
-func (my *AbstractVisitor)      VisitWhileStatementNoShortIf(n *WhileStatementNoShortIf)  { my.UnimplementedVisitor("VisitWhileStatementNoShortIf(WhileStatementNoShortIf)") }
+func (my *AbstractVisitor)     VisitLiteral3(n  *Literal3) bool{ return my.UnimplementedVisitor("Visit(*Literal3)") }
+func (my *AbstractVisitor)     EndVisitLiteral3(n  *Literal3) { my.UnimplementedVisitor("EndVisit(*Literal3)") }
 
-func (my *AbstractVisitor)      VisitWhileStatementNoShortIfWithArg(n *WhileStatementNoShortIf, o interface{})  { my.UnimplementedVisitor("VisitWhileStatementNoShortIfWithArg(WhileStatementNoShortIf, interface{})") }
+func (my *AbstractVisitor)     VisitLiteral4(n  *Literal4) bool{ return my.UnimplementedVisitor("Visit(*Literal4)") }
+func (my *AbstractVisitor)     EndVisitLiteral4(n  *Literal4) { my.UnimplementedVisitor("EndVisit(*Literal4)") }
 
-func (my *AbstractVisitor)      VisitDoStatement(n *DoStatement)  { my.UnimplementedVisitor("VisitDoStatement(DoStatement)") }
+func (my *AbstractVisitor)     VisitLiteral5(n  *Literal5) bool{ return my.UnimplementedVisitor("Visit(*Literal5)") }
+func (my *AbstractVisitor)     EndVisitLiteral5(n  *Literal5) { my.UnimplementedVisitor("EndVisit(*Literal5)") }
 
-func (my *AbstractVisitor)      VisitDoStatementWithArg(n *DoStatement, o interface{})  { my.UnimplementedVisitor("VisitDoStatementWithArg(DoStatement, interface{})") }
+func (my *AbstractVisitor)     VisitLiteral6(n  *Literal6) bool{ return my.UnimplementedVisitor("Visit(*Literal6)") }
+func (my *AbstractVisitor)     EndVisitLiteral6(n  *Literal6) { my.UnimplementedVisitor("EndVisit(*Literal6)") }
 
-func (my *AbstractVisitor)      VisitBasicForStatement(n *BasicForStatement)  { my.UnimplementedVisitor("VisitBasicForStatement(BasicForStatement)") }
+func (my *AbstractVisitor)     VisitBooleanLiteral0(n  *BooleanLiteral0) bool{ return my.UnimplementedVisitor("Visit(*BooleanLiteral0)") }
+func (my *AbstractVisitor)     EndVisitBooleanLiteral0(n  *BooleanLiteral0) { my.UnimplementedVisitor("EndVisit(*BooleanLiteral0)") }
 
-func (my *AbstractVisitor)      VisitBasicForStatementWithArg(n *BasicForStatement, o interface{})  { my.UnimplementedVisitor("VisitBasicForStatementWithArg(BasicForStatement, interface{})") }
+func (my *AbstractVisitor)     VisitBooleanLiteral1(n  *BooleanLiteral1) bool{ return my.UnimplementedVisitor("Visit(*BooleanLiteral1)") }
+func (my *AbstractVisitor)     EndVisitBooleanLiteral1(n  *BooleanLiteral1) { my.UnimplementedVisitor("EndVisit(*BooleanLiteral1)") }
 
-func (my *AbstractVisitor)      VisitForStatementNoShortIf(n *ForStatementNoShortIf)  { my.UnimplementedVisitor("VisitForStatementNoShortIf(ForStatementNoShortIf)") }
+func (my *AbstractVisitor)     VisitClassInstanceCreationExpression0(n  *ClassInstanceCreationExpression0) bool{ return my.UnimplementedVisitor("Visit(*ClassInstanceCreationExpression0)") }
+func (my *AbstractVisitor)     EndVisitClassInstanceCreationExpression0(n  *ClassInstanceCreationExpression0) { my.UnimplementedVisitor("EndVisit(*ClassInstanceCreationExpression0)") }
 
-func (my *AbstractVisitor)      VisitForStatementNoShortIfWithArg(n *ForStatementNoShortIf, o interface{})  { my.UnimplementedVisitor("VisitForStatementNoShortIfWithArg(ForStatementNoShortIf, interface{})") }
+func (my *AbstractVisitor)     VisitClassInstanceCreationExpression1(n  *ClassInstanceCreationExpression1) bool{ return my.UnimplementedVisitor("Visit(*ClassInstanceCreationExpression1)") }
+func (my *AbstractVisitor)     EndVisitClassInstanceCreationExpression1(n  *ClassInstanceCreationExpression1) { my.UnimplementedVisitor("EndVisit(*ClassInstanceCreationExpression1)") }
 
-func (my *AbstractVisitor)      VisitStatementExpressionList(n *StatementExpressionList)  { my.UnimplementedVisitor("VisitStatementExpressionList(StatementExpressionList)") }
+func (my *AbstractVisitor)     VisitArrayCreationExpression0(n  *ArrayCreationExpression0) bool{ return my.UnimplementedVisitor("Visit(*ArrayCreationExpression0)") }
+func (my *AbstractVisitor)     EndVisitArrayCreationExpression0(n  *ArrayCreationExpression0) { my.UnimplementedVisitor("EndVisit(*ArrayCreationExpression0)") }
 
-func (my *AbstractVisitor)      VisitStatementExpressionListWithArg(n *StatementExpressionList, o interface{})  { my.UnimplementedVisitor("VisitStatementExpressionListWithArg(StatementExpressionList, interface{})") }
+func (my *AbstractVisitor)     VisitArrayCreationExpression1(n  *ArrayCreationExpression1) bool{ return my.UnimplementedVisitor("Visit(*ArrayCreationExpression1)") }
+func (my *AbstractVisitor)     EndVisitArrayCreationExpression1(n  *ArrayCreationExpression1) { my.UnimplementedVisitor("EndVisit(*ArrayCreationExpression1)") }
 
-func (my *AbstractVisitor)      VisitEnhancedForStatement(n *EnhancedForStatement)  { my.UnimplementedVisitor("VisitEnhancedForStatement(EnhancedForStatement)") }
+func (my *AbstractVisitor)     VisitArrayCreationExpression2(n  *ArrayCreationExpression2) bool{ return my.UnimplementedVisitor("Visit(*ArrayCreationExpression2)") }
+func (my *AbstractVisitor)     EndVisitArrayCreationExpression2(n  *ArrayCreationExpression2) { my.UnimplementedVisitor("EndVisit(*ArrayCreationExpression2)") }
 
-func (my *AbstractVisitor)      VisitEnhancedForStatementWithArg(n *EnhancedForStatement, o interface{})  { my.UnimplementedVisitor("VisitEnhancedForStatementWithArg(EnhancedForStatement, interface{})") }
+func (my *AbstractVisitor)     VisitArrayCreationExpression3(n  *ArrayCreationExpression3) bool{ return my.UnimplementedVisitor("Visit(*ArrayCreationExpression3)") }
+func (my *AbstractVisitor)     EndVisitArrayCreationExpression3(n  *ArrayCreationExpression3) { my.UnimplementedVisitor("EndVisit(*ArrayCreationExpression3)") }
 
-func (my *AbstractVisitor)      VisitBreakStatement(n *BreakStatement)  { my.UnimplementedVisitor("VisitBreakStatement(BreakStatement)") }
+func (my *AbstractVisitor)     VisitDims0(n  *Dims0) bool{ return my.UnimplementedVisitor("Visit(*Dims0)") }
+func (my *AbstractVisitor)     EndVisitDims0(n  *Dims0) { my.UnimplementedVisitor("EndVisit(*Dims0)") }
 
-func (my *AbstractVisitor)      VisitBreakStatementWithArg(n *BreakStatement, o interface{})  { my.UnimplementedVisitor("VisitBreakStatementWithArg(BreakStatement, interface{})") }
+func (my *AbstractVisitor)     VisitDims1(n  *Dims1) bool{ return my.UnimplementedVisitor("Visit(*Dims1)") }
+func (my *AbstractVisitor)     EndVisitDims1(n  *Dims1) { my.UnimplementedVisitor("EndVisit(*Dims1)") }
 
-func (my *AbstractVisitor)      VisitContinueStatement(n *ContinueStatement)  { my.UnimplementedVisitor("VisitContinueStatement(ContinueStatement)") }
+func (my *AbstractVisitor)     VisitFieldAccess0(n  *FieldAccess0) bool{ return my.UnimplementedVisitor("Visit(*FieldAccess0)") }
+func (my *AbstractVisitor)     EndVisitFieldAccess0(n  *FieldAccess0) { my.UnimplementedVisitor("EndVisit(*FieldAccess0)") }
 
-func (my *AbstractVisitor)      VisitContinueStatementWithArg(n *ContinueStatement, o interface{})  { my.UnimplementedVisitor("VisitContinueStatementWithArg(ContinueStatement, interface{})") }
+func (my *AbstractVisitor)     VisitFieldAccess1(n  *FieldAccess1) bool{ return my.UnimplementedVisitor("Visit(*FieldAccess1)") }
+func (my *AbstractVisitor)     EndVisitFieldAccess1(n  *FieldAccess1) { my.UnimplementedVisitor("EndVisit(*FieldAccess1)") }
 
-func (my *AbstractVisitor)      VisitReturnStatement(n *ReturnStatement)  { my.UnimplementedVisitor("VisitReturnStatement(ReturnStatement)") }
+func (my *AbstractVisitor)     VisitFieldAccess2(n  *FieldAccess2) bool{ return my.UnimplementedVisitor("Visit(*FieldAccess2)") }
+func (my *AbstractVisitor)     EndVisitFieldAccess2(n  *FieldAccess2) { my.UnimplementedVisitor("EndVisit(*FieldAccess2)") }
 
-func (my *AbstractVisitor)      VisitReturnStatementWithArg(n *ReturnStatement, o interface{})  { my.UnimplementedVisitor("VisitReturnStatementWithArg(ReturnStatement, interface{})") }
+func (my *AbstractVisitor)     VisitMethodInvocation0(n  *MethodInvocation0) bool{ return my.UnimplementedVisitor("Visit(*MethodInvocation0)") }
+func (my *AbstractVisitor)     EndVisitMethodInvocation0(n  *MethodInvocation0) { my.UnimplementedVisitor("EndVisit(*MethodInvocation0)") }
 
-func (my *AbstractVisitor)      VisitThrowStatement(n *ThrowStatement)  { my.UnimplementedVisitor("VisitThrowStatement(ThrowStatement)") }
+func (my *AbstractVisitor)     VisitMethodInvocation1(n  *MethodInvocation1) bool{ return my.UnimplementedVisitor("Visit(*MethodInvocation1)") }
+func (my *AbstractVisitor)     EndVisitMethodInvocation1(n  *MethodInvocation1) { my.UnimplementedVisitor("EndVisit(*MethodInvocation1)") }
 
-func (my *AbstractVisitor)      VisitThrowStatementWithArg(n *ThrowStatement, o interface{})  { my.UnimplementedVisitor("VisitThrowStatementWithArg(ThrowStatement, interface{})") }
+func (my *AbstractVisitor)     VisitMethodInvocation2(n  *MethodInvocation2) bool{ return my.UnimplementedVisitor("Visit(*MethodInvocation2)") }
+func (my *AbstractVisitor)     EndVisitMethodInvocation2(n  *MethodInvocation2) { my.UnimplementedVisitor("EndVisit(*MethodInvocation2)") }
 
-func (my *AbstractVisitor)      VisitSynchronizedStatement(n *SynchronizedStatement)  { my.UnimplementedVisitor("VisitSynchronizedStatement(SynchronizedStatement)") }
+func (my *AbstractVisitor)     VisitMethodInvocation3(n  *MethodInvocation3) bool{ return my.UnimplementedVisitor("Visit(*MethodInvocation3)") }
+func (my *AbstractVisitor)     EndVisitMethodInvocation3(n  *MethodInvocation3) { my.UnimplementedVisitor("EndVisit(*MethodInvocation3)") }
 
-func (my *AbstractVisitor)      VisitSynchronizedStatementWithArg(n *SynchronizedStatement, o interface{})  { my.UnimplementedVisitor("VisitSynchronizedStatementWithArg(SynchronizedStatement, interface{})") }
+func (my *AbstractVisitor)     VisitMethodInvocation4(n  *MethodInvocation4) bool{ return my.UnimplementedVisitor("Visit(*MethodInvocation4)") }
+func (my *AbstractVisitor)     EndVisitMethodInvocation4(n  *MethodInvocation4) { my.UnimplementedVisitor("EndVisit(*MethodInvocation4)") }
 
-func (my *AbstractVisitor)      VisitCatches(n *Catches)  { my.UnimplementedVisitor("VisitCatches(Catches)") }
+func (my *AbstractVisitor)     VisitArrayAccess0(n  *ArrayAccess0) bool{ return my.UnimplementedVisitor("Visit(*ArrayAccess0)") }
+func (my *AbstractVisitor)     EndVisitArrayAccess0(n  *ArrayAccess0) { my.UnimplementedVisitor("EndVisit(*ArrayAccess0)") }
 
-func (my *AbstractVisitor)      VisitCatchesWithArg(n *Catches, o interface{})  { my.UnimplementedVisitor("VisitCatchesWithArg(Catches, interface{})") }
+func (my *AbstractVisitor)     VisitArrayAccess1(n  *ArrayAccess1) bool{ return my.UnimplementedVisitor("Visit(*ArrayAccess1)") }
+func (my *AbstractVisitor)     EndVisitArrayAccess1(n  *ArrayAccess1) { my.UnimplementedVisitor("EndVisit(*ArrayAccess1)") }
 
-func (my *AbstractVisitor)      VisitCatchClause(n *CatchClause)  { my.UnimplementedVisitor("VisitCatchClause(CatchClause)") }
+func (my *AbstractVisitor)     VisitUnaryExpression0(n  *UnaryExpression0) bool{ return my.UnimplementedVisitor("Visit(*UnaryExpression0)") }
+func (my *AbstractVisitor)     EndVisitUnaryExpression0(n  *UnaryExpression0) { my.UnimplementedVisitor("EndVisit(*UnaryExpression0)") }
 
-func (my *AbstractVisitor)      VisitCatchClauseWithArg(n *CatchClause, o interface{})  { my.UnimplementedVisitor("VisitCatchClauseWithArg(CatchClause, interface{})") }
+func (my *AbstractVisitor)     VisitUnaryExpression1(n  *UnaryExpression1) bool{ return my.UnimplementedVisitor("Visit(*UnaryExpression1)") }
+func (my *AbstractVisitor)     EndVisitUnaryExpression1(n  *UnaryExpression1) { my.UnimplementedVisitor("EndVisit(*UnaryExpression1)") }
 
-func (my *AbstractVisitor)      VisitFinally(n *Finally)  { my.UnimplementedVisitor("VisitFinally(Finally)") }
+func (my *AbstractVisitor)     VisitUnaryExpressionNotPlusMinus0(n  *UnaryExpressionNotPlusMinus0) bool{ return my.UnimplementedVisitor("Visit(*UnaryExpressionNotPlusMinus0)") }
+func (my *AbstractVisitor)     EndVisitUnaryExpressionNotPlusMinus0(n  *UnaryExpressionNotPlusMinus0) { my.UnimplementedVisitor("EndVisit(*UnaryExpressionNotPlusMinus0)") }
 
-func (my *AbstractVisitor)      VisitFinallyWithArg(n *Finally, o interface{})  { my.UnimplementedVisitor("VisitFinallyWithArg(Finally, interface{})") }
+func (my *AbstractVisitor)     VisitUnaryExpressionNotPlusMinus1(n  *UnaryExpressionNotPlusMinus1) bool{ return my.UnimplementedVisitor("Visit(*UnaryExpressionNotPlusMinus1)") }
+func (my *AbstractVisitor)     EndVisitUnaryExpressionNotPlusMinus1(n  *UnaryExpressionNotPlusMinus1) { my.UnimplementedVisitor("EndVisit(*UnaryExpressionNotPlusMinus1)") }
 
-func (my *AbstractVisitor)      VisitArgumentList(n *ArgumentList)  { my.UnimplementedVisitor("VisitArgumentList(ArgumentList)") }
+func (my *AbstractVisitor)     VisitCastExpression0(n  *CastExpression0) bool{ return my.UnimplementedVisitor("Visit(*CastExpression0)") }
+func (my *AbstractVisitor)     EndVisitCastExpression0(n  *CastExpression0) { my.UnimplementedVisitor("EndVisit(*CastExpression0)") }
 
-func (my *AbstractVisitor)      VisitArgumentListWithArg(n *ArgumentList, o interface{})  { my.UnimplementedVisitor("VisitArgumentListWithArg(ArgumentList, interface{})") }
+func (my *AbstractVisitor)     VisitCastExpression1(n  *CastExpression1) bool{ return my.UnimplementedVisitor("Visit(*CastExpression1)") }
+func (my *AbstractVisitor)     EndVisitCastExpression1(n  *CastExpression1) { my.UnimplementedVisitor("EndVisit(*CastExpression1)") }
 
-func (my *AbstractVisitor)      VisitDimExprs(n *DimExprs)  { my.UnimplementedVisitor("VisitDimExprs(DimExprs)") }
+func (my *AbstractVisitor)     VisitMultiplicativeExpression0(n  *MultiplicativeExpression0) bool{ return my.UnimplementedVisitor("Visit(*MultiplicativeExpression0)") }
+func (my *AbstractVisitor)     EndVisitMultiplicativeExpression0(n  *MultiplicativeExpression0) { my.UnimplementedVisitor("EndVisit(*MultiplicativeExpression0)") }
 
-func (my *AbstractVisitor)      VisitDimExprsWithArg(n *DimExprs, o interface{})  { my.UnimplementedVisitor("VisitDimExprsWithArg(DimExprs, interface{})") }
+func (my *AbstractVisitor)     VisitMultiplicativeExpression1(n  *MultiplicativeExpression1) bool{ return my.UnimplementedVisitor("Visit(*MultiplicativeExpression1)") }
+func (my *AbstractVisitor)     EndVisitMultiplicativeExpression1(n  *MultiplicativeExpression1) { my.UnimplementedVisitor("EndVisit(*MultiplicativeExpression1)") }
 
-func (my *AbstractVisitor)      VisitDimExpr(n *DimExpr)  { my.UnimplementedVisitor("VisitDimExpr(DimExpr)") }
+func (my *AbstractVisitor)     VisitMultiplicativeExpression2(n  *MultiplicativeExpression2) bool{ return my.UnimplementedVisitor("Visit(*MultiplicativeExpression2)") }
+func (my *AbstractVisitor)     EndVisitMultiplicativeExpression2(n  *MultiplicativeExpression2) { my.UnimplementedVisitor("EndVisit(*MultiplicativeExpression2)") }
 
-func (my *AbstractVisitor)      VisitDimExprWithArg(n *DimExpr, o interface{})  { my.UnimplementedVisitor("VisitDimExprWithArg(DimExpr, interface{})") }
+func (my *AbstractVisitor)     VisitAdditiveExpression0(n  *AdditiveExpression0) bool{ return my.UnimplementedVisitor("Visit(*AdditiveExpression0)") }
+func (my *AbstractVisitor)     EndVisitAdditiveExpression0(n  *AdditiveExpression0) { my.UnimplementedVisitor("EndVisit(*AdditiveExpression0)") }
 
-func (my *AbstractVisitor)      VisitPostIncrementExpression(n *PostIncrementExpression)  { my.UnimplementedVisitor("VisitPostIncrementExpression(PostIncrementExpression)") }
+func (my *AbstractVisitor)     VisitAdditiveExpression1(n  *AdditiveExpression1) bool{ return my.UnimplementedVisitor("Visit(*AdditiveExpression1)") }
+func (my *AbstractVisitor)     EndVisitAdditiveExpression1(n  *AdditiveExpression1) { my.UnimplementedVisitor("EndVisit(*AdditiveExpression1)") }
 
-func (my *AbstractVisitor)      VisitPostIncrementExpressionWithArg(n *PostIncrementExpression, o interface{})  { my.UnimplementedVisitor("VisitPostIncrementExpressionWithArg(PostIncrementExpression, interface{})") }
+func (my *AbstractVisitor)     VisitShiftExpression0(n  *ShiftExpression0) bool{ return my.UnimplementedVisitor("Visit(*ShiftExpression0)") }
+func (my *AbstractVisitor)     EndVisitShiftExpression0(n  *ShiftExpression0) { my.UnimplementedVisitor("EndVisit(*ShiftExpression0)") }
 
-func (my *AbstractVisitor)      VisitPostDecrementExpression(n *PostDecrementExpression)  { my.UnimplementedVisitor("VisitPostDecrementExpression(PostDecrementExpression)") }
+func (my *AbstractVisitor)     VisitShiftExpression1(n  *ShiftExpression1) bool{ return my.UnimplementedVisitor("Visit(*ShiftExpression1)") }
+func (my *AbstractVisitor)     EndVisitShiftExpression1(n  *ShiftExpression1) { my.UnimplementedVisitor("EndVisit(*ShiftExpression1)") }
 
-func (my *AbstractVisitor)      VisitPostDecrementExpressionWithArg(n *PostDecrementExpression, o interface{})  { my.UnimplementedVisitor("VisitPostDecrementExpressionWithArg(PostDecrementExpression, interface{})") }
+func (my *AbstractVisitor)     VisitShiftExpression2(n  *ShiftExpression2) bool{ return my.UnimplementedVisitor("Visit(*ShiftExpression2)") }
+func (my *AbstractVisitor)     EndVisitShiftExpression2(n  *ShiftExpression2) { my.UnimplementedVisitor("EndVisit(*ShiftExpression2)") }
 
-func (my *AbstractVisitor)      VisitPreIncrementExpression(n *PreIncrementExpression)  { my.UnimplementedVisitor("VisitPreIncrementExpression(PreIncrementExpression)") }
+func (my *AbstractVisitor)     VisitRelationalExpression0(n  *RelationalExpression0) bool{ return my.UnimplementedVisitor("Visit(*RelationalExpression0)") }
+func (my *AbstractVisitor)     EndVisitRelationalExpression0(n  *RelationalExpression0) { my.UnimplementedVisitor("EndVisit(*RelationalExpression0)") }
 
-func (my *AbstractVisitor)      VisitPreIncrementExpressionWithArg(n *PreIncrementExpression, o interface{})  { my.UnimplementedVisitor("VisitPreIncrementExpressionWithArg(PreIncrementExpression, interface{})") }
+func (my *AbstractVisitor)     VisitRelationalExpression1(n  *RelationalExpression1) bool{ return my.UnimplementedVisitor("Visit(*RelationalExpression1)") }
+func (my *AbstractVisitor)     EndVisitRelationalExpression1(n  *RelationalExpression1) { my.UnimplementedVisitor("EndVisit(*RelationalExpression1)") }
 
-func (my *AbstractVisitor)      VisitPreDecrementExpression(n *PreDecrementExpression)  { my.UnimplementedVisitor("VisitPreDecrementExpression(PreDecrementExpression)") }
+func (my *AbstractVisitor)     VisitRelationalExpression2(n  *RelationalExpression2) bool{ return my.UnimplementedVisitor("Visit(*RelationalExpression2)") }
+func (my *AbstractVisitor)     EndVisitRelationalExpression2(n  *RelationalExpression2) { my.UnimplementedVisitor("EndVisit(*RelationalExpression2)") }
 
-func (my *AbstractVisitor)      VisitPreDecrementExpressionWithArg(n *PreDecrementExpression, o interface{})  { my.UnimplementedVisitor("VisitPreDecrementExpressionWithArg(PreDecrementExpression, interface{})") }
+func (my *AbstractVisitor)     VisitRelationalExpression3(n  *RelationalExpression3) bool{ return my.UnimplementedVisitor("Visit(*RelationalExpression3)") }
+func (my *AbstractVisitor)     EndVisitRelationalExpression3(n  *RelationalExpression3) { my.UnimplementedVisitor("EndVisit(*RelationalExpression3)") }
 
-func (my *AbstractVisitor)      VisitAndExpression(n *AndExpression)  { my.UnimplementedVisitor("VisitAndExpression(AndExpression)") }
+func (my *AbstractVisitor)     VisitRelationalExpression4(n  *RelationalExpression4) bool{ return my.UnimplementedVisitor("Visit(*RelationalExpression4)") }
+func (my *AbstractVisitor)     EndVisitRelationalExpression4(n  *RelationalExpression4) { my.UnimplementedVisitor("EndVisit(*RelationalExpression4)") }
 
-func (my *AbstractVisitor)      VisitAndExpressionWithArg(n *AndExpression, o interface{})  { my.UnimplementedVisitor("VisitAndExpressionWithArg(AndExpression, interface{})") }
+func (my *AbstractVisitor)     VisitEqualityExpression0(n  *EqualityExpression0) bool{ return my.UnimplementedVisitor("Visit(*EqualityExpression0)") }
+func (my *AbstractVisitor)     EndVisitEqualityExpression0(n  *EqualityExpression0) { my.UnimplementedVisitor("EndVisit(*EqualityExpression0)") }
 
-func (my *AbstractVisitor)      VisitExclusiveOrExpression(n *ExclusiveOrExpression)  { my.UnimplementedVisitor("VisitExclusiveOrExpression(ExclusiveOrExpression)") }
+func (my *AbstractVisitor)     VisitEqualityExpression1(n  *EqualityExpression1) bool{ return my.UnimplementedVisitor("Visit(*EqualityExpression1)") }
+func (my *AbstractVisitor)     EndVisitEqualityExpression1(n  *EqualityExpression1) { my.UnimplementedVisitor("EndVisit(*EqualityExpression1)") }
 
-func (my *AbstractVisitor)      VisitExclusiveOrExpressionWithArg(n *ExclusiveOrExpression, o interface{})  { my.UnimplementedVisitor("VisitExclusiveOrExpressionWithArg(ExclusiveOrExpression, interface{})") }
+func (my *AbstractVisitor)     VisitAssignmentOperator0(n  *AssignmentOperator0) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator0)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator0(n  *AssignmentOperator0) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator0)") }
 
-func (my *AbstractVisitor)      VisitInclusiveOrExpression(n *InclusiveOrExpression)  { my.UnimplementedVisitor("VisitInclusiveOrExpression(InclusiveOrExpression)") }
+func (my *AbstractVisitor)     VisitAssignmentOperator1(n  *AssignmentOperator1) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator1)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator1(n  *AssignmentOperator1) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator1)") }
 
-func (my *AbstractVisitor)      VisitInclusiveOrExpressionWithArg(n *InclusiveOrExpression, o interface{})  { my.UnimplementedVisitor("VisitInclusiveOrExpressionWithArg(InclusiveOrExpression, interface{})") }
+func (my *AbstractVisitor)     VisitAssignmentOperator2(n  *AssignmentOperator2) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator2)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator2(n  *AssignmentOperator2) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator2)") }
 
-func (my *AbstractVisitor)      VisitConditionalAndExpression(n *ConditionalAndExpression)  { my.UnimplementedVisitor("VisitConditionalAndExpression(ConditionalAndExpression)") }
+func (my *AbstractVisitor)     VisitAssignmentOperator3(n  *AssignmentOperator3) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator3)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator3(n  *AssignmentOperator3) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator3)") }
 
-func (my *AbstractVisitor)      VisitConditionalAndExpressionWithArg(n *ConditionalAndExpression, o interface{})  { my.UnimplementedVisitor("VisitConditionalAndExpressionWithArg(ConditionalAndExpression, interface{})") }
+func (my *AbstractVisitor)     VisitAssignmentOperator4(n  *AssignmentOperator4) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator4)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator4(n  *AssignmentOperator4) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator4)") }
 
-func (my *AbstractVisitor)      VisitConditionalOrExpression(n *ConditionalOrExpression)  { my.UnimplementedVisitor("VisitConditionalOrExpression(ConditionalOrExpression)") }
+func (my *AbstractVisitor)     VisitAssignmentOperator5(n  *AssignmentOperator5) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator5)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator5(n  *AssignmentOperator5) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator5)") }
 
-func (my *AbstractVisitor)      VisitConditionalOrExpressionWithArg(n *ConditionalOrExpression, o interface{})  { my.UnimplementedVisitor("VisitConditionalOrExpressionWithArg(ConditionalOrExpression, interface{})") }
+func (my *AbstractVisitor)     VisitAssignmentOperator6(n  *AssignmentOperator6) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator6)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator6(n  *AssignmentOperator6) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator6)") }
 
-func (my *AbstractVisitor)      VisitConditionalExpression(n *ConditionalExpression)  { my.UnimplementedVisitor("VisitConditionalExpression(ConditionalExpression)") }
+func (my *AbstractVisitor)     VisitAssignmentOperator7(n  *AssignmentOperator7) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator7)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator7(n  *AssignmentOperator7) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator7)") }
 
-func (my *AbstractVisitor)      VisitConditionalExpressionWithArg(n *ConditionalExpression, o interface{})  { my.UnimplementedVisitor("VisitConditionalExpressionWithArg(ConditionalExpression, interface{})") }
+func (my *AbstractVisitor)     VisitAssignmentOperator8(n  *AssignmentOperator8) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator8)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator8(n  *AssignmentOperator8) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator8)") }
 
-func (my *AbstractVisitor)      VisitAssignment(n *Assignment)  { my.UnimplementedVisitor("VisitAssignment(Assignment)") }
+func (my *AbstractVisitor)     VisitAssignmentOperator9(n  *AssignmentOperator9) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator9)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator9(n  *AssignmentOperator9) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator9)") }
 
-func (my *AbstractVisitor)      VisitAssignmentWithArg(n *Assignment, o interface{})  { my.UnimplementedVisitor("VisitAssignmentWithArg(Assignment, interface{})") }
+func (my *AbstractVisitor)     VisitAssignmentOperator10(n  *AssignmentOperator10) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator10)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator10(n  *AssignmentOperator10) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator10)") }
 
-func (my *AbstractVisitor)      VisitCommaopt(n *Commaopt)  { my.UnimplementedVisitor("VisitCommaopt(Commaopt)") }
+func (my *AbstractVisitor)     VisitAssignmentOperator11(n  *AssignmentOperator11) bool{ return my.UnimplementedVisitor("Visit(*AssignmentOperator11)") }
+func (my *AbstractVisitor)     EndVisitAssignmentOperator11(n  *AssignmentOperator11) { my.UnimplementedVisitor("EndVisit(*AssignmentOperator11)") }
 
-func (my *AbstractVisitor)      VisitCommaoptWithArg(n *Commaopt, o interface{})  { my.UnimplementedVisitor("VisitCommaoptWithArg(Commaopt, interface{})") }
 
-func (my *AbstractVisitor)      VisitEllipsisopt(n *Ellipsisopt)  { my.UnimplementedVisitor("VisitEllipsisopt(Ellipsisopt)") }
-
-func (my *AbstractVisitor)      VisitEllipsisoptWithArg(n *Ellipsisopt, o interface{})  { my.UnimplementedVisitor("VisitEllipsisoptWithArg(Ellipsisopt, interface{})") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction0(n *LPGUserAction0)  { my.UnimplementedVisitor("VisitLPGUserAction0(LPGUserAction0)") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction0WithArg(n *LPGUserAction0, o interface{})  { my.UnimplementedVisitor("VisitLPGUserAction0WithArg(LPGUserAction0, interface{})") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction1(n *LPGUserAction1)  { my.UnimplementedVisitor("VisitLPGUserAction1(LPGUserAction1)") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction1WithArg(n *LPGUserAction1, o interface{})  { my.UnimplementedVisitor("VisitLPGUserAction1WithArg(LPGUserAction1, interface{})") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction2(n *LPGUserAction2)  { my.UnimplementedVisitor("VisitLPGUserAction2(LPGUserAction2)") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction2WithArg(n *LPGUserAction2, o interface{})  { my.UnimplementedVisitor("VisitLPGUserAction2WithArg(LPGUserAction2, interface{})") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction3(n *LPGUserAction3)  { my.UnimplementedVisitor("VisitLPGUserAction3(LPGUserAction3)") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction3WithArg(n *LPGUserAction3, o interface{})  { my.UnimplementedVisitor("VisitLPGUserAction3WithArg(LPGUserAction3, interface{})") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction4(n *LPGUserAction4)  { my.UnimplementedVisitor("VisitLPGUserAction4(LPGUserAction4)") }
-
-func (my *AbstractVisitor)      VisitLPGUserAction4WithArg(n *LPGUserAction4, o interface{})  { my.UnimplementedVisitor("VisitLPGUserAction4WithArg(LPGUserAction4, interface{})") }
-
-func (my *AbstractVisitor)      VisitIntegralType0(n *IntegralType0)  { my.UnimplementedVisitor("VisitIntegralType0(IntegralType0)") }
-
-func (my *AbstractVisitor)      VisitIntegralType0WithArg(n *IntegralType0, o interface{})  { my.UnimplementedVisitor("VisitIntegralType0WithArg(IntegralType0, interface{})") }
-
-func (my *AbstractVisitor)      VisitIntegralType1(n *IntegralType1)  { my.UnimplementedVisitor("VisitIntegralType1(IntegralType1)") }
-
-func (my *AbstractVisitor)      VisitIntegralType1WithArg(n *IntegralType1, o interface{})  { my.UnimplementedVisitor("VisitIntegralType1WithArg(IntegralType1, interface{})") }
-
-func (my *AbstractVisitor)      VisitIntegralType2(n *IntegralType2)  { my.UnimplementedVisitor("VisitIntegralType2(IntegralType2)") }
-
-func (my *AbstractVisitor)      VisitIntegralType2WithArg(n *IntegralType2, o interface{})  { my.UnimplementedVisitor("VisitIntegralType2WithArg(IntegralType2, interface{})") }
-
-func (my *AbstractVisitor)      VisitIntegralType3(n *IntegralType3)  { my.UnimplementedVisitor("VisitIntegralType3(IntegralType3)") }
-
-func (my *AbstractVisitor)      VisitIntegralType3WithArg(n *IntegralType3, o interface{})  { my.UnimplementedVisitor("VisitIntegralType3WithArg(IntegralType3, interface{})") }
-
-func (my *AbstractVisitor)      VisitIntegralType4(n *IntegralType4)  { my.UnimplementedVisitor("VisitIntegralType4(IntegralType4)") }
-
-func (my *AbstractVisitor)      VisitIntegralType4WithArg(n *IntegralType4, o interface{})  { my.UnimplementedVisitor("VisitIntegralType4WithArg(IntegralType4, interface{})") }
-
-func (my *AbstractVisitor)      VisitFloatingPointType0(n *FloatingPointType0)  { my.UnimplementedVisitor("VisitFloatingPointType0(FloatingPointType0)") }
-
-func (my *AbstractVisitor)      VisitFloatingPointType0WithArg(n *FloatingPointType0, o interface{})  { my.UnimplementedVisitor("VisitFloatingPointType0WithArg(FloatingPointType0, interface{})") }
-
-func (my *AbstractVisitor)      VisitFloatingPointType1(n *FloatingPointType1)  { my.UnimplementedVisitor("VisitFloatingPointType1(FloatingPointType1)") }
-
-func (my *AbstractVisitor)      VisitFloatingPointType1WithArg(n *FloatingPointType1, o interface{})  { my.UnimplementedVisitor("VisitFloatingPointType1WithArg(FloatingPointType1, interface{})") }
-
-func (my *AbstractVisitor)      VisitWildcardBounds0(n *WildcardBounds0)  { my.UnimplementedVisitor("VisitWildcardBounds0(WildcardBounds0)") }
-
-func (my *AbstractVisitor)      VisitWildcardBounds0WithArg(n *WildcardBounds0, o interface{})  { my.UnimplementedVisitor("VisitWildcardBounds0WithArg(WildcardBounds0, interface{})") }
-
-func (my *AbstractVisitor)      VisitWildcardBounds1(n *WildcardBounds1)  { my.UnimplementedVisitor("VisitWildcardBounds1(WildcardBounds1)") }
-
-func (my *AbstractVisitor)      VisitWildcardBounds1WithArg(n *WildcardBounds1, o interface{})  { my.UnimplementedVisitor("VisitWildcardBounds1WithArg(WildcardBounds1, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassModifier0(n *ClassModifier0)  { my.UnimplementedVisitor("VisitClassModifier0(ClassModifier0)") }
-
-func (my *AbstractVisitor)      VisitClassModifier0WithArg(n *ClassModifier0, o interface{})  { my.UnimplementedVisitor("VisitClassModifier0WithArg(ClassModifier0, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassModifier1(n *ClassModifier1)  { my.UnimplementedVisitor("VisitClassModifier1(ClassModifier1)") }
-
-func (my *AbstractVisitor)      VisitClassModifier1WithArg(n *ClassModifier1, o interface{})  { my.UnimplementedVisitor("VisitClassModifier1WithArg(ClassModifier1, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassModifier2(n *ClassModifier2)  { my.UnimplementedVisitor("VisitClassModifier2(ClassModifier2)") }
-
-func (my *AbstractVisitor)      VisitClassModifier2WithArg(n *ClassModifier2, o interface{})  { my.UnimplementedVisitor("VisitClassModifier2WithArg(ClassModifier2, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassModifier3(n *ClassModifier3)  { my.UnimplementedVisitor("VisitClassModifier3(ClassModifier3)") }
-
-func (my *AbstractVisitor)      VisitClassModifier3WithArg(n *ClassModifier3, o interface{})  { my.UnimplementedVisitor("VisitClassModifier3WithArg(ClassModifier3, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassModifier4(n *ClassModifier4)  { my.UnimplementedVisitor("VisitClassModifier4(ClassModifier4)") }
-
-func (my *AbstractVisitor)      VisitClassModifier4WithArg(n *ClassModifier4, o interface{})  { my.UnimplementedVisitor("VisitClassModifier4WithArg(ClassModifier4, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassModifier5(n *ClassModifier5)  { my.UnimplementedVisitor("VisitClassModifier5(ClassModifier5)") }
-
-func (my *AbstractVisitor)      VisitClassModifier5WithArg(n *ClassModifier5, o interface{})  { my.UnimplementedVisitor("VisitClassModifier5WithArg(ClassModifier5, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassModifier6(n *ClassModifier6)  { my.UnimplementedVisitor("VisitClassModifier6(ClassModifier6)") }
-
-func (my *AbstractVisitor)      VisitClassModifier6WithArg(n *ClassModifier6, o interface{})  { my.UnimplementedVisitor("VisitClassModifier6WithArg(ClassModifier6, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldModifier0(n *FieldModifier0)  { my.UnimplementedVisitor("VisitFieldModifier0(FieldModifier0)") }
-
-func (my *AbstractVisitor)      VisitFieldModifier0WithArg(n *FieldModifier0, o interface{})  { my.UnimplementedVisitor("VisitFieldModifier0WithArg(FieldModifier0, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldModifier1(n *FieldModifier1)  { my.UnimplementedVisitor("VisitFieldModifier1(FieldModifier1)") }
-
-func (my *AbstractVisitor)      VisitFieldModifier1WithArg(n *FieldModifier1, o interface{})  { my.UnimplementedVisitor("VisitFieldModifier1WithArg(FieldModifier1, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldModifier2(n *FieldModifier2)  { my.UnimplementedVisitor("VisitFieldModifier2(FieldModifier2)") }
-
-func (my *AbstractVisitor)      VisitFieldModifier2WithArg(n *FieldModifier2, o interface{})  { my.UnimplementedVisitor("VisitFieldModifier2WithArg(FieldModifier2, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldModifier3(n *FieldModifier3)  { my.UnimplementedVisitor("VisitFieldModifier3(FieldModifier3)") }
-
-func (my *AbstractVisitor)      VisitFieldModifier3WithArg(n *FieldModifier3, o interface{})  { my.UnimplementedVisitor("VisitFieldModifier3WithArg(FieldModifier3, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldModifier4(n *FieldModifier4)  { my.UnimplementedVisitor("VisitFieldModifier4(FieldModifier4)") }
-
-func (my *AbstractVisitor)      VisitFieldModifier4WithArg(n *FieldModifier4, o interface{})  { my.UnimplementedVisitor("VisitFieldModifier4WithArg(FieldModifier4, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldModifier5(n *FieldModifier5)  { my.UnimplementedVisitor("VisitFieldModifier5(FieldModifier5)") }
-
-func (my *AbstractVisitor)      VisitFieldModifier5WithArg(n *FieldModifier5, o interface{})  { my.UnimplementedVisitor("VisitFieldModifier5WithArg(FieldModifier5, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldModifier6(n *FieldModifier6)  { my.UnimplementedVisitor("VisitFieldModifier6(FieldModifier6)") }
-
-func (my *AbstractVisitor)      VisitFieldModifier6WithArg(n *FieldModifier6, o interface{})  { my.UnimplementedVisitor("VisitFieldModifier6WithArg(FieldModifier6, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodDeclarator0(n *MethodDeclarator0)  { my.UnimplementedVisitor("VisitMethodDeclarator0(MethodDeclarator0)") }
-
-func (my *AbstractVisitor)      VisitMethodDeclarator0WithArg(n *MethodDeclarator0, o interface{})  { my.UnimplementedVisitor("VisitMethodDeclarator0WithArg(MethodDeclarator0, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodDeclarator1(n *MethodDeclarator1)  { my.UnimplementedVisitor("VisitMethodDeclarator1(MethodDeclarator1)") }
-
-func (my *AbstractVisitor)      VisitMethodDeclarator1WithArg(n *MethodDeclarator1, o interface{})  { my.UnimplementedVisitor("VisitMethodDeclarator1WithArg(MethodDeclarator1, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier0(n *MethodModifier0)  { my.UnimplementedVisitor("VisitMethodModifier0(MethodModifier0)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier0WithArg(n *MethodModifier0, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier0WithArg(MethodModifier0, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier1(n *MethodModifier1)  { my.UnimplementedVisitor("VisitMethodModifier1(MethodModifier1)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier1WithArg(n *MethodModifier1, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier1WithArg(MethodModifier1, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier2(n *MethodModifier2)  { my.UnimplementedVisitor("VisitMethodModifier2(MethodModifier2)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier2WithArg(n *MethodModifier2, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier2WithArg(MethodModifier2, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier3(n *MethodModifier3)  { my.UnimplementedVisitor("VisitMethodModifier3(MethodModifier3)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier3WithArg(n *MethodModifier3, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier3WithArg(MethodModifier3, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier4(n *MethodModifier4)  { my.UnimplementedVisitor("VisitMethodModifier4(MethodModifier4)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier4WithArg(n *MethodModifier4, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier4WithArg(MethodModifier4, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier5(n *MethodModifier5)  { my.UnimplementedVisitor("VisitMethodModifier5(MethodModifier5)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier5WithArg(n *MethodModifier5, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier5WithArg(MethodModifier5, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier6(n *MethodModifier6)  { my.UnimplementedVisitor("VisitMethodModifier6(MethodModifier6)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier6WithArg(n *MethodModifier6, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier6WithArg(MethodModifier6, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier7(n *MethodModifier7)  { my.UnimplementedVisitor("VisitMethodModifier7(MethodModifier7)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier7WithArg(n *MethodModifier7, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier7WithArg(MethodModifier7, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodModifier8(n *MethodModifier8)  { my.UnimplementedVisitor("VisitMethodModifier8(MethodModifier8)") }
-
-func (my *AbstractVisitor)      VisitMethodModifier8WithArg(n *MethodModifier8, o interface{})  { my.UnimplementedVisitor("VisitMethodModifier8WithArg(MethodModifier8, interface{})") }
-
-func (my *AbstractVisitor)      VisitConstructorModifier0(n *ConstructorModifier0)  { my.UnimplementedVisitor("VisitConstructorModifier0(ConstructorModifier0)") }
-
-func (my *AbstractVisitor)      VisitConstructorModifier0WithArg(n *ConstructorModifier0, o interface{})  { my.UnimplementedVisitor("VisitConstructorModifier0WithArg(ConstructorModifier0, interface{})") }
-
-func (my *AbstractVisitor)      VisitConstructorModifier1(n *ConstructorModifier1)  { my.UnimplementedVisitor("VisitConstructorModifier1(ConstructorModifier1)") }
-
-func (my *AbstractVisitor)      VisitConstructorModifier1WithArg(n *ConstructorModifier1, o interface{})  { my.UnimplementedVisitor("VisitConstructorModifier1WithArg(ConstructorModifier1, interface{})") }
-
-func (my *AbstractVisitor)      VisitConstructorModifier2(n *ConstructorModifier2)  { my.UnimplementedVisitor("VisitConstructorModifier2(ConstructorModifier2)") }
-
-func (my *AbstractVisitor)      VisitConstructorModifier2WithArg(n *ConstructorModifier2, o interface{})  { my.UnimplementedVisitor("VisitConstructorModifier2WithArg(ConstructorModifier2, interface{})") }
-
-func (my *AbstractVisitor)      VisitExplicitConstructorInvocation0(n *ExplicitConstructorInvocation0)  { my.UnimplementedVisitor("VisitExplicitConstructorInvocation0(ExplicitConstructorInvocation0)") }
-
-func (my *AbstractVisitor)      VisitExplicitConstructorInvocation0WithArg(n *ExplicitConstructorInvocation0, o interface{})  { my.UnimplementedVisitor("VisitExplicitConstructorInvocation0WithArg(ExplicitConstructorInvocation0, interface{})") }
-
-func (my *AbstractVisitor)      VisitExplicitConstructorInvocation1(n *ExplicitConstructorInvocation1)  { my.UnimplementedVisitor("VisitExplicitConstructorInvocation1(ExplicitConstructorInvocation1)") }
-
-func (my *AbstractVisitor)      VisitExplicitConstructorInvocation1WithArg(n *ExplicitConstructorInvocation1, o interface{})  { my.UnimplementedVisitor("VisitExplicitConstructorInvocation1WithArg(ExplicitConstructorInvocation1, interface{})") }
-
-func (my *AbstractVisitor)      VisitExplicitConstructorInvocation2(n *ExplicitConstructorInvocation2)  { my.UnimplementedVisitor("VisitExplicitConstructorInvocation2(ExplicitConstructorInvocation2)") }
-
-func (my *AbstractVisitor)      VisitExplicitConstructorInvocation2WithArg(n *ExplicitConstructorInvocation2, o interface{})  { my.UnimplementedVisitor("VisitExplicitConstructorInvocation2WithArg(ExplicitConstructorInvocation2, interface{})") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier0(n *InterfaceModifier0)  { my.UnimplementedVisitor("VisitInterfaceModifier0(InterfaceModifier0)") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier0WithArg(n *InterfaceModifier0, o interface{})  { my.UnimplementedVisitor("VisitInterfaceModifier0WithArg(InterfaceModifier0, interface{})") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier1(n *InterfaceModifier1)  { my.UnimplementedVisitor("VisitInterfaceModifier1(InterfaceModifier1)") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier1WithArg(n *InterfaceModifier1, o interface{})  { my.UnimplementedVisitor("VisitInterfaceModifier1WithArg(InterfaceModifier1, interface{})") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier2(n *InterfaceModifier2)  { my.UnimplementedVisitor("VisitInterfaceModifier2(InterfaceModifier2)") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier2WithArg(n *InterfaceModifier2, o interface{})  { my.UnimplementedVisitor("VisitInterfaceModifier2WithArg(InterfaceModifier2, interface{})") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier3(n *InterfaceModifier3)  { my.UnimplementedVisitor("VisitInterfaceModifier3(InterfaceModifier3)") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier3WithArg(n *InterfaceModifier3, o interface{})  { my.UnimplementedVisitor("VisitInterfaceModifier3WithArg(InterfaceModifier3, interface{})") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier4(n *InterfaceModifier4)  { my.UnimplementedVisitor("VisitInterfaceModifier4(InterfaceModifier4)") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier4WithArg(n *InterfaceModifier4, o interface{})  { my.UnimplementedVisitor("VisitInterfaceModifier4WithArg(InterfaceModifier4, interface{})") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier5(n *InterfaceModifier5)  { my.UnimplementedVisitor("VisitInterfaceModifier5(InterfaceModifier5)") }
-
-func (my *AbstractVisitor)      VisitInterfaceModifier5WithArg(n *InterfaceModifier5, o interface{})  { my.UnimplementedVisitor("VisitInterfaceModifier5WithArg(InterfaceModifier5, interface{})") }
-
-func (my *AbstractVisitor)      VisitExtendsInterfaces0(n *ExtendsInterfaces0)  { my.UnimplementedVisitor("VisitExtendsInterfaces0(ExtendsInterfaces0)") }
-
-func (my *AbstractVisitor)      VisitExtendsInterfaces0WithArg(n *ExtendsInterfaces0, o interface{})  { my.UnimplementedVisitor("VisitExtendsInterfaces0WithArg(ExtendsInterfaces0, interface{})") }
-
-func (my *AbstractVisitor)      VisitExtendsInterfaces1(n *ExtendsInterfaces1)  { my.UnimplementedVisitor("VisitExtendsInterfaces1(ExtendsInterfaces1)") }
-
-func (my *AbstractVisitor)      VisitExtendsInterfaces1WithArg(n *ExtendsInterfaces1, o interface{})  { my.UnimplementedVisitor("VisitExtendsInterfaces1WithArg(ExtendsInterfaces1, interface{})") }
-
-func (my *AbstractVisitor)      VisitConstantModifier0(n *ConstantModifier0)  { my.UnimplementedVisitor("VisitConstantModifier0(ConstantModifier0)") }
-
-func (my *AbstractVisitor)      VisitConstantModifier0WithArg(n *ConstantModifier0, o interface{})  { my.UnimplementedVisitor("VisitConstantModifier0WithArg(ConstantModifier0, interface{})") }
-
-func (my *AbstractVisitor)      VisitConstantModifier1(n *ConstantModifier1)  { my.UnimplementedVisitor("VisitConstantModifier1(ConstantModifier1)") }
-
-func (my *AbstractVisitor)      VisitConstantModifier1WithArg(n *ConstantModifier1, o interface{})  { my.UnimplementedVisitor("VisitConstantModifier1WithArg(ConstantModifier1, interface{})") }
-
-func (my *AbstractVisitor)      VisitConstantModifier2(n *ConstantModifier2)  { my.UnimplementedVisitor("VisitConstantModifier2(ConstantModifier2)") }
-
-func (my *AbstractVisitor)      VisitConstantModifier2WithArg(n *ConstantModifier2, o interface{})  { my.UnimplementedVisitor("VisitConstantModifier2WithArg(ConstantModifier2, interface{})") }
-
-func (my *AbstractVisitor)      VisitAbstractMethodModifier0(n *AbstractMethodModifier0)  { my.UnimplementedVisitor("VisitAbstractMethodModifier0(AbstractMethodModifier0)") }
-
-func (my *AbstractVisitor)      VisitAbstractMethodModifier0WithArg(n *AbstractMethodModifier0, o interface{})  { my.UnimplementedVisitor("VisitAbstractMethodModifier0WithArg(AbstractMethodModifier0, interface{})") }
-
-func (my *AbstractVisitor)      VisitAbstractMethodModifier1(n *AbstractMethodModifier1)  { my.UnimplementedVisitor("VisitAbstractMethodModifier1(AbstractMethodModifier1)") }
-
-func (my *AbstractVisitor)      VisitAbstractMethodModifier1WithArg(n *AbstractMethodModifier1, o interface{})  { my.UnimplementedVisitor("VisitAbstractMethodModifier1WithArg(AbstractMethodModifier1, interface{})") }
-
-func (my *AbstractVisitor)      VisitAnnotationTypeElementDeclaration0(n *AnnotationTypeElementDeclaration0)  { my.UnimplementedVisitor("VisitAnnotationTypeElementDeclaration0(AnnotationTypeElementDeclaration0)") }
-
-func (my *AbstractVisitor)      VisitAnnotationTypeElementDeclaration0WithArg(n *AnnotationTypeElementDeclaration0, o interface{})  { my.UnimplementedVisitor("VisitAnnotationTypeElementDeclaration0WithArg(AnnotationTypeElementDeclaration0, interface{})") }
-
-func (my *AbstractVisitor)      VisitAnnotationTypeElementDeclaration1(n *AnnotationTypeElementDeclaration1)  { my.UnimplementedVisitor("VisitAnnotationTypeElementDeclaration1(AnnotationTypeElementDeclaration1)") }
-
-func (my *AbstractVisitor)      VisitAnnotationTypeElementDeclaration1WithArg(n *AnnotationTypeElementDeclaration1, o interface{})  { my.UnimplementedVisitor("VisitAnnotationTypeElementDeclaration1WithArg(AnnotationTypeElementDeclaration1, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssertStatement0(n *AssertStatement0)  { my.UnimplementedVisitor("VisitAssertStatement0(AssertStatement0)") }
-
-func (my *AbstractVisitor)      VisitAssertStatement0WithArg(n *AssertStatement0, o interface{})  { my.UnimplementedVisitor("VisitAssertStatement0WithArg(AssertStatement0, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssertStatement1(n *AssertStatement1)  { my.UnimplementedVisitor("VisitAssertStatement1(AssertStatement1)") }
-
-func (my *AbstractVisitor)      VisitAssertStatement1WithArg(n *AssertStatement1, o interface{})  { my.UnimplementedVisitor("VisitAssertStatement1WithArg(AssertStatement1, interface{})") }
-
-func (my *AbstractVisitor)      VisitSwitchLabel0(n *SwitchLabel0)  { my.UnimplementedVisitor("VisitSwitchLabel0(SwitchLabel0)") }
-
-func (my *AbstractVisitor)      VisitSwitchLabel0WithArg(n *SwitchLabel0, o interface{})  { my.UnimplementedVisitor("VisitSwitchLabel0WithArg(SwitchLabel0, interface{})") }
-
-func (my *AbstractVisitor)      VisitSwitchLabel1(n *SwitchLabel1)  { my.UnimplementedVisitor("VisitSwitchLabel1(SwitchLabel1)") }
-
-func (my *AbstractVisitor)      VisitSwitchLabel1WithArg(n *SwitchLabel1, o interface{})  { my.UnimplementedVisitor("VisitSwitchLabel1WithArg(SwitchLabel1, interface{})") }
-
-func (my *AbstractVisitor)      VisitSwitchLabel2(n *SwitchLabel2)  { my.UnimplementedVisitor("VisitSwitchLabel2(SwitchLabel2)") }
-
-func (my *AbstractVisitor)      VisitSwitchLabel2WithArg(n *SwitchLabel2, o interface{})  { my.UnimplementedVisitor("VisitSwitchLabel2WithArg(SwitchLabel2, interface{})") }
-
-func (my *AbstractVisitor)      VisitTryStatement0(n *TryStatement0)  { my.UnimplementedVisitor("VisitTryStatement0(TryStatement0)") }
-
-func (my *AbstractVisitor)      VisitTryStatement0WithArg(n *TryStatement0, o interface{})  { my.UnimplementedVisitor("VisitTryStatement0WithArg(TryStatement0, interface{})") }
-
-func (my *AbstractVisitor)      VisitTryStatement1(n *TryStatement1)  { my.UnimplementedVisitor("VisitTryStatement1(TryStatement1)") }
-
-func (my *AbstractVisitor)      VisitTryStatement1WithArg(n *TryStatement1, o interface{})  { my.UnimplementedVisitor("VisitTryStatement1WithArg(TryStatement1, interface{})") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray0(n *PrimaryNoNewArray0)  { my.UnimplementedVisitor("VisitPrimaryNoNewArray0(PrimaryNoNewArray0)") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray0WithArg(n *PrimaryNoNewArray0, o interface{})  { my.UnimplementedVisitor("VisitPrimaryNoNewArray0WithArg(PrimaryNoNewArray0, interface{})") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray1(n *PrimaryNoNewArray1)  { my.UnimplementedVisitor("VisitPrimaryNoNewArray1(PrimaryNoNewArray1)") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray1WithArg(n *PrimaryNoNewArray1, o interface{})  { my.UnimplementedVisitor("VisitPrimaryNoNewArray1WithArg(PrimaryNoNewArray1, interface{})") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray2(n *PrimaryNoNewArray2)  { my.UnimplementedVisitor("VisitPrimaryNoNewArray2(PrimaryNoNewArray2)") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray2WithArg(n *PrimaryNoNewArray2, o interface{})  { my.UnimplementedVisitor("VisitPrimaryNoNewArray2WithArg(PrimaryNoNewArray2, interface{})") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray3(n *PrimaryNoNewArray3)  { my.UnimplementedVisitor("VisitPrimaryNoNewArray3(PrimaryNoNewArray3)") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray3WithArg(n *PrimaryNoNewArray3, o interface{})  { my.UnimplementedVisitor("VisitPrimaryNoNewArray3WithArg(PrimaryNoNewArray3, interface{})") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray4(n *PrimaryNoNewArray4)  { my.UnimplementedVisitor("VisitPrimaryNoNewArray4(PrimaryNoNewArray4)") }
-
-func (my *AbstractVisitor)      VisitPrimaryNoNewArray4WithArg(n *PrimaryNoNewArray4, o interface{})  { my.UnimplementedVisitor("VisitPrimaryNoNewArray4WithArg(PrimaryNoNewArray4, interface{})") }
-
-func (my *AbstractVisitor)      VisitLiteral0(n *Literal0)  { my.UnimplementedVisitor("VisitLiteral0(Literal0)") }
-
-func (my *AbstractVisitor)      VisitLiteral0WithArg(n *Literal0, o interface{})  { my.UnimplementedVisitor("VisitLiteral0WithArg(Literal0, interface{})") }
-
-func (my *AbstractVisitor)      VisitLiteral1(n *Literal1)  { my.UnimplementedVisitor("VisitLiteral1(Literal1)") }
-
-func (my *AbstractVisitor)      VisitLiteral1WithArg(n *Literal1, o interface{})  { my.UnimplementedVisitor("VisitLiteral1WithArg(Literal1, interface{})") }
-
-func (my *AbstractVisitor)      VisitLiteral2(n *Literal2)  { my.UnimplementedVisitor("VisitLiteral2(Literal2)") }
-
-func (my *AbstractVisitor)      VisitLiteral2WithArg(n *Literal2, o interface{})  { my.UnimplementedVisitor("VisitLiteral2WithArg(Literal2, interface{})") }
-
-func (my *AbstractVisitor)      VisitLiteral3(n *Literal3)  { my.UnimplementedVisitor("VisitLiteral3(Literal3)") }
-
-func (my *AbstractVisitor)      VisitLiteral3WithArg(n *Literal3, o interface{})  { my.UnimplementedVisitor("VisitLiteral3WithArg(Literal3, interface{})") }
-
-func (my *AbstractVisitor)      VisitLiteral4(n *Literal4)  { my.UnimplementedVisitor("VisitLiteral4(Literal4)") }
-
-func (my *AbstractVisitor)      VisitLiteral4WithArg(n *Literal4, o interface{})  { my.UnimplementedVisitor("VisitLiteral4WithArg(Literal4, interface{})") }
-
-func (my *AbstractVisitor)      VisitLiteral5(n *Literal5)  { my.UnimplementedVisitor("VisitLiteral5(Literal5)") }
-
-func (my *AbstractVisitor)      VisitLiteral5WithArg(n *Literal5, o interface{})  { my.UnimplementedVisitor("VisitLiteral5WithArg(Literal5, interface{})") }
-
-func (my *AbstractVisitor)      VisitLiteral6(n *Literal6)  { my.UnimplementedVisitor("VisitLiteral6(Literal6)") }
-
-func (my *AbstractVisitor)      VisitLiteral6WithArg(n *Literal6, o interface{})  { my.UnimplementedVisitor("VisitLiteral6WithArg(Literal6, interface{})") }
-
-func (my *AbstractVisitor)      VisitBooleanLiteral0(n *BooleanLiteral0)  { my.UnimplementedVisitor("VisitBooleanLiteral0(BooleanLiteral0)") }
-
-func (my *AbstractVisitor)      VisitBooleanLiteral0WithArg(n *BooleanLiteral0, o interface{})  { my.UnimplementedVisitor("VisitBooleanLiteral0WithArg(BooleanLiteral0, interface{})") }
-
-func (my *AbstractVisitor)      VisitBooleanLiteral1(n *BooleanLiteral1)  { my.UnimplementedVisitor("VisitBooleanLiteral1(BooleanLiteral1)") }
-
-func (my *AbstractVisitor)      VisitBooleanLiteral1WithArg(n *BooleanLiteral1, o interface{})  { my.UnimplementedVisitor("VisitBooleanLiteral1WithArg(BooleanLiteral1, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassInstanceCreationExpression0(n *ClassInstanceCreationExpression0)  { my.UnimplementedVisitor("VisitClassInstanceCreationExpression0(ClassInstanceCreationExpression0)") }
-
-func (my *AbstractVisitor)      VisitClassInstanceCreationExpression0WithArg(n *ClassInstanceCreationExpression0, o interface{})  { my.UnimplementedVisitor("VisitClassInstanceCreationExpression0WithArg(ClassInstanceCreationExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitClassInstanceCreationExpression1(n *ClassInstanceCreationExpression1)  { my.UnimplementedVisitor("VisitClassInstanceCreationExpression1(ClassInstanceCreationExpression1)") }
-
-func (my *AbstractVisitor)      VisitClassInstanceCreationExpression1WithArg(n *ClassInstanceCreationExpression1, o interface{})  { my.UnimplementedVisitor("VisitClassInstanceCreationExpression1WithArg(ClassInstanceCreationExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitArrayCreationExpression0(n *ArrayCreationExpression0)  { my.UnimplementedVisitor("VisitArrayCreationExpression0(ArrayCreationExpression0)") }
-
-func (my *AbstractVisitor)      VisitArrayCreationExpression0WithArg(n *ArrayCreationExpression0, o interface{})  { my.UnimplementedVisitor("VisitArrayCreationExpression0WithArg(ArrayCreationExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitArrayCreationExpression1(n *ArrayCreationExpression1)  { my.UnimplementedVisitor("VisitArrayCreationExpression1(ArrayCreationExpression1)") }
-
-func (my *AbstractVisitor)      VisitArrayCreationExpression1WithArg(n *ArrayCreationExpression1, o interface{})  { my.UnimplementedVisitor("VisitArrayCreationExpression1WithArg(ArrayCreationExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitArrayCreationExpression2(n *ArrayCreationExpression2)  { my.UnimplementedVisitor("VisitArrayCreationExpression2(ArrayCreationExpression2)") }
-
-func (my *AbstractVisitor)      VisitArrayCreationExpression2WithArg(n *ArrayCreationExpression2, o interface{})  { my.UnimplementedVisitor("VisitArrayCreationExpression2WithArg(ArrayCreationExpression2, interface{})") }
-
-func (my *AbstractVisitor)      VisitArrayCreationExpression3(n *ArrayCreationExpression3)  { my.UnimplementedVisitor("VisitArrayCreationExpression3(ArrayCreationExpression3)") }
-
-func (my *AbstractVisitor)      VisitArrayCreationExpression3WithArg(n *ArrayCreationExpression3, o interface{})  { my.UnimplementedVisitor("VisitArrayCreationExpression3WithArg(ArrayCreationExpression3, interface{})") }
-
-func (my *AbstractVisitor)      VisitDims0(n *Dims0)  { my.UnimplementedVisitor("VisitDims0(Dims0)") }
-
-func (my *AbstractVisitor)      VisitDims0WithArg(n *Dims0, o interface{})  { my.UnimplementedVisitor("VisitDims0WithArg(Dims0, interface{})") }
-
-func (my *AbstractVisitor)      VisitDims1(n *Dims1)  { my.UnimplementedVisitor("VisitDims1(Dims1)") }
-
-func (my *AbstractVisitor)      VisitDims1WithArg(n *Dims1, o interface{})  { my.UnimplementedVisitor("VisitDims1WithArg(Dims1, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldAccess0(n *FieldAccess0)  { my.UnimplementedVisitor("VisitFieldAccess0(FieldAccess0)") }
-
-func (my *AbstractVisitor)      VisitFieldAccess0WithArg(n *FieldAccess0, o interface{})  { my.UnimplementedVisitor("VisitFieldAccess0WithArg(FieldAccess0, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldAccess1(n *FieldAccess1)  { my.UnimplementedVisitor("VisitFieldAccess1(FieldAccess1)") }
-
-func (my *AbstractVisitor)      VisitFieldAccess1WithArg(n *FieldAccess1, o interface{})  { my.UnimplementedVisitor("VisitFieldAccess1WithArg(FieldAccess1, interface{})") }
-
-func (my *AbstractVisitor)      VisitFieldAccess2(n *FieldAccess2)  { my.UnimplementedVisitor("VisitFieldAccess2(FieldAccess2)") }
-
-func (my *AbstractVisitor)      VisitFieldAccess2WithArg(n *FieldAccess2, o interface{})  { my.UnimplementedVisitor("VisitFieldAccess2WithArg(FieldAccess2, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation0(n *MethodInvocation0)  { my.UnimplementedVisitor("VisitMethodInvocation0(MethodInvocation0)") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation0WithArg(n *MethodInvocation0, o interface{})  { my.UnimplementedVisitor("VisitMethodInvocation0WithArg(MethodInvocation0, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation1(n *MethodInvocation1)  { my.UnimplementedVisitor("VisitMethodInvocation1(MethodInvocation1)") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation1WithArg(n *MethodInvocation1, o interface{})  { my.UnimplementedVisitor("VisitMethodInvocation1WithArg(MethodInvocation1, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation2(n *MethodInvocation2)  { my.UnimplementedVisitor("VisitMethodInvocation2(MethodInvocation2)") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation2WithArg(n *MethodInvocation2, o interface{})  { my.UnimplementedVisitor("VisitMethodInvocation2WithArg(MethodInvocation2, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation3(n *MethodInvocation3)  { my.UnimplementedVisitor("VisitMethodInvocation3(MethodInvocation3)") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation3WithArg(n *MethodInvocation3, o interface{})  { my.UnimplementedVisitor("VisitMethodInvocation3WithArg(MethodInvocation3, interface{})") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation4(n *MethodInvocation4)  { my.UnimplementedVisitor("VisitMethodInvocation4(MethodInvocation4)") }
-
-func (my *AbstractVisitor)      VisitMethodInvocation4WithArg(n *MethodInvocation4, o interface{})  { my.UnimplementedVisitor("VisitMethodInvocation4WithArg(MethodInvocation4, interface{})") }
-
-func (my *AbstractVisitor)      VisitArrayAccess0(n *ArrayAccess0)  { my.UnimplementedVisitor("VisitArrayAccess0(ArrayAccess0)") }
-
-func (my *AbstractVisitor)      VisitArrayAccess0WithArg(n *ArrayAccess0, o interface{})  { my.UnimplementedVisitor("VisitArrayAccess0WithArg(ArrayAccess0, interface{})") }
-
-func (my *AbstractVisitor)      VisitArrayAccess1(n *ArrayAccess1)  { my.UnimplementedVisitor("VisitArrayAccess1(ArrayAccess1)") }
-
-func (my *AbstractVisitor)      VisitArrayAccess1WithArg(n *ArrayAccess1, o interface{})  { my.UnimplementedVisitor("VisitArrayAccess1WithArg(ArrayAccess1, interface{})") }
-
-func (my *AbstractVisitor)      VisitUnaryExpression0(n *UnaryExpression0)  { my.UnimplementedVisitor("VisitUnaryExpression0(UnaryExpression0)") }
-
-func (my *AbstractVisitor)      VisitUnaryExpression0WithArg(n *UnaryExpression0, o interface{})  { my.UnimplementedVisitor("VisitUnaryExpression0WithArg(UnaryExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitUnaryExpression1(n *UnaryExpression1)  { my.UnimplementedVisitor("VisitUnaryExpression1(UnaryExpression1)") }
-
-func (my *AbstractVisitor)      VisitUnaryExpression1WithArg(n *UnaryExpression1, o interface{})  { my.UnimplementedVisitor("VisitUnaryExpression1WithArg(UnaryExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitUnaryExpressionNotPlusMinus0(n *UnaryExpressionNotPlusMinus0)  { my.UnimplementedVisitor("VisitUnaryExpressionNotPlusMinus0(UnaryExpressionNotPlusMinus0)") }
-
-func (my *AbstractVisitor)      VisitUnaryExpressionNotPlusMinus0WithArg(n *UnaryExpressionNotPlusMinus0, o interface{})  { my.UnimplementedVisitor("VisitUnaryExpressionNotPlusMinus0WithArg(UnaryExpressionNotPlusMinus0, interface{})") }
-
-func (my *AbstractVisitor)      VisitUnaryExpressionNotPlusMinus1(n *UnaryExpressionNotPlusMinus1)  { my.UnimplementedVisitor("VisitUnaryExpressionNotPlusMinus1(UnaryExpressionNotPlusMinus1)") }
-
-func (my *AbstractVisitor)      VisitUnaryExpressionNotPlusMinus1WithArg(n *UnaryExpressionNotPlusMinus1, o interface{})  { my.UnimplementedVisitor("VisitUnaryExpressionNotPlusMinus1WithArg(UnaryExpressionNotPlusMinus1, interface{})") }
-
-func (my *AbstractVisitor)      VisitCastExpression0(n *CastExpression0)  { my.UnimplementedVisitor("VisitCastExpression0(CastExpression0)") }
-
-func (my *AbstractVisitor)      VisitCastExpression0WithArg(n *CastExpression0, o interface{})  { my.UnimplementedVisitor("VisitCastExpression0WithArg(CastExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitCastExpression1(n *CastExpression1)  { my.UnimplementedVisitor("VisitCastExpression1(CastExpression1)") }
-
-func (my *AbstractVisitor)      VisitCastExpression1WithArg(n *CastExpression1, o interface{})  { my.UnimplementedVisitor("VisitCastExpression1WithArg(CastExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitMultiplicativeExpression0(n *MultiplicativeExpression0)  { my.UnimplementedVisitor("VisitMultiplicativeExpression0(MultiplicativeExpression0)") }
-
-func (my *AbstractVisitor)      VisitMultiplicativeExpression0WithArg(n *MultiplicativeExpression0, o interface{})  { my.UnimplementedVisitor("VisitMultiplicativeExpression0WithArg(MultiplicativeExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitMultiplicativeExpression1(n *MultiplicativeExpression1)  { my.UnimplementedVisitor("VisitMultiplicativeExpression1(MultiplicativeExpression1)") }
-
-func (my *AbstractVisitor)      VisitMultiplicativeExpression1WithArg(n *MultiplicativeExpression1, o interface{})  { my.UnimplementedVisitor("VisitMultiplicativeExpression1WithArg(MultiplicativeExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitMultiplicativeExpression2(n *MultiplicativeExpression2)  { my.UnimplementedVisitor("VisitMultiplicativeExpression2(MultiplicativeExpression2)") }
-
-func (my *AbstractVisitor)      VisitMultiplicativeExpression2WithArg(n *MultiplicativeExpression2, o interface{})  { my.UnimplementedVisitor("VisitMultiplicativeExpression2WithArg(MultiplicativeExpression2, interface{})") }
-
-func (my *AbstractVisitor)      VisitAdditiveExpression0(n *AdditiveExpression0)  { my.UnimplementedVisitor("VisitAdditiveExpression0(AdditiveExpression0)") }
-
-func (my *AbstractVisitor)      VisitAdditiveExpression0WithArg(n *AdditiveExpression0, o interface{})  { my.UnimplementedVisitor("VisitAdditiveExpression0WithArg(AdditiveExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitAdditiveExpression1(n *AdditiveExpression1)  { my.UnimplementedVisitor("VisitAdditiveExpression1(AdditiveExpression1)") }
-
-func (my *AbstractVisitor)      VisitAdditiveExpression1WithArg(n *AdditiveExpression1, o interface{})  { my.UnimplementedVisitor("VisitAdditiveExpression1WithArg(AdditiveExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitShiftExpression0(n *ShiftExpression0)  { my.UnimplementedVisitor("VisitShiftExpression0(ShiftExpression0)") }
-
-func (my *AbstractVisitor)      VisitShiftExpression0WithArg(n *ShiftExpression0, o interface{})  { my.UnimplementedVisitor("VisitShiftExpression0WithArg(ShiftExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitShiftExpression1(n *ShiftExpression1)  { my.UnimplementedVisitor("VisitShiftExpression1(ShiftExpression1)") }
-
-func (my *AbstractVisitor)      VisitShiftExpression1WithArg(n *ShiftExpression1, o interface{})  { my.UnimplementedVisitor("VisitShiftExpression1WithArg(ShiftExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitShiftExpression2(n *ShiftExpression2)  { my.UnimplementedVisitor("VisitShiftExpression2(ShiftExpression2)") }
-
-func (my *AbstractVisitor)      VisitShiftExpression2WithArg(n *ShiftExpression2, o interface{})  { my.UnimplementedVisitor("VisitShiftExpression2WithArg(ShiftExpression2, interface{})") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression0(n *RelationalExpression0)  { my.UnimplementedVisitor("VisitRelationalExpression0(RelationalExpression0)") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression0WithArg(n *RelationalExpression0, o interface{})  { my.UnimplementedVisitor("VisitRelationalExpression0WithArg(RelationalExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression1(n *RelationalExpression1)  { my.UnimplementedVisitor("VisitRelationalExpression1(RelationalExpression1)") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression1WithArg(n *RelationalExpression1, o interface{})  { my.UnimplementedVisitor("VisitRelationalExpression1WithArg(RelationalExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression2(n *RelationalExpression2)  { my.UnimplementedVisitor("VisitRelationalExpression2(RelationalExpression2)") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression2WithArg(n *RelationalExpression2, o interface{})  { my.UnimplementedVisitor("VisitRelationalExpression2WithArg(RelationalExpression2, interface{})") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression3(n *RelationalExpression3)  { my.UnimplementedVisitor("VisitRelationalExpression3(RelationalExpression3)") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression3WithArg(n *RelationalExpression3, o interface{})  { my.UnimplementedVisitor("VisitRelationalExpression3WithArg(RelationalExpression3, interface{})") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression4(n *RelationalExpression4)  { my.UnimplementedVisitor("VisitRelationalExpression4(RelationalExpression4)") }
-
-func (my *AbstractVisitor)      VisitRelationalExpression4WithArg(n *RelationalExpression4, o interface{})  { my.UnimplementedVisitor("VisitRelationalExpression4WithArg(RelationalExpression4, interface{})") }
-
-func (my *AbstractVisitor)      VisitEqualityExpression0(n *EqualityExpression0)  { my.UnimplementedVisitor("VisitEqualityExpression0(EqualityExpression0)") }
-
-func (my *AbstractVisitor)      VisitEqualityExpression0WithArg(n *EqualityExpression0, o interface{})  { my.UnimplementedVisitor("VisitEqualityExpression0WithArg(EqualityExpression0, interface{})") }
-
-func (my *AbstractVisitor)      VisitEqualityExpression1(n *EqualityExpression1)  { my.UnimplementedVisitor("VisitEqualityExpression1(EqualityExpression1)") }
-
-func (my *AbstractVisitor)      VisitEqualityExpression1WithArg(n *EqualityExpression1, o interface{})  { my.UnimplementedVisitor("VisitEqualityExpression1WithArg(EqualityExpression1, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator0(n *AssignmentOperator0)  { my.UnimplementedVisitor("VisitAssignmentOperator0(AssignmentOperator0)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator0WithArg(n *AssignmentOperator0, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator0WithArg(AssignmentOperator0, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator1(n *AssignmentOperator1)  { my.UnimplementedVisitor("VisitAssignmentOperator1(AssignmentOperator1)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator1WithArg(n *AssignmentOperator1, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator1WithArg(AssignmentOperator1, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator2(n *AssignmentOperator2)  { my.UnimplementedVisitor("VisitAssignmentOperator2(AssignmentOperator2)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator2WithArg(n *AssignmentOperator2, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator2WithArg(AssignmentOperator2, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator3(n *AssignmentOperator3)  { my.UnimplementedVisitor("VisitAssignmentOperator3(AssignmentOperator3)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator3WithArg(n *AssignmentOperator3, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator3WithArg(AssignmentOperator3, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator4(n *AssignmentOperator4)  { my.UnimplementedVisitor("VisitAssignmentOperator4(AssignmentOperator4)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator4WithArg(n *AssignmentOperator4, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator4WithArg(AssignmentOperator4, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator5(n *AssignmentOperator5)  { my.UnimplementedVisitor("VisitAssignmentOperator5(AssignmentOperator5)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator5WithArg(n *AssignmentOperator5, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator5WithArg(AssignmentOperator5, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator6(n *AssignmentOperator6)  { my.UnimplementedVisitor("VisitAssignmentOperator6(AssignmentOperator6)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator6WithArg(n *AssignmentOperator6, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator6WithArg(AssignmentOperator6, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator7(n *AssignmentOperator7)  { my.UnimplementedVisitor("VisitAssignmentOperator7(AssignmentOperator7)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator7WithArg(n *AssignmentOperator7, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator7WithArg(AssignmentOperator7, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator8(n *AssignmentOperator8)  { my.UnimplementedVisitor("VisitAssignmentOperator8(AssignmentOperator8)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator8WithArg(n *AssignmentOperator8, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator8WithArg(AssignmentOperator8, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator9(n *AssignmentOperator9)  { my.UnimplementedVisitor("VisitAssignmentOperator9(AssignmentOperator9)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator9WithArg(n *AssignmentOperator9, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator9WithArg(AssignmentOperator9, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator10(n *AssignmentOperator10)  { my.UnimplementedVisitor("VisitAssignmentOperator10(AssignmentOperator10)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator10WithArg(n *AssignmentOperator10, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator10WithArg(AssignmentOperator10, interface{})") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator11(n *AssignmentOperator11)  { my.UnimplementedVisitor("VisitAssignmentOperator11(AssignmentOperator11)") }
-
-func (my *AbstractVisitor)      VisitAssignmentOperator11WithArg(n *AssignmentOperator11, o interface{})  { my.UnimplementedVisitor("VisitAssignmentOperator11WithArg(AssignmentOperator11, interface{})") }
-
-
-func (my *AbstractVisitor)     Visit(n IAst){
-        {
-         var n2,ok =n.(*AstToken)
-         if ok {
-            my.dispatch.VisitAstToken(n2)
-            return 
-          }
+func (my *AbstractVisitor)     Visit(n IAst) bool{
+     switch n2 := n.(type) {
+        case *AstToken:{
+            return my.dispatch.VisitAstToken(n2)
         }
-        {
-         var n2,ok =n.(*identifier)
-         if ok {
-            my.dispatch.Visitidentifier(n2)
-            return 
-          }
+        case *identifier:{
+            return my.dispatch.Visitidentifier(n2)
         }
-        {
-         var n2,ok =n.(*PrimitiveType)
-         if ok {
-            my.dispatch.VisitPrimitiveType(n2)
-            return 
-          }
+        case *PrimitiveType:{
+            return my.dispatch.VisitPrimitiveType(n2)
         }
-        {
-         var n2,ok =n.(*ClassType)
-         if ok {
-            my.dispatch.VisitClassType(n2)
-            return 
-          }
+        case *ClassType:{
+            return my.dispatch.VisitClassType(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceType)
-         if ok {
-            my.dispatch.VisitInterfaceType(n2)
-            return 
-          }
+        case *InterfaceType:{
+            return my.dispatch.VisitInterfaceType(n2)
         }
-        {
-         var n2,ok =n.(*TypeName)
-         if ok {
-            my.dispatch.VisitTypeName(n2)
-            return 
-          }
+        case *TypeName:{
+            return my.dispatch.VisitTypeName(n2)
         }
-        {
-         var n2,ok =n.(*ArrayType)
-         if ok {
-            my.dispatch.VisitArrayType(n2)
-            return 
-          }
+        case *ArrayType:{
+            return my.dispatch.VisitArrayType(n2)
         }
-        {
-         var n2,ok =n.(*TypeParameter)
-         if ok {
-            my.dispatch.VisitTypeParameter(n2)
-            return 
-          }
+        case *TypeParameter:{
+            return my.dispatch.VisitTypeParameter(n2)
         }
-        {
-         var n2,ok =n.(*TypeBound)
-         if ok {
-            my.dispatch.VisitTypeBound(n2)
-            return 
-          }
+        case *TypeBound:{
+            return my.dispatch.VisitTypeBound(n2)
         }
-        {
-         var n2,ok =n.(*AdditionalBoundList)
-         if ok {
-            my.dispatch.VisitAdditionalBoundList(n2)
-            return 
-          }
+        case *AdditionalBoundList:{
+            return my.dispatch.VisitAdditionalBoundList(n2)
         }
-        {
-         var n2,ok =n.(*AdditionalBound)
-         if ok {
-            my.dispatch.VisitAdditionalBound(n2)
-            return 
-          }
+        case *AdditionalBound:{
+            return my.dispatch.VisitAdditionalBound(n2)
         }
-        {
-         var n2,ok =n.(*TypeArguments)
-         if ok {
-            my.dispatch.VisitTypeArguments(n2)
-            return 
-          }
+        case *TypeArguments:{
+            return my.dispatch.VisitTypeArguments(n2)
         }
-        {
-         var n2,ok =n.(*ActualTypeArgumentList)
-         if ok {
-            my.dispatch.VisitActualTypeArgumentList(n2)
-            return 
-          }
+        case *ActualTypeArgumentList:{
+            return my.dispatch.VisitActualTypeArgumentList(n2)
         }
-        {
-         var n2,ok =n.(*Wildcard)
-         if ok {
-            my.dispatch.VisitWildcard(n2)
-            return 
-          }
+        case *Wildcard:{
+            return my.dispatch.VisitWildcard(n2)
         }
-        {
-         var n2,ok =n.(*PackageName)
-         if ok {
-            my.dispatch.VisitPackageName(n2)
-            return 
-          }
+        case *PackageName:{
+            return my.dispatch.VisitPackageName(n2)
         }
-        {
-         var n2,ok =n.(*ExpressionName)
-         if ok {
-            my.dispatch.VisitExpressionName(n2)
-            return 
-          }
+        case *ExpressionName:{
+            return my.dispatch.VisitExpressionName(n2)
         }
-        {
-         var n2,ok =n.(*MethodName)
-         if ok {
-            my.dispatch.VisitMethodName(n2)
-            return 
-          }
+        case *MethodName:{
+            return my.dispatch.VisitMethodName(n2)
         }
-        {
-         var n2,ok =n.(*PackageOrTypeName)
-         if ok {
-            my.dispatch.VisitPackageOrTypeName(n2)
-            return 
-          }
+        case *PackageOrTypeName:{
+            return my.dispatch.VisitPackageOrTypeName(n2)
         }
-        {
-         var n2,ok =n.(*AmbiguousName)
-         if ok {
-            my.dispatch.VisitAmbiguousName(n2)
-            return 
-          }
+        case *AmbiguousName:{
+            return my.dispatch.VisitAmbiguousName(n2)
         }
-        {
-         var n2,ok =n.(*CompilationUnit)
-         if ok {
-            my.dispatch.VisitCompilationUnit(n2)
-            return 
-          }
+        case *CompilationUnit:{
+            return my.dispatch.VisitCompilationUnit(n2)
         }
-        {
-         var n2,ok =n.(*ImportDeclarations)
-         if ok {
-            my.dispatch.VisitImportDeclarations(n2)
-            return 
-          }
+        case *ImportDeclarations:{
+            return my.dispatch.VisitImportDeclarations(n2)
         }
-        {
-         var n2,ok =n.(*TypeDeclarations)
-         if ok {
-            my.dispatch.VisitTypeDeclarations(n2)
-            return 
-          }
+        case *TypeDeclarations:{
+            return my.dispatch.VisitTypeDeclarations(n2)
         }
-        {
-         var n2,ok =n.(*PackageDeclaration)
-         if ok {
-            my.dispatch.VisitPackageDeclaration(n2)
-            return 
-          }
+        case *PackageDeclaration:{
+            return my.dispatch.VisitPackageDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*SingleTypeImportDeclaration)
-         if ok {
-            my.dispatch.VisitSingleTypeImportDeclaration(n2)
-            return 
-          }
+        case *SingleTypeImportDeclaration:{
+            return my.dispatch.VisitSingleTypeImportDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*TypeImportOnDemandDeclaration)
-         if ok {
-            my.dispatch.VisitTypeImportOnDemandDeclaration(n2)
-            return 
-          }
+        case *TypeImportOnDemandDeclaration:{
+            return my.dispatch.VisitTypeImportOnDemandDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*SingleStaticImportDeclaration)
-         if ok {
-            my.dispatch.VisitSingleStaticImportDeclaration(n2)
-            return 
-          }
+        case *SingleStaticImportDeclaration:{
+            return my.dispatch.VisitSingleStaticImportDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*StaticImportOnDemandDeclaration)
-         if ok {
-            my.dispatch.VisitStaticImportOnDemandDeclaration(n2)
-            return 
-          }
+        case *StaticImportOnDemandDeclaration:{
+            return my.dispatch.VisitStaticImportOnDemandDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*TypeDeclaration)
-         if ok {
-            my.dispatch.VisitTypeDeclaration(n2)
-            return 
-          }
+        case *TypeDeclaration:{
+            return my.dispatch.VisitTypeDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*NormalClassDeclaration)
-         if ok {
-            my.dispatch.VisitNormalClassDeclaration(n2)
-            return 
-          }
+        case *NormalClassDeclaration:{
+            return my.dispatch.VisitNormalClassDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*ClassModifiers)
-         if ok {
-            my.dispatch.VisitClassModifiers(n2)
-            return 
-          }
+        case *ClassModifiers:{
+            return my.dispatch.VisitClassModifiers(n2)
         }
-        {
-         var n2,ok =n.(*TypeParameters)
-         if ok {
-            my.dispatch.VisitTypeParameters(n2)
-            return 
-          }
+        case *TypeParameters:{
+            return my.dispatch.VisitTypeParameters(n2)
         }
-        {
-         var n2,ok =n.(*TypeParameterList)
-         if ok {
-            my.dispatch.VisitTypeParameterList(n2)
-            return 
-          }
+        case *TypeParameterList:{
+            return my.dispatch.VisitTypeParameterList(n2)
         }
-        {
-         var n2,ok =n.(*Super)
-         if ok {
-            my.dispatch.VisitSuper(n2)
-            return 
-          }
+        case *Super:{
+            return my.dispatch.VisitSuper(n2)
         }
-        {
-         var n2,ok =n.(*Interfaces)
-         if ok {
-            my.dispatch.VisitInterfaces(n2)
-            return 
-          }
+        case *Interfaces:{
+            return my.dispatch.VisitInterfaces(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceTypeList)
-         if ok {
-            my.dispatch.VisitInterfaceTypeList(n2)
-            return 
-          }
+        case *InterfaceTypeList:{
+            return my.dispatch.VisitInterfaceTypeList(n2)
         }
-        {
-         var n2,ok =n.(*ClassBody)
-         if ok {
-            my.dispatch.VisitClassBody(n2)
-            return 
-          }
+        case *ClassBody:{
+            return my.dispatch.VisitClassBody(n2)
         }
-        {
-         var n2,ok =n.(*ClassBodyDeclarations)
-         if ok {
-            my.dispatch.VisitClassBodyDeclarations(n2)
-            return 
-          }
+        case *ClassBodyDeclarations:{
+            return my.dispatch.VisitClassBodyDeclarations(n2)
         }
-        {
-         var n2,ok =n.(*ClassMemberDeclaration)
-         if ok {
-            my.dispatch.VisitClassMemberDeclaration(n2)
-            return 
-          }
+        case *ClassMemberDeclaration:{
+            return my.dispatch.VisitClassMemberDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*FieldDeclaration)
-         if ok {
-            my.dispatch.VisitFieldDeclaration(n2)
-            return 
-          }
+        case *FieldDeclaration:{
+            return my.dispatch.VisitFieldDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*VariableDeclarators)
-         if ok {
-            my.dispatch.VisitVariableDeclarators(n2)
-            return 
-          }
+        case *VariableDeclarators:{
+            return my.dispatch.VisitVariableDeclarators(n2)
         }
-        {
-         var n2,ok =n.(*VariableDeclarator)
-         if ok {
-            my.dispatch.VisitVariableDeclarator(n2)
-            return 
-          }
+        case *VariableDeclarator:{
+            return my.dispatch.VisitVariableDeclarator(n2)
         }
-        {
-         var n2,ok =n.(*VariableDeclaratorId)
-         if ok {
-            my.dispatch.VisitVariableDeclaratorId(n2)
-            return 
-          }
+        case *VariableDeclaratorId:{
+            return my.dispatch.VisitVariableDeclaratorId(n2)
         }
-        {
-         var n2,ok =n.(*FieldModifiers)
-         if ok {
-            my.dispatch.VisitFieldModifiers(n2)
-            return 
-          }
+        case *FieldModifiers:{
+            return my.dispatch.VisitFieldModifiers(n2)
         }
-        {
-         var n2,ok =n.(*MethodDeclaration)
-         if ok {
-            my.dispatch.VisitMethodDeclaration(n2)
-            return 
-          }
+        case *MethodDeclaration:{
+            return my.dispatch.VisitMethodDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*MethodHeader)
-         if ok {
-            my.dispatch.VisitMethodHeader(n2)
-            return 
-          }
+        case *MethodHeader:{
+            return my.dispatch.VisitMethodHeader(n2)
         }
-        {
-         var n2,ok =n.(*ResultType)
-         if ok {
-            my.dispatch.VisitResultType(n2)
-            return 
-          }
+        case *ResultType:{
+            return my.dispatch.VisitResultType(n2)
         }
-        {
-         var n2,ok =n.(*FormalParameterList)
-         if ok {
-            my.dispatch.VisitFormalParameterList(n2)
-            return 
-          }
+        case *FormalParameterList:{
+            return my.dispatch.VisitFormalParameterList(n2)
         }
-        {
-         var n2,ok =n.(*FormalParameters)
-         if ok {
-            my.dispatch.VisitFormalParameters(n2)
-            return 
-          }
+        case *FormalParameters:{
+            return my.dispatch.VisitFormalParameters(n2)
         }
-        {
-         var n2,ok =n.(*FormalParameter)
-         if ok {
-            my.dispatch.VisitFormalParameter(n2)
-            return 
-          }
+        case *FormalParameter:{
+            return my.dispatch.VisitFormalParameter(n2)
         }
-        {
-         var n2,ok =n.(*VariableModifiers)
-         if ok {
-            my.dispatch.VisitVariableModifiers(n2)
-            return 
-          }
+        case *VariableModifiers:{
+            return my.dispatch.VisitVariableModifiers(n2)
         }
-        {
-         var n2,ok =n.(*VariableModifier)
-         if ok {
-            my.dispatch.VisitVariableModifier(n2)
-            return 
-          }
+        case *VariableModifier:{
+            return my.dispatch.VisitVariableModifier(n2)
         }
-        {
-         var n2,ok =n.(*LastFormalParameter)
-         if ok {
-            my.dispatch.VisitLastFormalParameter(n2)
-            return 
-          }
+        case *LastFormalParameter:{
+            return my.dispatch.VisitLastFormalParameter(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifiers)
-         if ok {
-            my.dispatch.VisitMethodModifiers(n2)
-            return 
-          }
+        case *MethodModifiers:{
+            return my.dispatch.VisitMethodModifiers(n2)
         }
-        {
-         var n2,ok =n.(*Throws)
-         if ok {
-            my.dispatch.VisitThrows(n2)
-            return 
-          }
+        case *Throws:{
+            return my.dispatch.VisitThrows(n2)
         }
-        {
-         var n2,ok =n.(*ExceptionTypeList)
-         if ok {
-            my.dispatch.VisitExceptionTypeList(n2)
-            return 
-          }
+        case *ExceptionTypeList:{
+            return my.dispatch.VisitExceptionTypeList(n2)
         }
-        {
-         var n2,ok =n.(*MethodBody)
-         if ok {
-            my.dispatch.VisitMethodBody(n2)
-            return 
-          }
+        case *MethodBody:{
+            return my.dispatch.VisitMethodBody(n2)
         }
-        {
-         var n2,ok =n.(*StaticInitializer)
-         if ok {
-            my.dispatch.VisitStaticInitializer(n2)
-            return 
-          }
+        case *StaticInitializer:{
+            return my.dispatch.VisitStaticInitializer(n2)
         }
-        {
-         var n2,ok =n.(*ConstructorDeclaration)
-         if ok {
-            my.dispatch.VisitConstructorDeclaration(n2)
-            return 
-          }
+        case *ConstructorDeclaration:{
+            return my.dispatch.VisitConstructorDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*ConstructorDeclarator)
-         if ok {
-            my.dispatch.VisitConstructorDeclarator(n2)
-            return 
-          }
+        case *ConstructorDeclarator:{
+            return my.dispatch.VisitConstructorDeclarator(n2)
         }
-        {
-         var n2,ok =n.(*ConstructorModifiers)
-         if ok {
-            my.dispatch.VisitConstructorModifiers(n2)
-            return 
-          }
+        case *ConstructorModifiers:{
+            return my.dispatch.VisitConstructorModifiers(n2)
         }
-        {
-         var n2,ok =n.(*ConstructorBody)
-         if ok {
-            my.dispatch.VisitConstructorBody(n2)
-            return 
-          }
+        case *ConstructorBody:{
+            return my.dispatch.VisitConstructorBody(n2)
         }
-        {
-         var n2,ok =n.(*EnumDeclaration)
-         if ok {
-            my.dispatch.VisitEnumDeclaration(n2)
-            return 
-          }
+        case *EnumDeclaration:{
+            return my.dispatch.VisitEnumDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*EnumBody)
-         if ok {
-            my.dispatch.VisitEnumBody(n2)
-            return 
-          }
+        case *EnumBody:{
+            return my.dispatch.VisitEnumBody(n2)
         }
-        {
-         var n2,ok =n.(*EnumConstants)
-         if ok {
-            my.dispatch.VisitEnumConstants(n2)
-            return 
-          }
+        case *EnumConstants:{
+            return my.dispatch.VisitEnumConstants(n2)
         }
-        {
-         var n2,ok =n.(*EnumConstant)
-         if ok {
-            my.dispatch.VisitEnumConstant(n2)
-            return 
-          }
+        case *EnumConstant:{
+            return my.dispatch.VisitEnumConstant(n2)
         }
-        {
-         var n2,ok =n.(*Arguments)
-         if ok {
-            my.dispatch.VisitArguments(n2)
-            return 
-          }
+        case *Arguments:{
+            return my.dispatch.VisitArguments(n2)
         }
-        {
-         var n2,ok =n.(*EnumBodyDeclarations)
-         if ok {
-            my.dispatch.VisitEnumBodyDeclarations(n2)
-            return 
-          }
+        case *EnumBodyDeclarations:{
+            return my.dispatch.VisitEnumBodyDeclarations(n2)
         }
-        {
-         var n2,ok =n.(*NormalInterfaceDeclaration)
-         if ok {
-            my.dispatch.VisitNormalInterfaceDeclaration(n2)
-            return 
-          }
+        case *NormalInterfaceDeclaration:{
+            return my.dispatch.VisitNormalInterfaceDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceModifiers)
-         if ok {
-            my.dispatch.VisitInterfaceModifiers(n2)
-            return 
-          }
+        case *InterfaceModifiers:{
+            return my.dispatch.VisitInterfaceModifiers(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceBody)
-         if ok {
-            my.dispatch.VisitInterfaceBody(n2)
-            return 
-          }
+        case *InterfaceBody:{
+            return my.dispatch.VisitInterfaceBody(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceMemberDeclarations)
-         if ok {
-            my.dispatch.VisitInterfaceMemberDeclarations(n2)
-            return 
-          }
+        case *InterfaceMemberDeclarations:{
+            return my.dispatch.VisitInterfaceMemberDeclarations(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceMemberDeclaration)
-         if ok {
-            my.dispatch.VisitInterfaceMemberDeclaration(n2)
-            return 
-          }
+        case *InterfaceMemberDeclaration:{
+            return my.dispatch.VisitInterfaceMemberDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*ConstantDeclaration)
-         if ok {
-            my.dispatch.VisitConstantDeclaration(n2)
-            return 
-          }
+        case *ConstantDeclaration:{
+            return my.dispatch.VisitConstantDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*ConstantModifiers)
-         if ok {
-            my.dispatch.VisitConstantModifiers(n2)
-            return 
-          }
+        case *ConstantModifiers:{
+            return my.dispatch.VisitConstantModifiers(n2)
         }
-        {
-         var n2,ok =n.(*AbstractMethodDeclaration)
-         if ok {
-            my.dispatch.VisitAbstractMethodDeclaration(n2)
-            return 
-          }
+        case *AbstractMethodDeclaration:{
+            return my.dispatch.VisitAbstractMethodDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*AbstractMethodModifiers)
-         if ok {
-            my.dispatch.VisitAbstractMethodModifiers(n2)
-            return 
-          }
+        case *AbstractMethodModifiers:{
+            return my.dispatch.VisitAbstractMethodModifiers(n2)
         }
-        {
-         var n2,ok =n.(*AnnotationTypeDeclaration)
-         if ok {
-            my.dispatch.VisitAnnotationTypeDeclaration(n2)
-            return 
-          }
+        case *AnnotationTypeDeclaration:{
+            return my.dispatch.VisitAnnotationTypeDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*AnnotationTypeBody)
-         if ok {
-            my.dispatch.VisitAnnotationTypeBody(n2)
-            return 
-          }
+        case *AnnotationTypeBody:{
+            return my.dispatch.VisitAnnotationTypeBody(n2)
         }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclarations)
-         if ok {
-            my.dispatch.VisitAnnotationTypeElementDeclarations(n2)
-            return 
-          }
+        case *AnnotationTypeElementDeclarations:{
+            return my.dispatch.VisitAnnotationTypeElementDeclarations(n2)
         }
-        {
-         var n2,ok =n.(*DefaultValue)
-         if ok {
-            my.dispatch.VisitDefaultValue(n2)
-            return 
-          }
+        case *DefaultValue:{
+            return my.dispatch.VisitDefaultValue(n2)
         }
-        {
-         var n2,ok =n.(*Annotations)
-         if ok {
-            my.dispatch.VisitAnnotations(n2)
-            return 
-          }
+        case *Annotations:{
+            return my.dispatch.VisitAnnotations(n2)
         }
-        {
-         var n2,ok =n.(*NormalAnnotation)
-         if ok {
-            my.dispatch.VisitNormalAnnotation(n2)
-            return 
-          }
+        case *NormalAnnotation:{
+            return my.dispatch.VisitNormalAnnotation(n2)
         }
-        {
-         var n2,ok =n.(*ElementValuePairs)
-         if ok {
-            my.dispatch.VisitElementValuePairs(n2)
-            return 
-          }
+        case *ElementValuePairs:{
+            return my.dispatch.VisitElementValuePairs(n2)
         }
-        {
-         var n2,ok =n.(*ElementValuePair)
-         if ok {
-            my.dispatch.VisitElementValuePair(n2)
-            return 
-          }
+        case *ElementValuePair:{
+            return my.dispatch.VisitElementValuePair(n2)
         }
-        {
-         var n2,ok =n.(*ElementValueArrayInitializer)
-         if ok {
-            my.dispatch.VisitElementValueArrayInitializer(n2)
-            return 
-          }
+        case *ElementValueArrayInitializer:{
+            return my.dispatch.VisitElementValueArrayInitializer(n2)
         }
-        {
-         var n2,ok =n.(*ElementValues)
-         if ok {
-            my.dispatch.VisitElementValues(n2)
-            return 
-          }
+        case *ElementValues:{
+            return my.dispatch.VisitElementValues(n2)
         }
-        {
-         var n2,ok =n.(*MarkerAnnotation)
-         if ok {
-            my.dispatch.VisitMarkerAnnotation(n2)
-            return 
-          }
+        case *MarkerAnnotation:{
+            return my.dispatch.VisitMarkerAnnotation(n2)
         }
-        {
-         var n2,ok =n.(*SingleElementAnnotation)
-         if ok {
-            my.dispatch.VisitSingleElementAnnotation(n2)
-            return 
-          }
+        case *SingleElementAnnotation:{
+            return my.dispatch.VisitSingleElementAnnotation(n2)
         }
-        {
-         var n2,ok =n.(*ArrayInitializer)
-         if ok {
-            my.dispatch.VisitArrayInitializer(n2)
-            return 
-          }
+        case *ArrayInitializer:{
+            return my.dispatch.VisitArrayInitializer(n2)
         }
-        {
-         var n2,ok =n.(*VariableInitializers)
-         if ok {
-            my.dispatch.VisitVariableInitializers(n2)
-            return 
-          }
+        case *VariableInitializers:{
+            return my.dispatch.VisitVariableInitializers(n2)
         }
-        {
-         var n2,ok =n.(*Block)
-         if ok {
-            my.dispatch.VisitBlock(n2)
-            return 
-          }
+        case *Block:{
+            return my.dispatch.VisitBlock(n2)
         }
-        {
-         var n2,ok =n.(*BlockStatements)
-         if ok {
-            my.dispatch.VisitBlockStatements(n2)
-            return 
-          }
+        case *BlockStatements:{
+            return my.dispatch.VisitBlockStatements(n2)
         }
-        {
-         var n2,ok =n.(*LocalVariableDeclarationStatement)
-         if ok {
-            my.dispatch.VisitLocalVariableDeclarationStatement(n2)
-            return 
-          }
+        case *LocalVariableDeclarationStatement:{
+            return my.dispatch.VisitLocalVariableDeclarationStatement(n2)
         }
-        {
-         var n2,ok =n.(*LocalVariableDeclaration)
-         if ok {
-            my.dispatch.VisitLocalVariableDeclaration(n2)
-            return 
-          }
+        case *LocalVariableDeclaration:{
+            return my.dispatch.VisitLocalVariableDeclaration(n2)
         }
-        {
-         var n2,ok =n.(*IfThenStatement)
-         if ok {
-            my.dispatch.VisitIfThenStatement(n2)
-            return 
-          }
+        case *IfThenStatement:{
+            return my.dispatch.VisitIfThenStatement(n2)
         }
-        {
-         var n2,ok =n.(*IfThenElseStatement)
-         if ok {
-            my.dispatch.VisitIfThenElseStatement(n2)
-            return 
-          }
+        case *IfThenElseStatement:{
+            return my.dispatch.VisitIfThenElseStatement(n2)
         }
-        {
-         var n2,ok =n.(*IfThenElseStatementNoShortIf)
-         if ok {
-            my.dispatch.VisitIfThenElseStatementNoShortIf(n2)
-            return 
-          }
+        case *IfThenElseStatementNoShortIf:{
+            return my.dispatch.VisitIfThenElseStatementNoShortIf(n2)
         }
-        {
-         var n2,ok =n.(*EmptyStatement)
-         if ok {
-            my.dispatch.VisitEmptyStatement(n2)
-            return 
-          }
+        case *EmptyStatement:{
+            return my.dispatch.VisitEmptyStatement(n2)
         }
-        {
-         var n2,ok =n.(*LabeledStatement)
-         if ok {
-            my.dispatch.VisitLabeledStatement(n2)
-            return 
-          }
+        case *LabeledStatement:{
+            return my.dispatch.VisitLabeledStatement(n2)
         }
-        {
-         var n2,ok =n.(*LabeledStatementNoShortIf)
-         if ok {
-            my.dispatch.VisitLabeledStatementNoShortIf(n2)
-            return 
-          }
+        case *LabeledStatementNoShortIf:{
+            return my.dispatch.VisitLabeledStatementNoShortIf(n2)
         }
-        {
-         var n2,ok =n.(*ExpressionStatement)
-         if ok {
-            my.dispatch.VisitExpressionStatement(n2)
-            return 
-          }
+        case *ExpressionStatement:{
+            return my.dispatch.VisitExpressionStatement(n2)
         }
-        {
-         var n2,ok =n.(*SwitchStatement)
-         if ok {
-            my.dispatch.VisitSwitchStatement(n2)
-            return 
-          }
+        case *SwitchStatement:{
+            return my.dispatch.VisitSwitchStatement(n2)
         }
-        {
-         var n2,ok =n.(*SwitchBlock)
-         if ok {
-            my.dispatch.VisitSwitchBlock(n2)
-            return 
-          }
+        case *SwitchBlock:{
+            return my.dispatch.VisitSwitchBlock(n2)
         }
-        {
-         var n2,ok =n.(*SwitchBlockStatementGroups)
-         if ok {
-            my.dispatch.VisitSwitchBlockStatementGroups(n2)
-            return 
-          }
+        case *SwitchBlockStatementGroups:{
+            return my.dispatch.VisitSwitchBlockStatementGroups(n2)
         }
-        {
-         var n2,ok =n.(*SwitchBlockStatementGroup)
-         if ok {
-            my.dispatch.VisitSwitchBlockStatementGroup(n2)
-            return 
-          }
+        case *SwitchBlockStatementGroup:{
+            return my.dispatch.VisitSwitchBlockStatementGroup(n2)
         }
-        {
-         var n2,ok =n.(*SwitchLabels)
-         if ok {
-            my.dispatch.VisitSwitchLabels(n2)
-            return 
-          }
+        case *SwitchLabels:{
+            return my.dispatch.VisitSwitchLabels(n2)
         }
-        {
-         var n2,ok =n.(*WhileStatement)
-         if ok {
-            my.dispatch.VisitWhileStatement(n2)
-            return 
-          }
+        case *WhileStatement:{
+            return my.dispatch.VisitWhileStatement(n2)
         }
-        {
-         var n2,ok =n.(*WhileStatementNoShortIf)
-         if ok {
-            my.dispatch.VisitWhileStatementNoShortIf(n2)
-            return 
-          }
+        case *WhileStatementNoShortIf:{
+            return my.dispatch.VisitWhileStatementNoShortIf(n2)
         }
-        {
-         var n2,ok =n.(*DoStatement)
-         if ok {
-            my.dispatch.VisitDoStatement(n2)
-            return 
-          }
+        case *DoStatement:{
+            return my.dispatch.VisitDoStatement(n2)
         }
-        {
-         var n2,ok =n.(*BasicForStatement)
-         if ok {
-            my.dispatch.VisitBasicForStatement(n2)
-            return 
-          }
+        case *BasicForStatement:{
+            return my.dispatch.VisitBasicForStatement(n2)
         }
-        {
-         var n2,ok =n.(*ForStatementNoShortIf)
-         if ok {
-            my.dispatch.VisitForStatementNoShortIf(n2)
-            return 
-          }
+        case *ForStatementNoShortIf:{
+            return my.dispatch.VisitForStatementNoShortIf(n2)
         }
-        {
-         var n2,ok =n.(*StatementExpressionList)
-         if ok {
-            my.dispatch.VisitStatementExpressionList(n2)
-            return 
-          }
+        case *StatementExpressionList:{
+            return my.dispatch.VisitStatementExpressionList(n2)
         }
-        {
-         var n2,ok =n.(*EnhancedForStatement)
-         if ok {
-            my.dispatch.VisitEnhancedForStatement(n2)
-            return 
-          }
+        case *EnhancedForStatement:{
+            return my.dispatch.VisitEnhancedForStatement(n2)
         }
-        {
-         var n2,ok =n.(*BreakStatement)
-         if ok {
-            my.dispatch.VisitBreakStatement(n2)
-            return 
-          }
+        case *BreakStatement:{
+            return my.dispatch.VisitBreakStatement(n2)
         }
-        {
-         var n2,ok =n.(*ContinueStatement)
-         if ok {
-            my.dispatch.VisitContinueStatement(n2)
-            return 
-          }
+        case *ContinueStatement:{
+            return my.dispatch.VisitContinueStatement(n2)
         }
-        {
-         var n2,ok =n.(*ReturnStatement)
-         if ok {
-            my.dispatch.VisitReturnStatement(n2)
-            return 
-          }
+        case *ReturnStatement:{
+            return my.dispatch.VisitReturnStatement(n2)
         }
-        {
-         var n2,ok =n.(*ThrowStatement)
-         if ok {
-            my.dispatch.VisitThrowStatement(n2)
-            return 
-          }
+        case *ThrowStatement:{
+            return my.dispatch.VisitThrowStatement(n2)
         }
-        {
-         var n2,ok =n.(*SynchronizedStatement)
-         if ok {
-            my.dispatch.VisitSynchronizedStatement(n2)
-            return 
-          }
+        case *SynchronizedStatement:{
+            return my.dispatch.VisitSynchronizedStatement(n2)
         }
-        {
-         var n2,ok =n.(*Catches)
-         if ok {
-            my.dispatch.VisitCatches(n2)
-            return 
-          }
+        case *Catches:{
+            return my.dispatch.VisitCatches(n2)
         }
-        {
-         var n2,ok =n.(*CatchClause)
-         if ok {
-            my.dispatch.VisitCatchClause(n2)
-            return 
-          }
+        case *CatchClause:{
+            return my.dispatch.VisitCatchClause(n2)
         }
-        {
-         var n2,ok =n.(*Finally)
-         if ok {
-            my.dispatch.VisitFinally(n2)
-            return 
-          }
+        case *Finally:{
+            return my.dispatch.VisitFinally(n2)
         }
-        {
-         var n2,ok =n.(*ArgumentList)
-         if ok {
-            my.dispatch.VisitArgumentList(n2)
-            return 
-          }
+        case *ArgumentList:{
+            return my.dispatch.VisitArgumentList(n2)
         }
-        {
-         var n2,ok =n.(*DimExprs)
-         if ok {
-            my.dispatch.VisitDimExprs(n2)
-            return 
-          }
+        case *DimExprs:{
+            return my.dispatch.VisitDimExprs(n2)
         }
-        {
-         var n2,ok =n.(*DimExpr)
-         if ok {
-            my.dispatch.VisitDimExpr(n2)
-            return 
-          }
+        case *DimExpr:{
+            return my.dispatch.VisitDimExpr(n2)
         }
-        {
-         var n2,ok =n.(*PostIncrementExpression)
-         if ok {
-            my.dispatch.VisitPostIncrementExpression(n2)
-            return 
-          }
+        case *PostIncrementExpression:{
+            return my.dispatch.VisitPostIncrementExpression(n2)
         }
-        {
-         var n2,ok =n.(*PostDecrementExpression)
-         if ok {
-            my.dispatch.VisitPostDecrementExpression(n2)
-            return 
-          }
+        case *PostDecrementExpression:{
+            return my.dispatch.VisitPostDecrementExpression(n2)
         }
-        {
-         var n2,ok =n.(*PreIncrementExpression)
-         if ok {
-            my.dispatch.VisitPreIncrementExpression(n2)
-            return 
-          }
+        case *PreIncrementExpression:{
+            return my.dispatch.VisitPreIncrementExpression(n2)
         }
-        {
-         var n2,ok =n.(*PreDecrementExpression)
-         if ok {
-            my.dispatch.VisitPreDecrementExpression(n2)
-            return 
-          }
+        case *PreDecrementExpression:{
+            return my.dispatch.VisitPreDecrementExpression(n2)
         }
-        {
-         var n2,ok =n.(*AndExpression)
-         if ok {
-            my.dispatch.VisitAndExpression(n2)
-            return 
-          }
+        case *AndExpression:{
+            return my.dispatch.VisitAndExpression(n2)
         }
-        {
-         var n2,ok =n.(*ExclusiveOrExpression)
-         if ok {
-            my.dispatch.VisitExclusiveOrExpression(n2)
-            return 
-          }
+        case *ExclusiveOrExpression:{
+            return my.dispatch.VisitExclusiveOrExpression(n2)
         }
-        {
-         var n2,ok =n.(*InclusiveOrExpression)
-         if ok {
-            my.dispatch.VisitInclusiveOrExpression(n2)
-            return 
-          }
+        case *InclusiveOrExpression:{
+            return my.dispatch.VisitInclusiveOrExpression(n2)
         }
-        {
-         var n2,ok =n.(*ConditionalAndExpression)
-         if ok {
-            my.dispatch.VisitConditionalAndExpression(n2)
-            return 
-          }
+        case *ConditionalAndExpression:{
+            return my.dispatch.VisitConditionalAndExpression(n2)
         }
-        {
-         var n2,ok =n.(*ConditionalOrExpression)
-         if ok {
-            my.dispatch.VisitConditionalOrExpression(n2)
-            return 
-          }
+        case *ConditionalOrExpression:{
+            return my.dispatch.VisitConditionalOrExpression(n2)
         }
-        {
-         var n2,ok =n.(*ConditionalExpression)
-         if ok {
-            my.dispatch.VisitConditionalExpression(n2)
-            return 
-          }
+        case *ConditionalExpression:{
+            return my.dispatch.VisitConditionalExpression(n2)
         }
-        {
-         var n2,ok =n.(*Assignment)
-         if ok {
-            my.dispatch.VisitAssignment(n2)
-            return 
-          }
+        case *Assignment:{
+            return my.dispatch.VisitAssignment(n2)
         }
-        {
-         var n2,ok =n.(*Commaopt)
-         if ok {
-            my.dispatch.VisitCommaopt(n2)
-            return 
-          }
+        case *Commaopt:{
+            return my.dispatch.VisitCommaopt(n2)
         }
-        {
-         var n2,ok =n.(*Ellipsisopt)
-         if ok {
-            my.dispatch.VisitEllipsisopt(n2)
-            return 
-          }
+        case *Ellipsisopt:{
+            return my.dispatch.VisitEllipsisopt(n2)
         }
-        {
-         var n2,ok =n.(*LPGUserAction0)
-         if ok {
-            my.dispatch.VisitLPGUserAction0(n2)
-            return 
-          }
+        case *LPGUserAction0:{
+            return my.dispatch.VisitLPGUserAction0(n2)
         }
-        {
-         var n2,ok =n.(*LPGUserAction1)
-         if ok {
-            my.dispatch.VisitLPGUserAction1(n2)
-            return 
-          }
+        case *LPGUserAction1:{
+            return my.dispatch.VisitLPGUserAction1(n2)
         }
-        {
-         var n2,ok =n.(*LPGUserAction2)
-         if ok {
-            my.dispatch.VisitLPGUserAction2(n2)
-            return 
-          }
+        case *LPGUserAction2:{
+            return my.dispatch.VisitLPGUserAction2(n2)
         }
-        {
-         var n2,ok =n.(*LPGUserAction3)
-         if ok {
-            my.dispatch.VisitLPGUserAction3(n2)
-            return 
-          }
+        case *LPGUserAction3:{
+            return my.dispatch.VisitLPGUserAction3(n2)
         }
-        {
-         var n2,ok =n.(*LPGUserAction4)
-         if ok {
-            my.dispatch.VisitLPGUserAction4(n2)
-            return 
-          }
+        case *LPGUserAction4:{
+            return my.dispatch.VisitLPGUserAction4(n2)
         }
-        {
-         var n2,ok =n.(*IntegralType0)
-         if ok {
-            my.dispatch.VisitIntegralType0(n2)
-            return 
-          }
+        case *IntegralType0:{
+            return my.dispatch.VisitIntegralType0(n2)
         }
-        {
-         var n2,ok =n.(*IntegralType1)
-         if ok {
-            my.dispatch.VisitIntegralType1(n2)
-            return 
-          }
+        case *IntegralType1:{
+            return my.dispatch.VisitIntegralType1(n2)
         }
-        {
-         var n2,ok =n.(*IntegralType2)
-         if ok {
-            my.dispatch.VisitIntegralType2(n2)
-            return 
-          }
+        case *IntegralType2:{
+            return my.dispatch.VisitIntegralType2(n2)
         }
-        {
-         var n2,ok =n.(*IntegralType3)
-         if ok {
-            my.dispatch.VisitIntegralType3(n2)
-            return 
-          }
+        case *IntegralType3:{
+            return my.dispatch.VisitIntegralType3(n2)
         }
-        {
-         var n2,ok =n.(*IntegralType4)
-         if ok {
-            my.dispatch.VisitIntegralType4(n2)
-            return 
-          }
+        case *IntegralType4:{
+            return my.dispatch.VisitIntegralType4(n2)
         }
-        {
-         var n2,ok =n.(*FloatingPointType0)
-         if ok {
-            my.dispatch.VisitFloatingPointType0(n2)
-            return 
-          }
+        case *FloatingPointType0:{
+            return my.dispatch.VisitFloatingPointType0(n2)
         }
-        {
-         var n2,ok =n.(*FloatingPointType1)
-         if ok {
-            my.dispatch.VisitFloatingPointType1(n2)
-            return 
-          }
+        case *FloatingPointType1:{
+            return my.dispatch.VisitFloatingPointType1(n2)
         }
-        {
-         var n2,ok =n.(*WildcardBounds0)
-         if ok {
-            my.dispatch.VisitWildcardBounds0(n2)
-            return 
-          }
+        case *WildcardBounds0:{
+            return my.dispatch.VisitWildcardBounds0(n2)
         }
-        {
-         var n2,ok =n.(*WildcardBounds1)
-         if ok {
-            my.dispatch.VisitWildcardBounds1(n2)
-            return 
-          }
+        case *WildcardBounds1:{
+            return my.dispatch.VisitWildcardBounds1(n2)
         }
-        {
-         var n2,ok =n.(*ClassModifier0)
-         if ok {
-            my.dispatch.VisitClassModifier0(n2)
-            return 
-          }
+        case *ClassModifier0:{
+            return my.dispatch.VisitClassModifier0(n2)
         }
-        {
-         var n2,ok =n.(*ClassModifier1)
-         if ok {
-            my.dispatch.VisitClassModifier1(n2)
-            return 
-          }
+        case *ClassModifier1:{
+            return my.dispatch.VisitClassModifier1(n2)
         }
-        {
-         var n2,ok =n.(*ClassModifier2)
-         if ok {
-            my.dispatch.VisitClassModifier2(n2)
-            return 
-          }
+        case *ClassModifier2:{
+            return my.dispatch.VisitClassModifier2(n2)
         }
-        {
-         var n2,ok =n.(*ClassModifier3)
-         if ok {
-            my.dispatch.VisitClassModifier3(n2)
-            return 
-          }
+        case *ClassModifier3:{
+            return my.dispatch.VisitClassModifier3(n2)
         }
-        {
-         var n2,ok =n.(*ClassModifier4)
-         if ok {
-            my.dispatch.VisitClassModifier4(n2)
-            return 
-          }
+        case *ClassModifier4:{
+            return my.dispatch.VisitClassModifier4(n2)
         }
-        {
-         var n2,ok =n.(*ClassModifier5)
-         if ok {
-            my.dispatch.VisitClassModifier5(n2)
-            return 
-          }
+        case *ClassModifier5:{
+            return my.dispatch.VisitClassModifier5(n2)
         }
-        {
-         var n2,ok =n.(*ClassModifier6)
-         if ok {
-            my.dispatch.VisitClassModifier6(n2)
-            return 
-          }
+        case *ClassModifier6:{
+            return my.dispatch.VisitClassModifier6(n2)
         }
-        {
-         var n2,ok =n.(*FieldModifier0)
-         if ok {
-            my.dispatch.VisitFieldModifier0(n2)
-            return 
-          }
+        case *FieldModifier0:{
+            return my.dispatch.VisitFieldModifier0(n2)
         }
-        {
-         var n2,ok =n.(*FieldModifier1)
-         if ok {
-            my.dispatch.VisitFieldModifier1(n2)
-            return 
-          }
+        case *FieldModifier1:{
+            return my.dispatch.VisitFieldModifier1(n2)
         }
-        {
-         var n2,ok =n.(*FieldModifier2)
-         if ok {
-            my.dispatch.VisitFieldModifier2(n2)
-            return 
-          }
+        case *FieldModifier2:{
+            return my.dispatch.VisitFieldModifier2(n2)
         }
-        {
-         var n2,ok =n.(*FieldModifier3)
-         if ok {
-            my.dispatch.VisitFieldModifier3(n2)
-            return 
-          }
+        case *FieldModifier3:{
+            return my.dispatch.VisitFieldModifier3(n2)
         }
-        {
-         var n2,ok =n.(*FieldModifier4)
-         if ok {
-            my.dispatch.VisitFieldModifier4(n2)
-            return 
-          }
+        case *FieldModifier4:{
+            return my.dispatch.VisitFieldModifier4(n2)
         }
-        {
-         var n2,ok =n.(*FieldModifier5)
-         if ok {
-            my.dispatch.VisitFieldModifier5(n2)
-            return 
-          }
+        case *FieldModifier5:{
+            return my.dispatch.VisitFieldModifier5(n2)
         }
-        {
-         var n2,ok =n.(*FieldModifier6)
-         if ok {
-            my.dispatch.VisitFieldModifier6(n2)
-            return 
-          }
+        case *FieldModifier6:{
+            return my.dispatch.VisitFieldModifier6(n2)
         }
-        {
-         var n2,ok =n.(*MethodDeclarator0)
-         if ok {
-            my.dispatch.VisitMethodDeclarator0(n2)
-            return 
-          }
+        case *MethodDeclarator0:{
+            return my.dispatch.VisitMethodDeclarator0(n2)
         }
-        {
-         var n2,ok =n.(*MethodDeclarator1)
-         if ok {
-            my.dispatch.VisitMethodDeclarator1(n2)
-            return 
-          }
+        case *MethodDeclarator1:{
+            return my.dispatch.VisitMethodDeclarator1(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier0)
-         if ok {
-            my.dispatch.VisitMethodModifier0(n2)
-            return 
-          }
+        case *MethodModifier0:{
+            return my.dispatch.VisitMethodModifier0(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier1)
-         if ok {
-            my.dispatch.VisitMethodModifier1(n2)
-            return 
-          }
+        case *MethodModifier1:{
+            return my.dispatch.VisitMethodModifier1(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier2)
-         if ok {
-            my.dispatch.VisitMethodModifier2(n2)
-            return 
-          }
+        case *MethodModifier2:{
+            return my.dispatch.VisitMethodModifier2(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier3)
-         if ok {
-            my.dispatch.VisitMethodModifier3(n2)
-            return 
-          }
+        case *MethodModifier3:{
+            return my.dispatch.VisitMethodModifier3(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier4)
-         if ok {
-            my.dispatch.VisitMethodModifier4(n2)
-            return 
-          }
+        case *MethodModifier4:{
+            return my.dispatch.VisitMethodModifier4(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier5)
-         if ok {
-            my.dispatch.VisitMethodModifier5(n2)
-            return 
-          }
+        case *MethodModifier5:{
+            return my.dispatch.VisitMethodModifier5(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier6)
-         if ok {
-            my.dispatch.VisitMethodModifier6(n2)
-            return 
-          }
+        case *MethodModifier6:{
+            return my.dispatch.VisitMethodModifier6(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier7)
-         if ok {
-            my.dispatch.VisitMethodModifier7(n2)
-            return 
-          }
+        case *MethodModifier7:{
+            return my.dispatch.VisitMethodModifier7(n2)
         }
-        {
-         var n2,ok =n.(*MethodModifier8)
-         if ok {
-            my.dispatch.VisitMethodModifier8(n2)
-            return 
-          }
+        case *MethodModifier8:{
+            return my.dispatch.VisitMethodModifier8(n2)
         }
-        {
-         var n2,ok =n.(*ConstructorModifier0)
-         if ok {
-            my.dispatch.VisitConstructorModifier0(n2)
-            return 
-          }
+        case *ConstructorModifier0:{
+            return my.dispatch.VisitConstructorModifier0(n2)
         }
-        {
-         var n2,ok =n.(*ConstructorModifier1)
-         if ok {
-            my.dispatch.VisitConstructorModifier1(n2)
-            return 
-          }
+        case *ConstructorModifier1:{
+            return my.dispatch.VisitConstructorModifier1(n2)
         }
-        {
-         var n2,ok =n.(*ConstructorModifier2)
-         if ok {
-            my.dispatch.VisitConstructorModifier2(n2)
-            return 
-          }
+        case *ConstructorModifier2:{
+            return my.dispatch.VisitConstructorModifier2(n2)
         }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation0)
-         if ok {
-            my.dispatch.VisitExplicitConstructorInvocation0(n2)
-            return 
-          }
+        case *ExplicitConstructorInvocation0:{
+            return my.dispatch.VisitExplicitConstructorInvocation0(n2)
         }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation1)
-         if ok {
-            my.dispatch.VisitExplicitConstructorInvocation1(n2)
-            return 
-          }
+        case *ExplicitConstructorInvocation1:{
+            return my.dispatch.VisitExplicitConstructorInvocation1(n2)
         }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation2)
-         if ok {
-            my.dispatch.VisitExplicitConstructorInvocation2(n2)
-            return 
-          }
+        case *ExplicitConstructorInvocation2:{
+            return my.dispatch.VisitExplicitConstructorInvocation2(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceModifier0)
-         if ok {
-            my.dispatch.VisitInterfaceModifier0(n2)
-            return 
-          }
+        case *InterfaceModifier0:{
+            return my.dispatch.VisitInterfaceModifier0(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceModifier1)
-         if ok {
-            my.dispatch.VisitInterfaceModifier1(n2)
-            return 
-          }
+        case *InterfaceModifier1:{
+            return my.dispatch.VisitInterfaceModifier1(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceModifier2)
-         if ok {
-            my.dispatch.VisitInterfaceModifier2(n2)
-            return 
-          }
+        case *InterfaceModifier2:{
+            return my.dispatch.VisitInterfaceModifier2(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceModifier3)
-         if ok {
-            my.dispatch.VisitInterfaceModifier3(n2)
-            return 
-          }
+        case *InterfaceModifier3:{
+            return my.dispatch.VisitInterfaceModifier3(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceModifier4)
-         if ok {
-            my.dispatch.VisitInterfaceModifier4(n2)
-            return 
-          }
+        case *InterfaceModifier4:{
+            return my.dispatch.VisitInterfaceModifier4(n2)
         }
-        {
-         var n2,ok =n.(*InterfaceModifier5)
-         if ok {
-            my.dispatch.VisitInterfaceModifier5(n2)
-            return 
-          }
+        case *InterfaceModifier5:{
+            return my.dispatch.VisitInterfaceModifier5(n2)
         }
-        {
-         var n2,ok =n.(*ExtendsInterfaces0)
-         if ok {
-            my.dispatch.VisitExtendsInterfaces0(n2)
-            return 
-          }
+        case *ExtendsInterfaces0:{
+            return my.dispatch.VisitExtendsInterfaces0(n2)
         }
-        {
-         var n2,ok =n.(*ExtendsInterfaces1)
-         if ok {
-            my.dispatch.VisitExtendsInterfaces1(n2)
-            return 
-          }
+        case *ExtendsInterfaces1:{
+            return my.dispatch.VisitExtendsInterfaces1(n2)
         }
-        {
-         var n2,ok =n.(*ConstantModifier0)
-         if ok {
-            my.dispatch.VisitConstantModifier0(n2)
-            return 
-          }
+        case *ConstantModifier0:{
+            return my.dispatch.VisitConstantModifier0(n2)
         }
-        {
-         var n2,ok =n.(*ConstantModifier1)
-         if ok {
-            my.dispatch.VisitConstantModifier1(n2)
-            return 
-          }
+        case *ConstantModifier1:{
+            return my.dispatch.VisitConstantModifier1(n2)
         }
-        {
-         var n2,ok =n.(*ConstantModifier2)
-         if ok {
-            my.dispatch.VisitConstantModifier2(n2)
-            return 
-          }
+        case *ConstantModifier2:{
+            return my.dispatch.VisitConstantModifier2(n2)
         }
-        {
-         var n2,ok =n.(*AbstractMethodModifier0)
-         if ok {
-            my.dispatch.VisitAbstractMethodModifier0(n2)
-            return 
-          }
+        case *AbstractMethodModifier0:{
+            return my.dispatch.VisitAbstractMethodModifier0(n2)
         }
-        {
-         var n2,ok =n.(*AbstractMethodModifier1)
-         if ok {
-            my.dispatch.VisitAbstractMethodModifier1(n2)
-            return 
-          }
+        case *AbstractMethodModifier1:{
+            return my.dispatch.VisitAbstractMethodModifier1(n2)
         }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclaration0)
-         if ok {
-            my.dispatch.VisitAnnotationTypeElementDeclaration0(n2)
-            return 
-          }
+        case *AnnotationTypeElementDeclaration0:{
+            return my.dispatch.VisitAnnotationTypeElementDeclaration0(n2)
         }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclaration1)
-         if ok {
-            my.dispatch.VisitAnnotationTypeElementDeclaration1(n2)
-            return 
-          }
+        case *AnnotationTypeElementDeclaration1:{
+            return my.dispatch.VisitAnnotationTypeElementDeclaration1(n2)
         }
-        {
-         var n2,ok =n.(*AssertStatement0)
-         if ok {
-            my.dispatch.VisitAssertStatement0(n2)
-            return 
-          }
+        case *AssertStatement0:{
+            return my.dispatch.VisitAssertStatement0(n2)
         }
-        {
-         var n2,ok =n.(*AssertStatement1)
-         if ok {
-            my.dispatch.VisitAssertStatement1(n2)
-            return 
-          }
+        case *AssertStatement1:{
+            return my.dispatch.VisitAssertStatement1(n2)
         }
-        {
-         var n2,ok =n.(*SwitchLabel0)
-         if ok {
-            my.dispatch.VisitSwitchLabel0(n2)
-            return 
-          }
+        case *SwitchLabel0:{
+            return my.dispatch.VisitSwitchLabel0(n2)
         }
-        {
-         var n2,ok =n.(*SwitchLabel1)
-         if ok {
-            my.dispatch.VisitSwitchLabel1(n2)
-            return 
-          }
+        case *SwitchLabel1:{
+            return my.dispatch.VisitSwitchLabel1(n2)
         }
-        {
-         var n2,ok =n.(*SwitchLabel2)
-         if ok {
-            my.dispatch.VisitSwitchLabel2(n2)
-            return 
-          }
+        case *SwitchLabel2:{
+            return my.dispatch.VisitSwitchLabel2(n2)
         }
-        {
-         var n2,ok =n.(*TryStatement0)
-         if ok {
-            my.dispatch.VisitTryStatement0(n2)
-            return 
-          }
+        case *TryStatement0:{
+            return my.dispatch.VisitTryStatement0(n2)
         }
-        {
-         var n2,ok =n.(*TryStatement1)
-         if ok {
-            my.dispatch.VisitTryStatement1(n2)
-            return 
-          }
+        case *TryStatement1:{
+            return my.dispatch.VisitTryStatement1(n2)
         }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray0)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray0(n2)
-            return 
-          }
+        case *PrimaryNoNewArray0:{
+            return my.dispatch.VisitPrimaryNoNewArray0(n2)
         }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray1)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray1(n2)
-            return 
-          }
+        case *PrimaryNoNewArray1:{
+            return my.dispatch.VisitPrimaryNoNewArray1(n2)
         }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray2)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray2(n2)
-            return 
-          }
+        case *PrimaryNoNewArray2:{
+            return my.dispatch.VisitPrimaryNoNewArray2(n2)
         }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray3)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray3(n2)
-            return 
-          }
+        case *PrimaryNoNewArray3:{
+            return my.dispatch.VisitPrimaryNoNewArray3(n2)
         }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray4)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray4(n2)
-            return 
-          }
+        case *PrimaryNoNewArray4:{
+            return my.dispatch.VisitPrimaryNoNewArray4(n2)
         }
-        {
-         var n2,ok =n.(*Literal0)
-         if ok {
-            my.dispatch.VisitLiteral0(n2)
-            return 
-          }
+        case *Literal0:{
+            return my.dispatch.VisitLiteral0(n2)
         }
-        {
-         var n2,ok =n.(*Literal1)
-         if ok {
-            my.dispatch.VisitLiteral1(n2)
-            return 
-          }
+        case *Literal1:{
+            return my.dispatch.VisitLiteral1(n2)
         }
-        {
-         var n2,ok =n.(*Literal2)
-         if ok {
-            my.dispatch.VisitLiteral2(n2)
-            return 
-          }
+        case *Literal2:{
+            return my.dispatch.VisitLiteral2(n2)
         }
-        {
-         var n2,ok =n.(*Literal3)
-         if ok {
-            my.dispatch.VisitLiteral3(n2)
-            return 
-          }
+        case *Literal3:{
+            return my.dispatch.VisitLiteral3(n2)
         }
-        {
-         var n2,ok =n.(*Literal4)
-         if ok {
-            my.dispatch.VisitLiteral4(n2)
-            return 
-          }
+        case *Literal4:{
+            return my.dispatch.VisitLiteral4(n2)
         }
-        {
-         var n2,ok =n.(*Literal5)
-         if ok {
-            my.dispatch.VisitLiteral5(n2)
-            return 
-          }
+        case *Literal5:{
+            return my.dispatch.VisitLiteral5(n2)
         }
-        {
-         var n2,ok =n.(*Literal6)
-         if ok {
-            my.dispatch.VisitLiteral6(n2)
-            return 
-          }
+        case *Literal6:{
+            return my.dispatch.VisitLiteral6(n2)
         }
-        {
-         var n2,ok =n.(*BooleanLiteral0)
-         if ok {
-            my.dispatch.VisitBooleanLiteral0(n2)
-            return 
-          }
+        case *BooleanLiteral0:{
+            return my.dispatch.VisitBooleanLiteral0(n2)
         }
-        {
-         var n2,ok =n.(*BooleanLiteral1)
-         if ok {
-            my.dispatch.VisitBooleanLiteral1(n2)
-            return 
-          }
+        case *BooleanLiteral1:{
+            return my.dispatch.VisitBooleanLiteral1(n2)
         }
-        {
-         var n2,ok =n.(*ClassInstanceCreationExpression0)
-         if ok {
-            my.dispatch.VisitClassInstanceCreationExpression0(n2)
-            return 
-          }
+        case *ClassInstanceCreationExpression0:{
+            return my.dispatch.VisitClassInstanceCreationExpression0(n2)
         }
-        {
-         var n2,ok =n.(*ClassInstanceCreationExpression1)
-         if ok {
-            my.dispatch.VisitClassInstanceCreationExpression1(n2)
-            return 
-          }
+        case *ClassInstanceCreationExpression1:{
+            return my.dispatch.VisitClassInstanceCreationExpression1(n2)
         }
-        {
-         var n2,ok =n.(*ArrayCreationExpression0)
-         if ok {
-            my.dispatch.VisitArrayCreationExpression0(n2)
-            return 
-          }
+        case *ArrayCreationExpression0:{
+            return my.dispatch.VisitArrayCreationExpression0(n2)
         }
-        {
-         var n2,ok =n.(*ArrayCreationExpression1)
-         if ok {
-            my.dispatch.VisitArrayCreationExpression1(n2)
-            return 
-          }
+        case *ArrayCreationExpression1:{
+            return my.dispatch.VisitArrayCreationExpression1(n2)
         }
-        {
-         var n2,ok =n.(*ArrayCreationExpression2)
-         if ok {
-            my.dispatch.VisitArrayCreationExpression2(n2)
-            return 
-          }
+        case *ArrayCreationExpression2:{
+            return my.dispatch.VisitArrayCreationExpression2(n2)
         }
-        {
-         var n2,ok =n.(*ArrayCreationExpression3)
-         if ok {
-            my.dispatch.VisitArrayCreationExpression3(n2)
-            return 
-          }
+        case *ArrayCreationExpression3:{
+            return my.dispatch.VisitArrayCreationExpression3(n2)
         }
-        {
-         var n2,ok =n.(*Dims0)
-         if ok {
-            my.dispatch.VisitDims0(n2)
-            return 
-          }
+        case *Dims0:{
+            return my.dispatch.VisitDims0(n2)
         }
-        {
-         var n2,ok =n.(*Dims1)
-         if ok {
-            my.dispatch.VisitDims1(n2)
-            return 
-          }
+        case *Dims1:{
+            return my.dispatch.VisitDims1(n2)
         }
-        {
-         var n2,ok =n.(*FieldAccess0)
-         if ok {
-            my.dispatch.VisitFieldAccess0(n2)
-            return 
-          }
+        case *FieldAccess0:{
+            return my.dispatch.VisitFieldAccess0(n2)
         }
-        {
-         var n2,ok =n.(*FieldAccess1)
-         if ok {
-            my.dispatch.VisitFieldAccess1(n2)
-            return 
-          }
+        case *FieldAccess1:{
+            return my.dispatch.VisitFieldAccess1(n2)
         }
-        {
-         var n2,ok =n.(*FieldAccess2)
-         if ok {
-            my.dispatch.VisitFieldAccess2(n2)
-            return 
-          }
+        case *FieldAccess2:{
+            return my.dispatch.VisitFieldAccess2(n2)
         }
-        {
-         var n2,ok =n.(*MethodInvocation0)
-         if ok {
-            my.dispatch.VisitMethodInvocation0(n2)
-            return 
-          }
+        case *MethodInvocation0:{
+            return my.dispatch.VisitMethodInvocation0(n2)
         }
-        {
-         var n2,ok =n.(*MethodInvocation1)
-         if ok {
-            my.dispatch.VisitMethodInvocation1(n2)
-            return 
-          }
+        case *MethodInvocation1:{
+            return my.dispatch.VisitMethodInvocation1(n2)
         }
-        {
-         var n2,ok =n.(*MethodInvocation2)
-         if ok {
-            my.dispatch.VisitMethodInvocation2(n2)
-            return 
-          }
+        case *MethodInvocation2:{
+            return my.dispatch.VisitMethodInvocation2(n2)
         }
-        {
-         var n2,ok =n.(*MethodInvocation3)
-         if ok {
-            my.dispatch.VisitMethodInvocation3(n2)
-            return 
-          }
+        case *MethodInvocation3:{
+            return my.dispatch.VisitMethodInvocation3(n2)
         }
-        {
-         var n2,ok =n.(*MethodInvocation4)
-         if ok {
-            my.dispatch.VisitMethodInvocation4(n2)
-            return 
-          }
+        case *MethodInvocation4:{
+            return my.dispatch.VisitMethodInvocation4(n2)
         }
-        {
-         var n2,ok =n.(*ArrayAccess0)
-         if ok {
-            my.dispatch.VisitArrayAccess0(n2)
-            return 
-          }
+        case *ArrayAccess0:{
+            return my.dispatch.VisitArrayAccess0(n2)
         }
-        {
-         var n2,ok =n.(*ArrayAccess1)
-         if ok {
-            my.dispatch.VisitArrayAccess1(n2)
-            return 
-          }
+        case *ArrayAccess1:{
+            return my.dispatch.VisitArrayAccess1(n2)
         }
-        {
-         var n2,ok =n.(*UnaryExpression0)
-         if ok {
-            my.dispatch.VisitUnaryExpression0(n2)
-            return 
-          }
+        case *UnaryExpression0:{
+            return my.dispatch.VisitUnaryExpression0(n2)
         }
-        {
-         var n2,ok =n.(*UnaryExpression1)
-         if ok {
-            my.dispatch.VisitUnaryExpression1(n2)
-            return 
-          }
+        case *UnaryExpression1:{
+            return my.dispatch.VisitUnaryExpression1(n2)
         }
-        {
-         var n2,ok =n.(*UnaryExpressionNotPlusMinus0)
-         if ok {
-            my.dispatch.VisitUnaryExpressionNotPlusMinus0(n2)
-            return 
-          }
+        case *UnaryExpressionNotPlusMinus0:{
+            return my.dispatch.VisitUnaryExpressionNotPlusMinus0(n2)
         }
-        {
-         var n2,ok =n.(*UnaryExpressionNotPlusMinus1)
-         if ok {
-            my.dispatch.VisitUnaryExpressionNotPlusMinus1(n2)
-            return 
-          }
+        case *UnaryExpressionNotPlusMinus1:{
+            return my.dispatch.VisitUnaryExpressionNotPlusMinus1(n2)
         }
-        {
-         var n2,ok =n.(*CastExpression0)
-         if ok {
-            my.dispatch.VisitCastExpression0(n2)
-            return 
-          }
+        case *CastExpression0:{
+            return my.dispatch.VisitCastExpression0(n2)
         }
-        {
-         var n2,ok =n.(*CastExpression1)
-         if ok {
-            my.dispatch.VisitCastExpression1(n2)
-            return 
-          }
+        case *CastExpression1:{
+            return my.dispatch.VisitCastExpression1(n2)
         }
-        {
-         var n2,ok =n.(*MultiplicativeExpression0)
-         if ok {
-            my.dispatch.VisitMultiplicativeExpression0(n2)
-            return 
-          }
+        case *MultiplicativeExpression0:{
+            return my.dispatch.VisitMultiplicativeExpression0(n2)
         }
-        {
-         var n2,ok =n.(*MultiplicativeExpression1)
-         if ok {
-            my.dispatch.VisitMultiplicativeExpression1(n2)
-            return 
-          }
+        case *MultiplicativeExpression1:{
+            return my.dispatch.VisitMultiplicativeExpression1(n2)
         }
-        {
-         var n2,ok =n.(*MultiplicativeExpression2)
-         if ok {
-            my.dispatch.VisitMultiplicativeExpression2(n2)
-            return 
-          }
+        case *MultiplicativeExpression2:{
+            return my.dispatch.VisitMultiplicativeExpression2(n2)
         }
-        {
-         var n2,ok =n.(*AdditiveExpression0)
-         if ok {
-            my.dispatch.VisitAdditiveExpression0(n2)
-            return 
-          }
+        case *AdditiveExpression0:{
+            return my.dispatch.VisitAdditiveExpression0(n2)
         }
-        {
-         var n2,ok =n.(*AdditiveExpression1)
-         if ok {
-            my.dispatch.VisitAdditiveExpression1(n2)
-            return 
-          }
+        case *AdditiveExpression1:{
+            return my.dispatch.VisitAdditiveExpression1(n2)
         }
-        {
-         var n2,ok =n.(*ShiftExpression0)
-         if ok {
-            my.dispatch.VisitShiftExpression0(n2)
-            return 
-          }
+        case *ShiftExpression0:{
+            return my.dispatch.VisitShiftExpression0(n2)
         }
-        {
-         var n2,ok =n.(*ShiftExpression1)
-         if ok {
-            my.dispatch.VisitShiftExpression1(n2)
-            return 
-          }
+        case *ShiftExpression1:{
+            return my.dispatch.VisitShiftExpression1(n2)
         }
-        {
-         var n2,ok =n.(*ShiftExpression2)
-         if ok {
-            my.dispatch.VisitShiftExpression2(n2)
-            return 
-          }
+        case *ShiftExpression2:{
+            return my.dispatch.VisitShiftExpression2(n2)
         }
-        {
-         var n2,ok =n.(*RelationalExpression0)
-         if ok {
-            my.dispatch.VisitRelationalExpression0(n2)
-            return 
-          }
+        case *RelationalExpression0:{
+            return my.dispatch.VisitRelationalExpression0(n2)
         }
-        {
-         var n2,ok =n.(*RelationalExpression1)
-         if ok {
-            my.dispatch.VisitRelationalExpression1(n2)
-            return 
-          }
+        case *RelationalExpression1:{
+            return my.dispatch.VisitRelationalExpression1(n2)
         }
-        {
-         var n2,ok =n.(*RelationalExpression2)
-         if ok {
-            my.dispatch.VisitRelationalExpression2(n2)
-            return 
-          }
+        case *RelationalExpression2:{
+            return my.dispatch.VisitRelationalExpression2(n2)
         }
-        {
-         var n2,ok =n.(*RelationalExpression3)
-         if ok {
-            my.dispatch.VisitRelationalExpression3(n2)
-            return 
-          }
+        case *RelationalExpression3:{
+            return my.dispatch.VisitRelationalExpression3(n2)
         }
-        {
-         var n2,ok =n.(*RelationalExpression4)
-         if ok {
-            my.dispatch.VisitRelationalExpression4(n2)
-            return 
-          }
+        case *RelationalExpression4:{
+            return my.dispatch.VisitRelationalExpression4(n2)
         }
-        {
-         var n2,ok =n.(*EqualityExpression0)
-         if ok {
-            my.dispatch.VisitEqualityExpression0(n2)
-            return 
-          }
+        case *EqualityExpression0:{
+            return my.dispatch.VisitEqualityExpression0(n2)
         }
-        {
-         var n2,ok =n.(*EqualityExpression1)
-         if ok {
-            my.dispatch.VisitEqualityExpression1(n2)
-            return 
-          }
+        case *EqualityExpression1:{
+            return my.dispatch.VisitEqualityExpression1(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator0)
-         if ok {
-            my.dispatch.VisitAssignmentOperator0(n2)
-            return 
-          }
+        case *AssignmentOperator0:{
+            return my.dispatch.VisitAssignmentOperator0(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator1)
-         if ok {
-            my.dispatch.VisitAssignmentOperator1(n2)
-            return 
-          }
+        case *AssignmentOperator1:{
+            return my.dispatch.VisitAssignmentOperator1(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator2)
-         if ok {
-            my.dispatch.VisitAssignmentOperator2(n2)
-            return 
-          }
+        case *AssignmentOperator2:{
+            return my.dispatch.VisitAssignmentOperator2(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator3)
-         if ok {
-            my.dispatch.VisitAssignmentOperator3(n2)
-            return 
-          }
+        case *AssignmentOperator3:{
+            return my.dispatch.VisitAssignmentOperator3(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator4)
-         if ok {
-            my.dispatch.VisitAssignmentOperator4(n2)
-            return 
-          }
+        case *AssignmentOperator4:{
+            return my.dispatch.VisitAssignmentOperator4(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator5)
-         if ok {
-            my.dispatch.VisitAssignmentOperator5(n2)
-            return 
-          }
+        case *AssignmentOperator5:{
+            return my.dispatch.VisitAssignmentOperator5(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator6)
-         if ok {
-            my.dispatch.VisitAssignmentOperator6(n2)
-            return 
-          }
+        case *AssignmentOperator6:{
+            return my.dispatch.VisitAssignmentOperator6(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator7)
-         if ok {
-            my.dispatch.VisitAssignmentOperator7(n2)
-            return 
-          }
+        case *AssignmentOperator7:{
+            return my.dispatch.VisitAssignmentOperator7(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator8)
-         if ok {
-            my.dispatch.VisitAssignmentOperator8(n2)
-            return 
-          }
+        case *AssignmentOperator8:{
+            return my.dispatch.VisitAssignmentOperator8(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator9)
-         if ok {
-            my.dispatch.VisitAssignmentOperator9(n2)
-            return 
-          }
+        case *AssignmentOperator9:{
+            return my.dispatch.VisitAssignmentOperator9(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator10)
-         if ok {
-            my.dispatch.VisitAssignmentOperator10(n2)
-            return 
-          }
+        case *AssignmentOperator10:{
+            return my.dispatch.VisitAssignmentOperator10(n2)
         }
-        {
-         var n2,ok =n.(*AssignmentOperator11)
-         if ok {
-            my.dispatch.VisitAssignmentOperator11(n2)
-            return 
-          }
+        case *AssignmentOperator11:{
+            return my.dispatch.VisitAssignmentOperator11(n2)
         }
+        default:{ return false}
+     }
 }
-func (my *AbstractVisitor)     VisitWithArg(n IAst, o interface{}){
-        {
-         var n2,ok =n.(*AstToken)
-         if ok {
-            my.dispatch.VisitAstTokenWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*identifier)
-         if ok {
-            my.dispatch.VisitidentifierWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PrimitiveType)
-         if ok {
-            my.dispatch.VisitPrimitiveTypeWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassType)
-         if ok {
-            my.dispatch.VisitClassTypeWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceType)
-         if ok {
-            my.dispatch.VisitInterfaceTypeWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeName)
-         if ok {
-            my.dispatch.VisitTypeNameWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayType)
-         if ok {
-            my.dispatch.VisitArrayTypeWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameter)
-         if ok {
-            my.dispatch.VisitTypeParameterWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeBound)
-         if ok {
-            my.dispatch.VisitTypeBoundWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AdditionalBoundList)
-         if ok {
-            my.dispatch.VisitAdditionalBoundListWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AdditionalBound)
-         if ok {
-            my.dispatch.VisitAdditionalBoundWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeArguments)
-         if ok {
-            my.dispatch.VisitTypeArgumentsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ActualTypeArgumentList)
-         if ok {
-            my.dispatch.VisitActualTypeArgumentListWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Wildcard)
-         if ok {
-            my.dispatch.VisitWildcardWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PackageName)
-         if ok {
-            my.dispatch.VisitPackageNameWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExpressionName)
-         if ok {
-            my.dispatch.VisitExpressionNameWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodName)
-         if ok {
-            my.dispatch.VisitMethodNameWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PackageOrTypeName)
-         if ok {
-            my.dispatch.VisitPackageOrTypeNameWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AmbiguousName)
-         if ok {
-            my.dispatch.VisitAmbiguousNameWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*CompilationUnit)
-         if ok {
-            my.dispatch.VisitCompilationUnitWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ImportDeclarations)
-         if ok {
-            my.dispatch.VisitImportDeclarationsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeDeclarations)
-         if ok {
-            my.dispatch.VisitTypeDeclarationsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PackageDeclaration)
-         if ok {
-            my.dispatch.VisitPackageDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SingleTypeImportDeclaration)
-         if ok {
-            my.dispatch.VisitSingleTypeImportDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeImportOnDemandDeclaration)
-         if ok {
-            my.dispatch.VisitTypeImportOnDemandDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SingleStaticImportDeclaration)
-         if ok {
-            my.dispatch.VisitSingleStaticImportDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*StaticImportOnDemandDeclaration)
-         if ok {
-            my.dispatch.VisitStaticImportOnDemandDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeDeclaration)
-         if ok {
-            my.dispatch.VisitTypeDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*NormalClassDeclaration)
-         if ok {
-            my.dispatch.VisitNormalClassDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifiers)
-         if ok {
-            my.dispatch.VisitClassModifiersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameters)
-         if ok {
-            my.dispatch.VisitTypeParametersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameterList)
-         if ok {
-            my.dispatch.VisitTypeParameterListWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Super)
-         if ok {
-            my.dispatch.VisitSuperWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Interfaces)
-         if ok {
-            my.dispatch.VisitInterfacesWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceTypeList)
-         if ok {
-            my.dispatch.VisitInterfaceTypeListWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassBody)
-         if ok {
-            my.dispatch.VisitClassBodyWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassBodyDeclarations)
-         if ok {
-            my.dispatch.VisitClassBodyDeclarationsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassMemberDeclaration)
-         if ok {
-            my.dispatch.VisitClassMemberDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldDeclaration)
-         if ok {
-            my.dispatch.VisitFieldDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclarators)
-         if ok {
-            my.dispatch.VisitVariableDeclaratorsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclarator)
-         if ok {
-            my.dispatch.VisitVariableDeclaratorWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclaratorId)
-         if ok {
-            my.dispatch.VisitVariableDeclaratorIdWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifiers)
-         if ok {
-            my.dispatch.VisitFieldModifiersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclaration)
-         if ok {
-            my.dispatch.VisitMethodDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodHeader)
-         if ok {
-            my.dispatch.VisitMethodHeaderWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ResultType)
-         if ok {
-            my.dispatch.VisitResultTypeWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameterList)
-         if ok {
-            my.dispatch.VisitFormalParameterListWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameters)
-         if ok {
-            my.dispatch.VisitFormalParametersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameter)
-         if ok {
-            my.dispatch.VisitFormalParameterWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*VariableModifiers)
-         if ok {
-            my.dispatch.VisitVariableModifiersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*VariableModifier)
-         if ok {
-            my.dispatch.VisitVariableModifierWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LastFormalParameter)
-         if ok {
-            my.dispatch.VisitLastFormalParameterWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifiers)
-         if ok {
-            my.dispatch.VisitMethodModifiersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Throws)
-         if ok {
-            my.dispatch.VisitThrowsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExceptionTypeList)
-         if ok {
-            my.dispatch.VisitExceptionTypeListWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodBody)
-         if ok {
-            my.dispatch.VisitMethodBodyWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*StaticInitializer)
-         if ok {
-            my.dispatch.VisitStaticInitializerWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorDeclaration)
-         if ok {
-            my.dispatch.VisitConstructorDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorDeclarator)
-         if ok {
-            my.dispatch.VisitConstructorDeclaratorWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifiers)
-         if ok {
-            my.dispatch.VisitConstructorModifiersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorBody)
-         if ok {
-            my.dispatch.VisitConstructorBodyWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EnumDeclaration)
-         if ok {
-            my.dispatch.VisitEnumDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EnumBody)
-         if ok {
-            my.dispatch.VisitEnumBodyWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EnumConstants)
-         if ok {
-            my.dispatch.VisitEnumConstantsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EnumConstant)
-         if ok {
-            my.dispatch.VisitEnumConstantWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Arguments)
-         if ok {
-            my.dispatch.VisitArgumentsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EnumBodyDeclarations)
-         if ok {
-            my.dispatch.VisitEnumBodyDeclarationsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*NormalInterfaceDeclaration)
-         if ok {
-            my.dispatch.VisitNormalInterfaceDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifiers)
-         if ok {
-            my.dispatch.VisitInterfaceModifiersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceBody)
-         if ok {
-            my.dispatch.VisitInterfaceBodyWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceMemberDeclarations)
-         if ok {
-            my.dispatch.VisitInterfaceMemberDeclarationsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceMemberDeclaration)
-         if ok {
-            my.dispatch.VisitInterfaceMemberDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantDeclaration)
-         if ok {
-            my.dispatch.VisitConstantDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifiers)
-         if ok {
-            my.dispatch.VisitConstantModifiersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodDeclaration)
-         if ok {
-            my.dispatch.VisitAbstractMethodDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifiers)
-         if ok {
-            my.dispatch.VisitAbstractMethodModifiersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeDeclaration)
-         if ok {
-            my.dispatch.VisitAnnotationTypeDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeBody)
-         if ok {
-            my.dispatch.VisitAnnotationTypeBodyWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclarations)
-         if ok {
-            my.dispatch.VisitAnnotationTypeElementDeclarationsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*DefaultValue)
-         if ok {
-            my.dispatch.VisitDefaultValueWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Annotations)
-         if ok {
-            my.dispatch.VisitAnnotationsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*NormalAnnotation)
-         if ok {
-            my.dispatch.VisitNormalAnnotationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValuePairs)
-         if ok {
-            my.dispatch.VisitElementValuePairsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValuePair)
-         if ok {
-            my.dispatch.VisitElementValuePairWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValueArrayInitializer)
-         if ok {
-            my.dispatch.VisitElementValueArrayInitializerWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValues)
-         if ok {
-            my.dispatch.VisitElementValuesWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MarkerAnnotation)
-         if ok {
-            my.dispatch.VisitMarkerAnnotationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SingleElementAnnotation)
-         if ok {
-            my.dispatch.VisitSingleElementAnnotationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayInitializer)
-         if ok {
-            my.dispatch.VisitArrayInitializerWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*VariableInitializers)
-         if ok {
-            my.dispatch.VisitVariableInitializersWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Block)
-         if ok {
-            my.dispatch.VisitBlockWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*BlockStatements)
-         if ok {
-            my.dispatch.VisitBlockStatementsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LocalVariableDeclarationStatement)
-         if ok {
-            my.dispatch.VisitLocalVariableDeclarationStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LocalVariableDeclaration)
-         if ok {
-            my.dispatch.VisitLocalVariableDeclarationWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenStatement)
-         if ok {
-            my.dispatch.VisitIfThenStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenElseStatement)
-         if ok {
-            my.dispatch.VisitIfThenElseStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenElseStatementNoShortIf)
-         if ok {
-            my.dispatch.VisitIfThenElseStatementNoShortIfWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EmptyStatement)
-         if ok {
-            my.dispatch.VisitEmptyStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LabeledStatement)
-         if ok {
-            my.dispatch.VisitLabeledStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LabeledStatementNoShortIf)
-         if ok {
-            my.dispatch.VisitLabeledStatementNoShortIfWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExpressionStatement)
-         if ok {
-            my.dispatch.VisitExpressionStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchStatement)
-         if ok {
-            my.dispatch.VisitSwitchStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlock)
-         if ok {
-            my.dispatch.VisitSwitchBlockWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlockStatementGroups)
-         if ok {
-            my.dispatch.VisitSwitchBlockStatementGroupsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlockStatementGroup)
-         if ok {
-            my.dispatch.VisitSwitchBlockStatementGroupWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabels)
-         if ok {
-            my.dispatch.VisitSwitchLabelsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*WhileStatement)
-         if ok {
-            my.dispatch.VisitWhileStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*WhileStatementNoShortIf)
-         if ok {
-            my.dispatch.VisitWhileStatementNoShortIfWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*DoStatement)
-         if ok {
-            my.dispatch.VisitDoStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*BasicForStatement)
-         if ok {
-            my.dispatch.VisitBasicForStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ForStatementNoShortIf)
-         if ok {
-            my.dispatch.VisitForStatementNoShortIfWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*StatementExpressionList)
-         if ok {
-            my.dispatch.VisitStatementExpressionListWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EnhancedForStatement)
-         if ok {
-            my.dispatch.VisitEnhancedForStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*BreakStatement)
-         if ok {
-            my.dispatch.VisitBreakStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ContinueStatement)
-         if ok {
-            my.dispatch.VisitContinueStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ReturnStatement)
-         if ok {
-            my.dispatch.VisitReturnStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ThrowStatement)
-         if ok {
-            my.dispatch.VisitThrowStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SynchronizedStatement)
-         if ok {
-            my.dispatch.VisitSynchronizedStatementWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Catches)
-         if ok {
-            my.dispatch.VisitCatchesWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*CatchClause)
-         if ok {
-            my.dispatch.VisitCatchClauseWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Finally)
-         if ok {
-            my.dispatch.VisitFinallyWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArgumentList)
-         if ok {
-            my.dispatch.VisitArgumentListWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*DimExprs)
-         if ok {
-            my.dispatch.VisitDimExprsWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*DimExpr)
-         if ok {
-            my.dispatch.VisitDimExprWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PostIncrementExpression)
-         if ok {
-            my.dispatch.VisitPostIncrementExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PostDecrementExpression)
-         if ok {
-            my.dispatch.VisitPostDecrementExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PreIncrementExpression)
-         if ok {
-            my.dispatch.VisitPreIncrementExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PreDecrementExpression)
-         if ok {
-            my.dispatch.VisitPreDecrementExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AndExpression)
-         if ok {
-            my.dispatch.VisitAndExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExclusiveOrExpression)
-         if ok {
-            my.dispatch.VisitExclusiveOrExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InclusiveOrExpression)
-         if ok {
-            my.dispatch.VisitInclusiveOrExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalAndExpression)
-         if ok {
-            my.dispatch.VisitConditionalAndExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalOrExpression)
-         if ok {
-            my.dispatch.VisitConditionalOrExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalExpression)
-         if ok {
-            my.dispatch.VisitConditionalExpressionWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Assignment)
-         if ok {
-            my.dispatch.VisitAssignmentWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Commaopt)
-         if ok {
-            my.dispatch.VisitCommaoptWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Ellipsisopt)
-         if ok {
-            my.dispatch.VisitEllipsisoptWithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction0)
-         if ok {
-            my.dispatch.VisitLPGUserAction0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction1)
-         if ok {
-            my.dispatch.VisitLPGUserAction1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction2)
-         if ok {
-            my.dispatch.VisitLPGUserAction2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction3)
-         if ok {
-            my.dispatch.VisitLPGUserAction3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction4)
-         if ok {
-            my.dispatch.VisitLPGUserAction4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType0)
-         if ok {
-            my.dispatch.VisitIntegralType0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType1)
-         if ok {
-            my.dispatch.VisitIntegralType1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType2)
-         if ok {
-            my.dispatch.VisitIntegralType2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType3)
-         if ok {
-            my.dispatch.VisitIntegralType3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType4)
-         if ok {
-            my.dispatch.VisitIntegralType4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FloatingPointType0)
-         if ok {
-            my.dispatch.VisitFloatingPointType0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FloatingPointType1)
-         if ok {
-            my.dispatch.VisitFloatingPointType1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*WildcardBounds0)
-         if ok {
-            my.dispatch.VisitWildcardBounds0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*WildcardBounds1)
-         if ok {
-            my.dispatch.VisitWildcardBounds1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier0)
-         if ok {
-            my.dispatch.VisitClassModifier0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier1)
-         if ok {
-            my.dispatch.VisitClassModifier1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier2)
-         if ok {
-            my.dispatch.VisitClassModifier2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier3)
-         if ok {
-            my.dispatch.VisitClassModifier3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier4)
-         if ok {
-            my.dispatch.VisitClassModifier4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier5)
-         if ok {
-            my.dispatch.VisitClassModifier5WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier6)
-         if ok {
-            my.dispatch.VisitClassModifier6WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier0)
-         if ok {
-            my.dispatch.VisitFieldModifier0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier1)
-         if ok {
-            my.dispatch.VisitFieldModifier1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier2)
-         if ok {
-            my.dispatch.VisitFieldModifier2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier3)
-         if ok {
-            my.dispatch.VisitFieldModifier3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier4)
-         if ok {
-            my.dispatch.VisitFieldModifier4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier5)
-         if ok {
-            my.dispatch.VisitFieldModifier5WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier6)
-         if ok {
-            my.dispatch.VisitFieldModifier6WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclarator0)
-         if ok {
-            my.dispatch.VisitMethodDeclarator0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclarator1)
-         if ok {
-            my.dispatch.VisitMethodDeclarator1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier0)
-         if ok {
-            my.dispatch.VisitMethodModifier0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier1)
-         if ok {
-            my.dispatch.VisitMethodModifier1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier2)
-         if ok {
-            my.dispatch.VisitMethodModifier2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier3)
-         if ok {
-            my.dispatch.VisitMethodModifier3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier4)
-         if ok {
-            my.dispatch.VisitMethodModifier4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier5)
-         if ok {
-            my.dispatch.VisitMethodModifier5WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier6)
-         if ok {
-            my.dispatch.VisitMethodModifier6WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier7)
-         if ok {
-            my.dispatch.VisitMethodModifier7WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier8)
-         if ok {
-            my.dispatch.VisitMethodModifier8WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier0)
-         if ok {
-            my.dispatch.VisitConstructorModifier0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier1)
-         if ok {
-            my.dispatch.VisitConstructorModifier1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier2)
-         if ok {
-            my.dispatch.VisitConstructorModifier2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation0)
-         if ok {
-            my.dispatch.VisitExplicitConstructorInvocation0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation1)
-         if ok {
-            my.dispatch.VisitExplicitConstructorInvocation1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation2)
-         if ok {
-            my.dispatch.VisitExplicitConstructorInvocation2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier0)
-         if ok {
-            my.dispatch.VisitInterfaceModifier0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier1)
-         if ok {
-            my.dispatch.VisitInterfaceModifier1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier2)
-         if ok {
-            my.dispatch.VisitInterfaceModifier2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier3)
-         if ok {
-            my.dispatch.VisitInterfaceModifier3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier4)
-         if ok {
-            my.dispatch.VisitInterfaceModifier4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier5)
-         if ok {
-            my.dispatch.VisitInterfaceModifier5WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExtendsInterfaces0)
-         if ok {
-            my.dispatch.VisitExtendsInterfaces0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ExtendsInterfaces1)
-         if ok {
-            my.dispatch.VisitExtendsInterfaces1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier0)
-         if ok {
-            my.dispatch.VisitConstantModifier0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier1)
-         if ok {
-            my.dispatch.VisitConstantModifier1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier2)
-         if ok {
-            my.dispatch.VisitConstantModifier2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifier0)
-         if ok {
-            my.dispatch.VisitAbstractMethodModifier0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifier1)
-         if ok {
-            my.dispatch.VisitAbstractMethodModifier1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclaration0)
-         if ok {
-            my.dispatch.VisitAnnotationTypeElementDeclaration0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclaration1)
-         if ok {
-            my.dispatch.VisitAnnotationTypeElementDeclaration1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssertStatement0)
-         if ok {
-            my.dispatch.VisitAssertStatement0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssertStatement1)
-         if ok {
-            my.dispatch.VisitAssertStatement1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel0)
-         if ok {
-            my.dispatch.VisitSwitchLabel0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel1)
-         if ok {
-            my.dispatch.VisitSwitchLabel1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel2)
-         if ok {
-            my.dispatch.VisitSwitchLabel2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TryStatement0)
-         if ok {
-            my.dispatch.VisitTryStatement0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*TryStatement1)
-         if ok {
-            my.dispatch.VisitTryStatement1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray0)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray1)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray2)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray3)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray4)
-         if ok {
-            my.dispatch.VisitPrimaryNoNewArray4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Literal0)
-         if ok {
-            my.dispatch.VisitLiteral0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Literal1)
-         if ok {
-            my.dispatch.VisitLiteral1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Literal2)
-         if ok {
-            my.dispatch.VisitLiteral2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Literal3)
-         if ok {
-            my.dispatch.VisitLiteral3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Literal4)
-         if ok {
-            my.dispatch.VisitLiteral4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Literal5)
-         if ok {
-            my.dispatch.VisitLiteral5WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Literal6)
-         if ok {
-            my.dispatch.VisitLiteral6WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*BooleanLiteral0)
-         if ok {
-            my.dispatch.VisitBooleanLiteral0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*BooleanLiteral1)
-         if ok {
-            my.dispatch.VisitBooleanLiteral1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassInstanceCreationExpression0)
-         if ok {
-            my.dispatch.VisitClassInstanceCreationExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ClassInstanceCreationExpression1)
-         if ok {
-            my.dispatch.VisitClassInstanceCreationExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression0)
-         if ok {
-            my.dispatch.VisitArrayCreationExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression1)
-         if ok {
-            my.dispatch.VisitArrayCreationExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression2)
-         if ok {
-            my.dispatch.VisitArrayCreationExpression2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression3)
-         if ok {
-            my.dispatch.VisitArrayCreationExpression3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Dims0)
-         if ok {
-            my.dispatch.VisitDims0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*Dims1)
-         if ok {
-            my.dispatch.VisitDims1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess0)
-         if ok {
-            my.dispatch.VisitFieldAccess0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess1)
-         if ok {
-            my.dispatch.VisitFieldAccess1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess2)
-         if ok {
-            my.dispatch.VisitFieldAccess2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation0)
-         if ok {
-            my.dispatch.VisitMethodInvocation0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation1)
-         if ok {
-            my.dispatch.VisitMethodInvocation1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation2)
-         if ok {
-            my.dispatch.VisitMethodInvocation2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation3)
-         if ok {
-            my.dispatch.VisitMethodInvocation3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation4)
-         if ok {
-            my.dispatch.VisitMethodInvocation4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayAccess0)
-         if ok {
-            my.dispatch.VisitArrayAccess0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayAccess1)
-         if ok {
-            my.dispatch.VisitArrayAccess1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpression0)
-         if ok {
-            my.dispatch.VisitUnaryExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpression1)
-         if ok {
-            my.dispatch.VisitUnaryExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpressionNotPlusMinus0)
-         if ok {
-            my.dispatch.VisitUnaryExpressionNotPlusMinus0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpressionNotPlusMinus1)
-         if ok {
-            my.dispatch.VisitUnaryExpressionNotPlusMinus1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*CastExpression0)
-         if ok {
-            my.dispatch.VisitCastExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*CastExpression1)
-         if ok {
-            my.dispatch.VisitCastExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression0)
-         if ok {
-            my.dispatch.VisitMultiplicativeExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression1)
-         if ok {
-            my.dispatch.VisitMultiplicativeExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression2)
-         if ok {
-            my.dispatch.VisitMultiplicativeExpression2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AdditiveExpression0)
-         if ok {
-            my.dispatch.VisitAdditiveExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AdditiveExpression1)
-         if ok {
-            my.dispatch.VisitAdditiveExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression0)
-         if ok {
-            my.dispatch.VisitShiftExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression1)
-         if ok {
-            my.dispatch.VisitShiftExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression2)
-         if ok {
-            my.dispatch.VisitShiftExpression2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression0)
-         if ok {
-            my.dispatch.VisitRelationalExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression1)
-         if ok {
-            my.dispatch.VisitRelationalExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression2)
-         if ok {
-            my.dispatch.VisitRelationalExpression2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression3)
-         if ok {
-            my.dispatch.VisitRelationalExpression3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression4)
-         if ok {
-            my.dispatch.VisitRelationalExpression4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EqualityExpression0)
-         if ok {
-            my.dispatch.VisitEqualityExpression0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*EqualityExpression1)
-         if ok {
-            my.dispatch.VisitEqualityExpression1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator0)
-         if ok {
-            my.dispatch.VisitAssignmentOperator0WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator1)
-         if ok {
-            my.dispatch.VisitAssignmentOperator1WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator2)
-         if ok {
-            my.dispatch.VisitAssignmentOperator2WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator3)
-         if ok {
-            my.dispatch.VisitAssignmentOperator3WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator4)
-         if ok {
-            my.dispatch.VisitAssignmentOperator4WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator5)
-         if ok {
-            my.dispatch.VisitAssignmentOperator5WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator6)
-         if ok {
-            my.dispatch.VisitAssignmentOperator6WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator7)
-         if ok {
-            my.dispatch.VisitAssignmentOperator7WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator8)
-         if ok {
-            my.dispatch.VisitAssignmentOperator8WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator9)
-         if ok {
-            my.dispatch.VisitAssignmentOperator9WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator10)
-         if ok {
-            my.dispatch.VisitAssignmentOperator10WithArg(n2,o)
-            return 
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator11)
-         if ok {
-            my.dispatch.VisitAssignmentOperator11WithArg(n2,o)
-            return 
-          }
+func (my *AbstractVisitor)     EndVisit(n  IAst){
+     switch n2 := n.(type) {
+        case *AstToken:{
+            my.dispatch.EndVisitAstToken(n2)
         }
+        case *identifier:{
+            my.dispatch.EndVisitidentifier(n2)
+        }
+        case *PrimitiveType:{
+            my.dispatch.EndVisitPrimitiveType(n2)
+        }
+        case *ClassType:{
+            my.dispatch.EndVisitClassType(n2)
+        }
+        case *InterfaceType:{
+            my.dispatch.EndVisitInterfaceType(n2)
+        }
+        case *TypeName:{
+            my.dispatch.EndVisitTypeName(n2)
+        }
+        case *ArrayType:{
+            my.dispatch.EndVisitArrayType(n2)
+        }
+        case *TypeParameter:{
+            my.dispatch.EndVisitTypeParameter(n2)
+        }
+        case *TypeBound:{
+            my.dispatch.EndVisitTypeBound(n2)
+        }
+        case *AdditionalBoundList:{
+            my.dispatch.EndVisitAdditionalBoundList(n2)
+        }
+        case *AdditionalBound:{
+            my.dispatch.EndVisitAdditionalBound(n2)
+        }
+        case *TypeArguments:{
+            my.dispatch.EndVisitTypeArguments(n2)
+        }
+        case *ActualTypeArgumentList:{
+            my.dispatch.EndVisitActualTypeArgumentList(n2)
+        }
+        case *Wildcard:{
+            my.dispatch.EndVisitWildcard(n2)
+        }
+        case *PackageName:{
+            my.dispatch.EndVisitPackageName(n2)
+        }
+        case *ExpressionName:{
+            my.dispatch.EndVisitExpressionName(n2)
+        }
+        case *MethodName:{
+            my.dispatch.EndVisitMethodName(n2)
+        }
+        case *PackageOrTypeName:{
+            my.dispatch.EndVisitPackageOrTypeName(n2)
+        }
+        case *AmbiguousName:{
+            my.dispatch.EndVisitAmbiguousName(n2)
+        }
+        case *CompilationUnit:{
+            my.dispatch.EndVisitCompilationUnit(n2)
+        }
+        case *ImportDeclarations:{
+            my.dispatch.EndVisitImportDeclarations(n2)
+        }
+        case *TypeDeclarations:{
+            my.dispatch.EndVisitTypeDeclarations(n2)
+        }
+        case *PackageDeclaration:{
+            my.dispatch.EndVisitPackageDeclaration(n2)
+        }
+        case *SingleTypeImportDeclaration:{
+            my.dispatch.EndVisitSingleTypeImportDeclaration(n2)
+        }
+        case *TypeImportOnDemandDeclaration:{
+            my.dispatch.EndVisitTypeImportOnDemandDeclaration(n2)
+        }
+        case *SingleStaticImportDeclaration:{
+            my.dispatch.EndVisitSingleStaticImportDeclaration(n2)
+        }
+        case *StaticImportOnDemandDeclaration:{
+            my.dispatch.EndVisitStaticImportOnDemandDeclaration(n2)
+        }
+        case *TypeDeclaration:{
+            my.dispatch.EndVisitTypeDeclaration(n2)
+        }
+        case *NormalClassDeclaration:{
+            my.dispatch.EndVisitNormalClassDeclaration(n2)
+        }
+        case *ClassModifiers:{
+            my.dispatch.EndVisitClassModifiers(n2)
+        }
+        case *TypeParameters:{
+            my.dispatch.EndVisitTypeParameters(n2)
+        }
+        case *TypeParameterList:{
+            my.dispatch.EndVisitTypeParameterList(n2)
+        }
+        case *Super:{
+            my.dispatch.EndVisitSuper(n2)
+        }
+        case *Interfaces:{
+            my.dispatch.EndVisitInterfaces(n2)
+        }
+        case *InterfaceTypeList:{
+            my.dispatch.EndVisitInterfaceTypeList(n2)
+        }
+        case *ClassBody:{
+            my.dispatch.EndVisitClassBody(n2)
+        }
+        case *ClassBodyDeclarations:{
+            my.dispatch.EndVisitClassBodyDeclarations(n2)
+        }
+        case *ClassMemberDeclaration:{
+            my.dispatch.EndVisitClassMemberDeclaration(n2)
+        }
+        case *FieldDeclaration:{
+            my.dispatch.EndVisitFieldDeclaration(n2)
+        }
+        case *VariableDeclarators:{
+            my.dispatch.EndVisitVariableDeclarators(n2)
+        }
+        case *VariableDeclarator:{
+            my.dispatch.EndVisitVariableDeclarator(n2)
+        }
+        case *VariableDeclaratorId:{
+            my.dispatch.EndVisitVariableDeclaratorId(n2)
+        }
+        case *FieldModifiers:{
+            my.dispatch.EndVisitFieldModifiers(n2)
+        }
+        case *MethodDeclaration:{
+            my.dispatch.EndVisitMethodDeclaration(n2)
+        }
+        case *MethodHeader:{
+            my.dispatch.EndVisitMethodHeader(n2)
+        }
+        case *ResultType:{
+            my.dispatch.EndVisitResultType(n2)
+        }
+        case *FormalParameterList:{
+            my.dispatch.EndVisitFormalParameterList(n2)
+        }
+        case *FormalParameters:{
+            my.dispatch.EndVisitFormalParameters(n2)
+        }
+        case *FormalParameter:{
+            my.dispatch.EndVisitFormalParameter(n2)
+        }
+        case *VariableModifiers:{
+            my.dispatch.EndVisitVariableModifiers(n2)
+        }
+        case *VariableModifier:{
+            my.dispatch.EndVisitVariableModifier(n2)
+        }
+        case *LastFormalParameter:{
+            my.dispatch.EndVisitLastFormalParameter(n2)
+        }
+        case *MethodModifiers:{
+            my.dispatch.EndVisitMethodModifiers(n2)
+        }
+        case *Throws:{
+            my.dispatch.EndVisitThrows(n2)
+        }
+        case *ExceptionTypeList:{
+            my.dispatch.EndVisitExceptionTypeList(n2)
+        }
+        case *MethodBody:{
+            my.dispatch.EndVisitMethodBody(n2)
+        }
+        case *StaticInitializer:{
+            my.dispatch.EndVisitStaticInitializer(n2)
+        }
+        case *ConstructorDeclaration:{
+            my.dispatch.EndVisitConstructorDeclaration(n2)
+        }
+        case *ConstructorDeclarator:{
+            my.dispatch.EndVisitConstructorDeclarator(n2)
+        }
+        case *ConstructorModifiers:{
+            my.dispatch.EndVisitConstructorModifiers(n2)
+        }
+        case *ConstructorBody:{
+            my.dispatch.EndVisitConstructorBody(n2)
+        }
+        case *EnumDeclaration:{
+            my.dispatch.EndVisitEnumDeclaration(n2)
+        }
+        case *EnumBody:{
+            my.dispatch.EndVisitEnumBody(n2)
+        }
+        case *EnumConstants:{
+            my.dispatch.EndVisitEnumConstants(n2)
+        }
+        case *EnumConstant:{
+            my.dispatch.EndVisitEnumConstant(n2)
+        }
+        case *Arguments:{
+            my.dispatch.EndVisitArguments(n2)
+        }
+        case *EnumBodyDeclarations:{
+            my.dispatch.EndVisitEnumBodyDeclarations(n2)
+        }
+        case *NormalInterfaceDeclaration:{
+            my.dispatch.EndVisitNormalInterfaceDeclaration(n2)
+        }
+        case *InterfaceModifiers:{
+            my.dispatch.EndVisitInterfaceModifiers(n2)
+        }
+        case *InterfaceBody:{
+            my.dispatch.EndVisitInterfaceBody(n2)
+        }
+        case *InterfaceMemberDeclarations:{
+            my.dispatch.EndVisitInterfaceMemberDeclarations(n2)
+        }
+        case *InterfaceMemberDeclaration:{
+            my.dispatch.EndVisitInterfaceMemberDeclaration(n2)
+        }
+        case *ConstantDeclaration:{
+            my.dispatch.EndVisitConstantDeclaration(n2)
+        }
+        case *ConstantModifiers:{
+            my.dispatch.EndVisitConstantModifiers(n2)
+        }
+        case *AbstractMethodDeclaration:{
+            my.dispatch.EndVisitAbstractMethodDeclaration(n2)
+        }
+        case *AbstractMethodModifiers:{
+            my.dispatch.EndVisitAbstractMethodModifiers(n2)
+        }
+        case *AnnotationTypeDeclaration:{
+            my.dispatch.EndVisitAnnotationTypeDeclaration(n2)
+        }
+        case *AnnotationTypeBody:{
+            my.dispatch.EndVisitAnnotationTypeBody(n2)
+        }
+        case *AnnotationTypeElementDeclarations:{
+            my.dispatch.EndVisitAnnotationTypeElementDeclarations(n2)
+        }
+        case *DefaultValue:{
+            my.dispatch.EndVisitDefaultValue(n2)
+        }
+        case *Annotations:{
+            my.dispatch.EndVisitAnnotations(n2)
+        }
+        case *NormalAnnotation:{
+            my.dispatch.EndVisitNormalAnnotation(n2)
+        }
+        case *ElementValuePairs:{
+            my.dispatch.EndVisitElementValuePairs(n2)
+        }
+        case *ElementValuePair:{
+            my.dispatch.EndVisitElementValuePair(n2)
+        }
+        case *ElementValueArrayInitializer:{
+            my.dispatch.EndVisitElementValueArrayInitializer(n2)
+        }
+        case *ElementValues:{
+            my.dispatch.EndVisitElementValues(n2)
+        }
+        case *MarkerAnnotation:{
+            my.dispatch.EndVisitMarkerAnnotation(n2)
+        }
+        case *SingleElementAnnotation:{
+            my.dispatch.EndVisitSingleElementAnnotation(n2)
+        }
+        case *ArrayInitializer:{
+            my.dispatch.EndVisitArrayInitializer(n2)
+        }
+        case *VariableInitializers:{
+            my.dispatch.EndVisitVariableInitializers(n2)
+        }
+        case *Block:{
+            my.dispatch.EndVisitBlock(n2)
+        }
+        case *BlockStatements:{
+            my.dispatch.EndVisitBlockStatements(n2)
+        }
+        case *LocalVariableDeclarationStatement:{
+            my.dispatch.EndVisitLocalVariableDeclarationStatement(n2)
+        }
+        case *LocalVariableDeclaration:{
+            my.dispatch.EndVisitLocalVariableDeclaration(n2)
+        }
+        case *IfThenStatement:{
+            my.dispatch.EndVisitIfThenStatement(n2)
+        }
+        case *IfThenElseStatement:{
+            my.dispatch.EndVisitIfThenElseStatement(n2)
+        }
+        case *IfThenElseStatementNoShortIf:{
+            my.dispatch.EndVisitIfThenElseStatementNoShortIf(n2)
+        }
+        case *EmptyStatement:{
+            my.dispatch.EndVisitEmptyStatement(n2)
+        }
+        case *LabeledStatement:{
+            my.dispatch.EndVisitLabeledStatement(n2)
+        }
+        case *LabeledStatementNoShortIf:{
+            my.dispatch.EndVisitLabeledStatementNoShortIf(n2)
+        }
+        case *ExpressionStatement:{
+            my.dispatch.EndVisitExpressionStatement(n2)
+        }
+        case *SwitchStatement:{
+            my.dispatch.EndVisitSwitchStatement(n2)
+        }
+        case *SwitchBlock:{
+            my.dispatch.EndVisitSwitchBlock(n2)
+        }
+        case *SwitchBlockStatementGroups:{
+            my.dispatch.EndVisitSwitchBlockStatementGroups(n2)
+        }
+        case *SwitchBlockStatementGroup:{
+            my.dispatch.EndVisitSwitchBlockStatementGroup(n2)
+        }
+        case *SwitchLabels:{
+            my.dispatch.EndVisitSwitchLabels(n2)
+        }
+        case *WhileStatement:{
+            my.dispatch.EndVisitWhileStatement(n2)
+        }
+        case *WhileStatementNoShortIf:{
+            my.dispatch.EndVisitWhileStatementNoShortIf(n2)
+        }
+        case *DoStatement:{
+            my.dispatch.EndVisitDoStatement(n2)
+        }
+        case *BasicForStatement:{
+            my.dispatch.EndVisitBasicForStatement(n2)
+        }
+        case *ForStatementNoShortIf:{
+            my.dispatch.EndVisitForStatementNoShortIf(n2)
+        }
+        case *StatementExpressionList:{
+            my.dispatch.EndVisitStatementExpressionList(n2)
+        }
+        case *EnhancedForStatement:{
+            my.dispatch.EndVisitEnhancedForStatement(n2)
+        }
+        case *BreakStatement:{
+            my.dispatch.EndVisitBreakStatement(n2)
+        }
+        case *ContinueStatement:{
+            my.dispatch.EndVisitContinueStatement(n2)
+        }
+        case *ReturnStatement:{
+            my.dispatch.EndVisitReturnStatement(n2)
+        }
+        case *ThrowStatement:{
+            my.dispatch.EndVisitThrowStatement(n2)
+        }
+        case *SynchronizedStatement:{
+            my.dispatch.EndVisitSynchronizedStatement(n2)
+        }
+        case *Catches:{
+            my.dispatch.EndVisitCatches(n2)
+        }
+        case *CatchClause:{
+            my.dispatch.EndVisitCatchClause(n2)
+        }
+        case *Finally:{
+            my.dispatch.EndVisitFinally(n2)
+        }
+        case *ArgumentList:{
+            my.dispatch.EndVisitArgumentList(n2)
+        }
+        case *DimExprs:{
+            my.dispatch.EndVisitDimExprs(n2)
+        }
+        case *DimExpr:{
+            my.dispatch.EndVisitDimExpr(n2)
+        }
+        case *PostIncrementExpression:{
+            my.dispatch.EndVisitPostIncrementExpression(n2)
+        }
+        case *PostDecrementExpression:{
+            my.dispatch.EndVisitPostDecrementExpression(n2)
+        }
+        case *PreIncrementExpression:{
+            my.dispatch.EndVisitPreIncrementExpression(n2)
+        }
+        case *PreDecrementExpression:{
+            my.dispatch.EndVisitPreDecrementExpression(n2)
+        }
+        case *AndExpression:{
+            my.dispatch.EndVisitAndExpression(n2)
+        }
+        case *ExclusiveOrExpression:{
+            my.dispatch.EndVisitExclusiveOrExpression(n2)
+        }
+        case *InclusiveOrExpression:{
+            my.dispatch.EndVisitInclusiveOrExpression(n2)
+        }
+        case *ConditionalAndExpression:{
+            my.dispatch.EndVisitConditionalAndExpression(n2)
+        }
+        case *ConditionalOrExpression:{
+            my.dispatch.EndVisitConditionalOrExpression(n2)
+        }
+        case *ConditionalExpression:{
+            my.dispatch.EndVisitConditionalExpression(n2)
+        }
+        case *Assignment:{
+            my.dispatch.EndVisitAssignment(n2)
+        }
+        case *Commaopt:{
+            my.dispatch.EndVisitCommaopt(n2)
+        }
+        case *Ellipsisopt:{
+            my.dispatch.EndVisitEllipsisopt(n2)
+        }
+        case *LPGUserAction0:{
+            my.dispatch.EndVisitLPGUserAction0(n2)
+        }
+        case *LPGUserAction1:{
+            my.dispatch.EndVisitLPGUserAction1(n2)
+        }
+        case *LPGUserAction2:{
+            my.dispatch.EndVisitLPGUserAction2(n2)
+        }
+        case *LPGUserAction3:{
+            my.dispatch.EndVisitLPGUserAction3(n2)
+        }
+        case *LPGUserAction4:{
+            my.dispatch.EndVisitLPGUserAction4(n2)
+        }
+        case *IntegralType0:{
+            my.dispatch.EndVisitIntegralType0(n2)
+        }
+        case *IntegralType1:{
+            my.dispatch.EndVisitIntegralType1(n2)
+        }
+        case *IntegralType2:{
+            my.dispatch.EndVisitIntegralType2(n2)
+        }
+        case *IntegralType3:{
+            my.dispatch.EndVisitIntegralType3(n2)
+        }
+        case *IntegralType4:{
+            my.dispatch.EndVisitIntegralType4(n2)
+        }
+        case *FloatingPointType0:{
+            my.dispatch.EndVisitFloatingPointType0(n2)
+        }
+        case *FloatingPointType1:{
+            my.dispatch.EndVisitFloatingPointType1(n2)
+        }
+        case *WildcardBounds0:{
+            my.dispatch.EndVisitWildcardBounds0(n2)
+        }
+        case *WildcardBounds1:{
+            my.dispatch.EndVisitWildcardBounds1(n2)
+        }
+        case *ClassModifier0:{
+            my.dispatch.EndVisitClassModifier0(n2)
+        }
+        case *ClassModifier1:{
+            my.dispatch.EndVisitClassModifier1(n2)
+        }
+        case *ClassModifier2:{
+            my.dispatch.EndVisitClassModifier2(n2)
+        }
+        case *ClassModifier3:{
+            my.dispatch.EndVisitClassModifier3(n2)
+        }
+        case *ClassModifier4:{
+            my.dispatch.EndVisitClassModifier4(n2)
+        }
+        case *ClassModifier5:{
+            my.dispatch.EndVisitClassModifier5(n2)
+        }
+        case *ClassModifier6:{
+            my.dispatch.EndVisitClassModifier6(n2)
+        }
+        case *FieldModifier0:{
+            my.dispatch.EndVisitFieldModifier0(n2)
+        }
+        case *FieldModifier1:{
+            my.dispatch.EndVisitFieldModifier1(n2)
+        }
+        case *FieldModifier2:{
+            my.dispatch.EndVisitFieldModifier2(n2)
+        }
+        case *FieldModifier3:{
+            my.dispatch.EndVisitFieldModifier3(n2)
+        }
+        case *FieldModifier4:{
+            my.dispatch.EndVisitFieldModifier4(n2)
+        }
+        case *FieldModifier5:{
+            my.dispatch.EndVisitFieldModifier5(n2)
+        }
+        case *FieldModifier6:{
+            my.dispatch.EndVisitFieldModifier6(n2)
+        }
+        case *MethodDeclarator0:{
+            my.dispatch.EndVisitMethodDeclarator0(n2)
+        }
+        case *MethodDeclarator1:{
+            my.dispatch.EndVisitMethodDeclarator1(n2)
+        }
+        case *MethodModifier0:{
+            my.dispatch.EndVisitMethodModifier0(n2)
+        }
+        case *MethodModifier1:{
+            my.dispatch.EndVisitMethodModifier1(n2)
+        }
+        case *MethodModifier2:{
+            my.dispatch.EndVisitMethodModifier2(n2)
+        }
+        case *MethodModifier3:{
+            my.dispatch.EndVisitMethodModifier3(n2)
+        }
+        case *MethodModifier4:{
+            my.dispatch.EndVisitMethodModifier4(n2)
+        }
+        case *MethodModifier5:{
+            my.dispatch.EndVisitMethodModifier5(n2)
+        }
+        case *MethodModifier6:{
+            my.dispatch.EndVisitMethodModifier6(n2)
+        }
+        case *MethodModifier7:{
+            my.dispatch.EndVisitMethodModifier7(n2)
+        }
+        case *MethodModifier8:{
+            my.dispatch.EndVisitMethodModifier8(n2)
+        }
+        case *ConstructorModifier0:{
+            my.dispatch.EndVisitConstructorModifier0(n2)
+        }
+        case *ConstructorModifier1:{
+            my.dispatch.EndVisitConstructorModifier1(n2)
+        }
+        case *ConstructorModifier2:{
+            my.dispatch.EndVisitConstructorModifier2(n2)
+        }
+        case *ExplicitConstructorInvocation0:{
+            my.dispatch.EndVisitExplicitConstructorInvocation0(n2)
+        }
+        case *ExplicitConstructorInvocation1:{
+            my.dispatch.EndVisitExplicitConstructorInvocation1(n2)
+        }
+        case *ExplicitConstructorInvocation2:{
+            my.dispatch.EndVisitExplicitConstructorInvocation2(n2)
+        }
+        case *InterfaceModifier0:{
+            my.dispatch.EndVisitInterfaceModifier0(n2)
+        }
+        case *InterfaceModifier1:{
+            my.dispatch.EndVisitInterfaceModifier1(n2)
+        }
+        case *InterfaceModifier2:{
+            my.dispatch.EndVisitInterfaceModifier2(n2)
+        }
+        case *InterfaceModifier3:{
+            my.dispatch.EndVisitInterfaceModifier3(n2)
+        }
+        case *InterfaceModifier4:{
+            my.dispatch.EndVisitInterfaceModifier4(n2)
+        }
+        case *InterfaceModifier5:{
+            my.dispatch.EndVisitInterfaceModifier5(n2)
+        }
+        case *ExtendsInterfaces0:{
+            my.dispatch.EndVisitExtendsInterfaces0(n2)
+        }
+        case *ExtendsInterfaces1:{
+            my.dispatch.EndVisitExtendsInterfaces1(n2)
+        }
+        case *ConstantModifier0:{
+            my.dispatch.EndVisitConstantModifier0(n2)
+        }
+        case *ConstantModifier1:{
+            my.dispatch.EndVisitConstantModifier1(n2)
+        }
+        case *ConstantModifier2:{
+            my.dispatch.EndVisitConstantModifier2(n2)
+        }
+        case *AbstractMethodModifier0:{
+            my.dispatch.EndVisitAbstractMethodModifier0(n2)
+        }
+        case *AbstractMethodModifier1:{
+            my.dispatch.EndVisitAbstractMethodModifier1(n2)
+        }
+        case *AnnotationTypeElementDeclaration0:{
+            my.dispatch.EndVisitAnnotationTypeElementDeclaration0(n2)
+        }
+        case *AnnotationTypeElementDeclaration1:{
+            my.dispatch.EndVisitAnnotationTypeElementDeclaration1(n2)
+        }
+        case *AssertStatement0:{
+            my.dispatch.EndVisitAssertStatement0(n2)
+        }
+        case *AssertStatement1:{
+            my.dispatch.EndVisitAssertStatement1(n2)
+        }
+        case *SwitchLabel0:{
+            my.dispatch.EndVisitSwitchLabel0(n2)
+        }
+        case *SwitchLabel1:{
+            my.dispatch.EndVisitSwitchLabel1(n2)
+        }
+        case *SwitchLabel2:{
+            my.dispatch.EndVisitSwitchLabel2(n2)
+        }
+        case *TryStatement0:{
+            my.dispatch.EndVisitTryStatement0(n2)
+        }
+        case *TryStatement1:{
+            my.dispatch.EndVisitTryStatement1(n2)
+        }
+        case *PrimaryNoNewArray0:{
+            my.dispatch.EndVisitPrimaryNoNewArray0(n2)
+        }
+        case *PrimaryNoNewArray1:{
+            my.dispatch.EndVisitPrimaryNoNewArray1(n2)
+        }
+        case *PrimaryNoNewArray2:{
+            my.dispatch.EndVisitPrimaryNoNewArray2(n2)
+        }
+        case *PrimaryNoNewArray3:{
+            my.dispatch.EndVisitPrimaryNoNewArray3(n2)
+        }
+        case *PrimaryNoNewArray4:{
+            my.dispatch.EndVisitPrimaryNoNewArray4(n2)
+        }
+        case *Literal0:{
+            my.dispatch.EndVisitLiteral0(n2)
+        }
+        case *Literal1:{
+            my.dispatch.EndVisitLiteral1(n2)
+        }
+        case *Literal2:{
+            my.dispatch.EndVisitLiteral2(n2)
+        }
+        case *Literal3:{
+            my.dispatch.EndVisitLiteral3(n2)
+        }
+        case *Literal4:{
+            my.dispatch.EndVisitLiteral4(n2)
+        }
+        case *Literal5:{
+            my.dispatch.EndVisitLiteral5(n2)
+        }
+        case *Literal6:{
+            my.dispatch.EndVisitLiteral6(n2)
+        }
+        case *BooleanLiteral0:{
+            my.dispatch.EndVisitBooleanLiteral0(n2)
+        }
+        case *BooleanLiteral1:{
+            my.dispatch.EndVisitBooleanLiteral1(n2)
+        }
+        case *ClassInstanceCreationExpression0:{
+            my.dispatch.EndVisitClassInstanceCreationExpression0(n2)
+        }
+        case *ClassInstanceCreationExpression1:{
+            my.dispatch.EndVisitClassInstanceCreationExpression1(n2)
+        }
+        case *ArrayCreationExpression0:{
+            my.dispatch.EndVisitArrayCreationExpression0(n2)
+        }
+        case *ArrayCreationExpression1:{
+            my.dispatch.EndVisitArrayCreationExpression1(n2)
+        }
+        case *ArrayCreationExpression2:{
+            my.dispatch.EndVisitArrayCreationExpression2(n2)
+        }
+        case *ArrayCreationExpression3:{
+            my.dispatch.EndVisitArrayCreationExpression3(n2)
+        }
+        case *Dims0:{
+            my.dispatch.EndVisitDims0(n2)
+        }
+        case *Dims1:{
+            my.dispatch.EndVisitDims1(n2)
+        }
+        case *FieldAccess0:{
+            my.dispatch.EndVisitFieldAccess0(n2)
+        }
+        case *FieldAccess1:{
+            my.dispatch.EndVisitFieldAccess1(n2)
+        }
+        case *FieldAccess2:{
+            my.dispatch.EndVisitFieldAccess2(n2)
+        }
+        case *MethodInvocation0:{
+            my.dispatch.EndVisitMethodInvocation0(n2)
+        }
+        case *MethodInvocation1:{
+            my.dispatch.EndVisitMethodInvocation1(n2)
+        }
+        case *MethodInvocation2:{
+            my.dispatch.EndVisitMethodInvocation2(n2)
+        }
+        case *MethodInvocation3:{
+            my.dispatch.EndVisitMethodInvocation3(n2)
+        }
+        case *MethodInvocation4:{
+            my.dispatch.EndVisitMethodInvocation4(n2)
+        }
+        case *ArrayAccess0:{
+            my.dispatch.EndVisitArrayAccess0(n2)
+        }
+        case *ArrayAccess1:{
+            my.dispatch.EndVisitArrayAccess1(n2)
+        }
+        case *UnaryExpression0:{
+            my.dispatch.EndVisitUnaryExpression0(n2)
+        }
+        case *UnaryExpression1:{
+            my.dispatch.EndVisitUnaryExpression1(n2)
+        }
+        case *UnaryExpressionNotPlusMinus0:{
+            my.dispatch.EndVisitUnaryExpressionNotPlusMinus0(n2)
+        }
+        case *UnaryExpressionNotPlusMinus1:{
+            my.dispatch.EndVisitUnaryExpressionNotPlusMinus1(n2)
+        }
+        case *CastExpression0:{
+            my.dispatch.EndVisitCastExpression0(n2)
+        }
+        case *CastExpression1:{
+            my.dispatch.EndVisitCastExpression1(n2)
+        }
+        case *MultiplicativeExpression0:{
+            my.dispatch.EndVisitMultiplicativeExpression0(n2)
+        }
+        case *MultiplicativeExpression1:{
+            my.dispatch.EndVisitMultiplicativeExpression1(n2)
+        }
+        case *MultiplicativeExpression2:{
+            my.dispatch.EndVisitMultiplicativeExpression2(n2)
+        }
+        case *AdditiveExpression0:{
+            my.dispatch.EndVisitAdditiveExpression0(n2)
+        }
+        case *AdditiveExpression1:{
+            my.dispatch.EndVisitAdditiveExpression1(n2)
+        }
+        case *ShiftExpression0:{
+            my.dispatch.EndVisitShiftExpression0(n2)
+        }
+        case *ShiftExpression1:{
+            my.dispatch.EndVisitShiftExpression1(n2)
+        }
+        case *ShiftExpression2:{
+            my.dispatch.EndVisitShiftExpression2(n2)
+        }
+        case *RelationalExpression0:{
+            my.dispatch.EndVisitRelationalExpression0(n2)
+        }
+        case *RelationalExpression1:{
+            my.dispatch.EndVisitRelationalExpression1(n2)
+        }
+        case *RelationalExpression2:{
+            my.dispatch.EndVisitRelationalExpression2(n2)
+        }
+        case *RelationalExpression3:{
+            my.dispatch.EndVisitRelationalExpression3(n2)
+        }
+        case *RelationalExpression4:{
+            my.dispatch.EndVisitRelationalExpression4(n2)
+        }
+        case *EqualityExpression0:{
+            my.dispatch.EndVisitEqualityExpression0(n2)
+        }
+        case *EqualityExpression1:{
+            my.dispatch.EndVisitEqualityExpression1(n2)
+        }
+        case *AssignmentOperator0:{
+            my.dispatch.EndVisitAssignmentOperator0(n2)
+        }
+        case *AssignmentOperator1:{
+            my.dispatch.EndVisitAssignmentOperator1(n2)
+        }
+        case *AssignmentOperator2:{
+            my.dispatch.EndVisitAssignmentOperator2(n2)
+        }
+        case *AssignmentOperator3:{
+            my.dispatch.EndVisitAssignmentOperator3(n2)
+        }
+        case *AssignmentOperator4:{
+            my.dispatch.EndVisitAssignmentOperator4(n2)
+        }
+        case *AssignmentOperator5:{
+            my.dispatch.EndVisitAssignmentOperator5(n2)
+        }
+        case *AssignmentOperator6:{
+            my.dispatch.EndVisitAssignmentOperator6(n2)
+        }
+        case *AssignmentOperator7:{
+            my.dispatch.EndVisitAssignmentOperator7(n2)
+        }
+        case *AssignmentOperator8:{
+            my.dispatch.EndVisitAssignmentOperator8(n2)
+        }
+        case *AssignmentOperator9:{
+            my.dispatch.EndVisitAssignmentOperator9(n2)
+        }
+        case *AssignmentOperator10:{
+            my.dispatch.EndVisitAssignmentOperator10(n2)
+        }
+        case *AssignmentOperator11:{
+            my.dispatch.EndVisitAssignmentOperator11(n2)
+        }
+        default:{ }
+     }
 }
 func AnyCastToAbstractVisitor(i interface{}) *AbstractVisitor {
 	if nil == i{
 		return nil
 	}else{
 		return i.(*AbstractVisitor)
-	}
-}
-type ResultVisitorResultArgumentVisitor interface{
-   ResultVisitor
-   ResultArgumentVisitor
-   }
-type AbstractResultVisitor struct{
-   dispatch ResultVisitorResultArgumentVisitor
-   }
-func NewAbstractResultVisitor(dispatch ResultVisitorResultArgumentVisitor) *AbstractResultVisitor{
-         my := new(AbstractResultVisitor)
-         if dispatch != nil{
-           my.dispatch = dispatch
-         }else{
-           my.dispatch = my
-         }
-        return my
-}
-
-func (my *AbstractResultVisitor)       UnimplementedVisitor(s  string) interface{}{ return nil }
-
-func (my *AbstractResultVisitor)     VisitAstTokenWithResult(n *AstToken) interface{}{ return  my.UnimplementedVisitor("VisitAstTokenWithResult(*AstToken)")}
-
-func (my *AbstractResultVisitor)     VisitAstTokenWithResultArgument(n *AstToken, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAstTokenWithResultArgument(*AstToken, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitidentifierWithResult(n *identifier) interface{}{ return  my.UnimplementedVisitor("VisitidentifierWithResult(*identifier)")}
-
-func (my *AbstractResultVisitor)     VisitidentifierWithResultArgument(n *identifier, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitidentifierWithResultArgument(*identifier, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPrimitiveTypeWithResult(n *PrimitiveType) interface{}{ return  my.UnimplementedVisitor("VisitPrimitiveTypeWithResult(*PrimitiveType)")}
-
-func (my *AbstractResultVisitor)     VisitPrimitiveTypeWithResultArgument(n *PrimitiveType, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPrimitiveTypeWithResultArgument(*PrimitiveType, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassTypeWithResult(n *ClassType) interface{}{ return  my.UnimplementedVisitor("VisitClassTypeWithResult(*ClassType)")}
-
-func (my *AbstractResultVisitor)     VisitClassTypeWithResultArgument(n *ClassType, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassTypeWithResultArgument(*ClassType, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceTypeWithResult(n *InterfaceType) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceTypeWithResult(*InterfaceType)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceTypeWithResultArgument(n *InterfaceType, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceTypeWithResultArgument(*InterfaceType, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeNameWithResult(n *TypeName) interface{}{ return  my.UnimplementedVisitor("VisitTypeNameWithResult(*TypeName)")}
-
-func (my *AbstractResultVisitor)     VisitTypeNameWithResultArgument(n *TypeName, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeNameWithResultArgument(*TypeName, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArrayTypeWithResult(n *ArrayType) interface{}{ return  my.UnimplementedVisitor("VisitArrayTypeWithResult(*ArrayType)")}
-
-func (my *AbstractResultVisitor)     VisitArrayTypeWithResultArgument(n *ArrayType, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArrayTypeWithResultArgument(*ArrayType, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeParameterWithResult(n *TypeParameter) interface{}{ return  my.UnimplementedVisitor("VisitTypeParameterWithResult(*TypeParameter)")}
-
-func (my *AbstractResultVisitor)     VisitTypeParameterWithResultArgument(n *TypeParameter, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeParameterWithResultArgument(*TypeParameter, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeBoundWithResult(n *TypeBound) interface{}{ return  my.UnimplementedVisitor("VisitTypeBoundWithResult(*TypeBound)")}
-
-func (my *AbstractResultVisitor)     VisitTypeBoundWithResultArgument(n *TypeBound, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeBoundWithResultArgument(*TypeBound, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAdditionalBoundListWithResult(n *AdditionalBoundList) interface{}{ return  my.UnimplementedVisitor("VisitAdditionalBoundListWithResult(*AdditionalBoundList)")}
-
-func (my *AbstractResultVisitor)     VisitAdditionalBoundListWithResultArgument(n *AdditionalBoundList, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAdditionalBoundListWithResultArgument(*AdditionalBoundList, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAdditionalBoundWithResult(n *AdditionalBound) interface{}{ return  my.UnimplementedVisitor("VisitAdditionalBoundWithResult(*AdditionalBound)")}
-
-func (my *AbstractResultVisitor)     VisitAdditionalBoundWithResultArgument(n *AdditionalBound, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAdditionalBoundWithResultArgument(*AdditionalBound, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeArgumentsWithResult(n *TypeArguments) interface{}{ return  my.UnimplementedVisitor("VisitTypeArgumentsWithResult(*TypeArguments)")}
-
-func (my *AbstractResultVisitor)     VisitTypeArgumentsWithResultArgument(n *TypeArguments, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeArgumentsWithResultArgument(*TypeArguments, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitActualTypeArgumentListWithResult(n *ActualTypeArgumentList) interface{}{ return  my.UnimplementedVisitor("VisitActualTypeArgumentListWithResult(*ActualTypeArgumentList)")}
-
-func (my *AbstractResultVisitor)     VisitActualTypeArgumentListWithResultArgument(n *ActualTypeArgumentList, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitActualTypeArgumentListWithResultArgument(*ActualTypeArgumentList, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitWildcardWithResult(n *Wildcard) interface{}{ return  my.UnimplementedVisitor("VisitWildcardWithResult(*Wildcard)")}
-
-func (my *AbstractResultVisitor)     VisitWildcardWithResultArgument(n *Wildcard, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitWildcardWithResultArgument(*Wildcard, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPackageNameWithResult(n *PackageName) interface{}{ return  my.UnimplementedVisitor("VisitPackageNameWithResult(*PackageName)")}
-
-func (my *AbstractResultVisitor)     VisitPackageNameWithResultArgument(n *PackageName, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPackageNameWithResultArgument(*PackageName, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExpressionNameWithResult(n *ExpressionName) interface{}{ return  my.UnimplementedVisitor("VisitExpressionNameWithResult(*ExpressionName)")}
-
-func (my *AbstractResultVisitor)     VisitExpressionNameWithResultArgument(n *ExpressionName, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExpressionNameWithResultArgument(*ExpressionName, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodNameWithResult(n *MethodName) interface{}{ return  my.UnimplementedVisitor("VisitMethodNameWithResult(*MethodName)")}
-
-func (my *AbstractResultVisitor)     VisitMethodNameWithResultArgument(n *MethodName, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodNameWithResultArgument(*MethodName, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPackageOrTypeNameWithResult(n *PackageOrTypeName) interface{}{ return  my.UnimplementedVisitor("VisitPackageOrTypeNameWithResult(*PackageOrTypeName)")}
-
-func (my *AbstractResultVisitor)     VisitPackageOrTypeNameWithResultArgument(n *PackageOrTypeName, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPackageOrTypeNameWithResultArgument(*PackageOrTypeName, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAmbiguousNameWithResult(n *AmbiguousName) interface{}{ return  my.UnimplementedVisitor("VisitAmbiguousNameWithResult(*AmbiguousName)")}
-
-func (my *AbstractResultVisitor)     VisitAmbiguousNameWithResultArgument(n *AmbiguousName, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAmbiguousNameWithResultArgument(*AmbiguousName, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitCompilationUnitWithResult(n *CompilationUnit) interface{}{ return  my.UnimplementedVisitor("VisitCompilationUnitWithResult(*CompilationUnit)")}
-
-func (my *AbstractResultVisitor)     VisitCompilationUnitWithResultArgument(n *CompilationUnit, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitCompilationUnitWithResultArgument(*CompilationUnit, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitImportDeclarationsWithResult(n *ImportDeclarations) interface{}{ return  my.UnimplementedVisitor("VisitImportDeclarationsWithResult(*ImportDeclarations)")}
-
-func (my *AbstractResultVisitor)     VisitImportDeclarationsWithResultArgument(n *ImportDeclarations, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitImportDeclarationsWithResultArgument(*ImportDeclarations, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeDeclarationsWithResult(n *TypeDeclarations) interface{}{ return  my.UnimplementedVisitor("VisitTypeDeclarationsWithResult(*TypeDeclarations)")}
-
-func (my *AbstractResultVisitor)     VisitTypeDeclarationsWithResultArgument(n *TypeDeclarations, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeDeclarationsWithResultArgument(*TypeDeclarations, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPackageDeclarationWithResult(n *PackageDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitPackageDeclarationWithResult(*PackageDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitPackageDeclarationWithResultArgument(n *PackageDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPackageDeclarationWithResultArgument(*PackageDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSingleTypeImportDeclarationWithResult(n *SingleTypeImportDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitSingleTypeImportDeclarationWithResult(*SingleTypeImportDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitSingleTypeImportDeclarationWithResultArgument(n *SingleTypeImportDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSingleTypeImportDeclarationWithResultArgument(*SingleTypeImportDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeImportOnDemandDeclarationWithResult(n *TypeImportOnDemandDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitTypeImportOnDemandDeclarationWithResult(*TypeImportOnDemandDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitTypeImportOnDemandDeclarationWithResultArgument(n *TypeImportOnDemandDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeImportOnDemandDeclarationWithResultArgument(*TypeImportOnDemandDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSingleStaticImportDeclarationWithResult(n *SingleStaticImportDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitSingleStaticImportDeclarationWithResult(*SingleStaticImportDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitSingleStaticImportDeclarationWithResultArgument(n *SingleStaticImportDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSingleStaticImportDeclarationWithResultArgument(*SingleStaticImportDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitStaticImportOnDemandDeclarationWithResult(n *StaticImportOnDemandDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitStaticImportOnDemandDeclarationWithResult(*StaticImportOnDemandDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitStaticImportOnDemandDeclarationWithResultArgument(n *StaticImportOnDemandDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitStaticImportOnDemandDeclarationWithResultArgument(*StaticImportOnDemandDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeDeclarationWithResult(n *TypeDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitTypeDeclarationWithResult(*TypeDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitTypeDeclarationWithResultArgument(n *TypeDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeDeclarationWithResultArgument(*TypeDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitNormalClassDeclarationWithResult(n *NormalClassDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitNormalClassDeclarationWithResult(*NormalClassDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitNormalClassDeclarationWithResultArgument(n *NormalClassDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitNormalClassDeclarationWithResultArgument(*NormalClassDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassModifiersWithResult(n *ClassModifiers) interface{}{ return  my.UnimplementedVisitor("VisitClassModifiersWithResult(*ClassModifiers)")}
-
-func (my *AbstractResultVisitor)     VisitClassModifiersWithResultArgument(n *ClassModifiers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassModifiersWithResultArgument(*ClassModifiers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeParametersWithResult(n *TypeParameters) interface{}{ return  my.UnimplementedVisitor("VisitTypeParametersWithResult(*TypeParameters)")}
-
-func (my *AbstractResultVisitor)     VisitTypeParametersWithResultArgument(n *TypeParameters, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeParametersWithResultArgument(*TypeParameters, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTypeParameterListWithResult(n *TypeParameterList) interface{}{ return  my.UnimplementedVisitor("VisitTypeParameterListWithResult(*TypeParameterList)")}
-
-func (my *AbstractResultVisitor)     VisitTypeParameterListWithResultArgument(n *TypeParameterList, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTypeParameterListWithResultArgument(*TypeParameterList, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSuperWithResult(n *Super) interface{}{ return  my.UnimplementedVisitor("VisitSuperWithResult(*Super)")}
-
-func (my *AbstractResultVisitor)     VisitSuperWithResultArgument(n *Super, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSuperWithResultArgument(*Super, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfacesWithResult(n *Interfaces) interface{}{ return  my.UnimplementedVisitor("VisitInterfacesWithResult(*Interfaces)")}
-
-func (my *AbstractResultVisitor)     VisitInterfacesWithResultArgument(n *Interfaces, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfacesWithResultArgument(*Interfaces, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceTypeListWithResult(n *InterfaceTypeList) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceTypeListWithResult(*InterfaceTypeList)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceTypeListWithResultArgument(n *InterfaceTypeList, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceTypeListWithResultArgument(*InterfaceTypeList, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassBodyWithResult(n *ClassBody) interface{}{ return  my.UnimplementedVisitor("VisitClassBodyWithResult(*ClassBody)")}
-
-func (my *AbstractResultVisitor)     VisitClassBodyWithResultArgument(n *ClassBody, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassBodyWithResultArgument(*ClassBody, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassBodyDeclarationsWithResult(n *ClassBodyDeclarations) interface{}{ return  my.UnimplementedVisitor("VisitClassBodyDeclarationsWithResult(*ClassBodyDeclarations)")}
-
-func (my *AbstractResultVisitor)     VisitClassBodyDeclarationsWithResultArgument(n *ClassBodyDeclarations, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassBodyDeclarationsWithResultArgument(*ClassBodyDeclarations, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassMemberDeclarationWithResult(n *ClassMemberDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitClassMemberDeclarationWithResult(*ClassMemberDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitClassMemberDeclarationWithResultArgument(n *ClassMemberDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassMemberDeclarationWithResultArgument(*ClassMemberDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldDeclarationWithResult(n *FieldDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitFieldDeclarationWithResult(*FieldDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitFieldDeclarationWithResultArgument(n *FieldDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldDeclarationWithResultArgument(*FieldDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitVariableDeclaratorsWithResult(n *VariableDeclarators) interface{}{ return  my.UnimplementedVisitor("VisitVariableDeclaratorsWithResult(*VariableDeclarators)")}
-
-func (my *AbstractResultVisitor)     VisitVariableDeclaratorsWithResultArgument(n *VariableDeclarators, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitVariableDeclaratorsWithResultArgument(*VariableDeclarators, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitVariableDeclaratorWithResult(n *VariableDeclarator) interface{}{ return  my.UnimplementedVisitor("VisitVariableDeclaratorWithResult(*VariableDeclarator)")}
-
-func (my *AbstractResultVisitor)     VisitVariableDeclaratorWithResultArgument(n *VariableDeclarator, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitVariableDeclaratorWithResultArgument(*VariableDeclarator, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitVariableDeclaratorIdWithResult(n *VariableDeclaratorId) interface{}{ return  my.UnimplementedVisitor("VisitVariableDeclaratorIdWithResult(*VariableDeclaratorId)")}
-
-func (my *AbstractResultVisitor)     VisitVariableDeclaratorIdWithResultArgument(n *VariableDeclaratorId, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitVariableDeclaratorIdWithResultArgument(*VariableDeclaratorId, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifiersWithResult(n *FieldModifiers) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifiersWithResult(*FieldModifiers)")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifiersWithResultArgument(n *FieldModifiers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifiersWithResultArgument(*FieldModifiers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodDeclarationWithResult(n *MethodDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitMethodDeclarationWithResult(*MethodDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitMethodDeclarationWithResultArgument(n *MethodDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodDeclarationWithResultArgument(*MethodDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodHeaderWithResult(n *MethodHeader) interface{}{ return  my.UnimplementedVisitor("VisitMethodHeaderWithResult(*MethodHeader)")}
-
-func (my *AbstractResultVisitor)     VisitMethodHeaderWithResultArgument(n *MethodHeader, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodHeaderWithResultArgument(*MethodHeader, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitResultTypeWithResult(n *ResultType) interface{}{ return  my.UnimplementedVisitor("VisitResultTypeWithResult(*ResultType)")}
-
-func (my *AbstractResultVisitor)     VisitResultTypeWithResultArgument(n *ResultType, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitResultTypeWithResultArgument(*ResultType, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFormalParameterListWithResult(n *FormalParameterList) interface{}{ return  my.UnimplementedVisitor("VisitFormalParameterListWithResult(*FormalParameterList)")}
-
-func (my *AbstractResultVisitor)     VisitFormalParameterListWithResultArgument(n *FormalParameterList, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFormalParameterListWithResultArgument(*FormalParameterList, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFormalParametersWithResult(n *FormalParameters) interface{}{ return  my.UnimplementedVisitor("VisitFormalParametersWithResult(*FormalParameters)")}
-
-func (my *AbstractResultVisitor)     VisitFormalParametersWithResultArgument(n *FormalParameters, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFormalParametersWithResultArgument(*FormalParameters, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFormalParameterWithResult(n *FormalParameter) interface{}{ return  my.UnimplementedVisitor("VisitFormalParameterWithResult(*FormalParameter)")}
-
-func (my *AbstractResultVisitor)     VisitFormalParameterWithResultArgument(n *FormalParameter, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFormalParameterWithResultArgument(*FormalParameter, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitVariableModifiersWithResult(n *VariableModifiers) interface{}{ return  my.UnimplementedVisitor("VisitVariableModifiersWithResult(*VariableModifiers)")}
-
-func (my *AbstractResultVisitor)     VisitVariableModifiersWithResultArgument(n *VariableModifiers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitVariableModifiersWithResultArgument(*VariableModifiers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitVariableModifierWithResult(n *VariableModifier) interface{}{ return  my.UnimplementedVisitor("VisitVariableModifierWithResult(*VariableModifier)")}
-
-func (my *AbstractResultVisitor)     VisitVariableModifierWithResultArgument(n *VariableModifier, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitVariableModifierWithResultArgument(*VariableModifier, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLastFormalParameterWithResult(n *LastFormalParameter) interface{}{ return  my.UnimplementedVisitor("VisitLastFormalParameterWithResult(*LastFormalParameter)")}
-
-func (my *AbstractResultVisitor)     VisitLastFormalParameterWithResultArgument(n *LastFormalParameter, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLastFormalParameterWithResultArgument(*LastFormalParameter, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifiersWithResult(n *MethodModifiers) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifiersWithResult(*MethodModifiers)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifiersWithResultArgument(n *MethodModifiers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifiersWithResultArgument(*MethodModifiers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitThrowsWithResult(n *Throws) interface{}{ return  my.UnimplementedVisitor("VisitThrowsWithResult(*Throws)")}
-
-func (my *AbstractResultVisitor)     VisitThrowsWithResultArgument(n *Throws, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitThrowsWithResultArgument(*Throws, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExceptionTypeListWithResult(n *ExceptionTypeList) interface{}{ return  my.UnimplementedVisitor("VisitExceptionTypeListWithResult(*ExceptionTypeList)")}
-
-func (my *AbstractResultVisitor)     VisitExceptionTypeListWithResultArgument(n *ExceptionTypeList, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExceptionTypeListWithResultArgument(*ExceptionTypeList, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodBodyWithResult(n *MethodBody) interface{}{ return  my.UnimplementedVisitor("VisitMethodBodyWithResult(*MethodBody)")}
-
-func (my *AbstractResultVisitor)     VisitMethodBodyWithResultArgument(n *MethodBody, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodBodyWithResultArgument(*MethodBody, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitStaticInitializerWithResult(n *StaticInitializer) interface{}{ return  my.UnimplementedVisitor("VisitStaticInitializerWithResult(*StaticInitializer)")}
-
-func (my *AbstractResultVisitor)     VisitStaticInitializerWithResultArgument(n *StaticInitializer, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitStaticInitializerWithResultArgument(*StaticInitializer, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstructorDeclarationWithResult(n *ConstructorDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitConstructorDeclarationWithResult(*ConstructorDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitConstructorDeclarationWithResultArgument(n *ConstructorDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstructorDeclarationWithResultArgument(*ConstructorDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstructorDeclaratorWithResult(n *ConstructorDeclarator) interface{}{ return  my.UnimplementedVisitor("VisitConstructorDeclaratorWithResult(*ConstructorDeclarator)")}
-
-func (my *AbstractResultVisitor)     VisitConstructorDeclaratorWithResultArgument(n *ConstructorDeclarator, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstructorDeclaratorWithResultArgument(*ConstructorDeclarator, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstructorModifiersWithResult(n *ConstructorModifiers) interface{}{ return  my.UnimplementedVisitor("VisitConstructorModifiersWithResult(*ConstructorModifiers)")}
-
-func (my *AbstractResultVisitor)     VisitConstructorModifiersWithResultArgument(n *ConstructorModifiers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstructorModifiersWithResultArgument(*ConstructorModifiers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstructorBodyWithResult(n *ConstructorBody) interface{}{ return  my.UnimplementedVisitor("VisitConstructorBodyWithResult(*ConstructorBody)")}
-
-func (my *AbstractResultVisitor)     VisitConstructorBodyWithResultArgument(n *ConstructorBody, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstructorBodyWithResultArgument(*ConstructorBody, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEnumDeclarationWithResult(n *EnumDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitEnumDeclarationWithResult(*EnumDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitEnumDeclarationWithResultArgument(n *EnumDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEnumDeclarationWithResultArgument(*EnumDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEnumBodyWithResult(n *EnumBody) interface{}{ return  my.UnimplementedVisitor("VisitEnumBodyWithResult(*EnumBody)")}
-
-func (my *AbstractResultVisitor)     VisitEnumBodyWithResultArgument(n *EnumBody, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEnumBodyWithResultArgument(*EnumBody, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEnumConstantsWithResult(n *EnumConstants) interface{}{ return  my.UnimplementedVisitor("VisitEnumConstantsWithResult(*EnumConstants)")}
-
-func (my *AbstractResultVisitor)     VisitEnumConstantsWithResultArgument(n *EnumConstants, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEnumConstantsWithResultArgument(*EnumConstants, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEnumConstantWithResult(n *EnumConstant) interface{}{ return  my.UnimplementedVisitor("VisitEnumConstantWithResult(*EnumConstant)")}
-
-func (my *AbstractResultVisitor)     VisitEnumConstantWithResultArgument(n *EnumConstant, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEnumConstantWithResultArgument(*EnumConstant, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArgumentsWithResult(n *Arguments) interface{}{ return  my.UnimplementedVisitor("VisitArgumentsWithResult(*Arguments)")}
-
-func (my *AbstractResultVisitor)     VisitArgumentsWithResultArgument(n *Arguments, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArgumentsWithResultArgument(*Arguments, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEnumBodyDeclarationsWithResult(n *EnumBodyDeclarations) interface{}{ return  my.UnimplementedVisitor("VisitEnumBodyDeclarationsWithResult(*EnumBodyDeclarations)")}
-
-func (my *AbstractResultVisitor)     VisitEnumBodyDeclarationsWithResultArgument(n *EnumBodyDeclarations, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEnumBodyDeclarationsWithResultArgument(*EnumBodyDeclarations, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitNormalInterfaceDeclarationWithResult(n *NormalInterfaceDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitNormalInterfaceDeclarationWithResult(*NormalInterfaceDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitNormalInterfaceDeclarationWithResultArgument(n *NormalInterfaceDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitNormalInterfaceDeclarationWithResultArgument(*NormalInterfaceDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifiersWithResult(n *InterfaceModifiers) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifiersWithResult(*InterfaceModifiers)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifiersWithResultArgument(n *InterfaceModifiers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifiersWithResultArgument(*InterfaceModifiers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceBodyWithResult(n *InterfaceBody) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceBodyWithResult(*InterfaceBody)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceBodyWithResultArgument(n *InterfaceBody, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceBodyWithResultArgument(*InterfaceBody, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceMemberDeclarationsWithResult(n *InterfaceMemberDeclarations) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceMemberDeclarationsWithResult(*InterfaceMemberDeclarations)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceMemberDeclarationsWithResultArgument(n *InterfaceMemberDeclarations, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceMemberDeclarationsWithResultArgument(*InterfaceMemberDeclarations, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceMemberDeclarationWithResult(n *InterfaceMemberDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceMemberDeclarationWithResult(*InterfaceMemberDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceMemberDeclarationWithResultArgument(n *InterfaceMemberDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceMemberDeclarationWithResultArgument(*InterfaceMemberDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstantDeclarationWithResult(n *ConstantDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitConstantDeclarationWithResult(*ConstantDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitConstantDeclarationWithResultArgument(n *ConstantDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstantDeclarationWithResultArgument(*ConstantDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstantModifiersWithResult(n *ConstantModifiers) interface{}{ return  my.UnimplementedVisitor("VisitConstantModifiersWithResult(*ConstantModifiers)")}
-
-func (my *AbstractResultVisitor)     VisitConstantModifiersWithResultArgument(n *ConstantModifiers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstantModifiersWithResultArgument(*ConstantModifiers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAbstractMethodDeclarationWithResult(n *AbstractMethodDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitAbstractMethodDeclarationWithResult(*AbstractMethodDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitAbstractMethodDeclarationWithResultArgument(n *AbstractMethodDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAbstractMethodDeclarationWithResultArgument(*AbstractMethodDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAbstractMethodModifiersWithResult(n *AbstractMethodModifiers) interface{}{ return  my.UnimplementedVisitor("VisitAbstractMethodModifiersWithResult(*AbstractMethodModifiers)")}
-
-func (my *AbstractResultVisitor)     VisitAbstractMethodModifiersWithResultArgument(n *AbstractMethodModifiers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAbstractMethodModifiersWithResultArgument(*AbstractMethodModifiers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeDeclarationWithResult(n *AnnotationTypeDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeDeclarationWithResult(*AnnotationTypeDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeDeclarationWithResultArgument(n *AnnotationTypeDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeDeclarationWithResultArgument(*AnnotationTypeDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeBodyWithResult(n *AnnotationTypeBody) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeBodyWithResult(*AnnotationTypeBody)")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeBodyWithResultArgument(n *AnnotationTypeBody, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeBodyWithResultArgument(*AnnotationTypeBody, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeElementDeclarationsWithResult(n *AnnotationTypeElementDeclarations) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeElementDeclarationsWithResult(*AnnotationTypeElementDeclarations)")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeElementDeclarationsWithResultArgument(n *AnnotationTypeElementDeclarations, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeElementDeclarationsWithResultArgument(*AnnotationTypeElementDeclarations, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitDefaultValueWithResult(n *DefaultValue) interface{}{ return  my.UnimplementedVisitor("VisitDefaultValueWithResult(*DefaultValue)")}
-
-func (my *AbstractResultVisitor)     VisitDefaultValueWithResultArgument(n *DefaultValue, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitDefaultValueWithResultArgument(*DefaultValue, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationsWithResult(n *Annotations) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationsWithResult(*Annotations)")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationsWithResultArgument(n *Annotations, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationsWithResultArgument(*Annotations, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitNormalAnnotationWithResult(n *NormalAnnotation) interface{}{ return  my.UnimplementedVisitor("VisitNormalAnnotationWithResult(*NormalAnnotation)")}
-
-func (my *AbstractResultVisitor)     VisitNormalAnnotationWithResultArgument(n *NormalAnnotation, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitNormalAnnotationWithResultArgument(*NormalAnnotation, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitElementValuePairsWithResult(n *ElementValuePairs) interface{}{ return  my.UnimplementedVisitor("VisitElementValuePairsWithResult(*ElementValuePairs)")}
-
-func (my *AbstractResultVisitor)     VisitElementValuePairsWithResultArgument(n *ElementValuePairs, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitElementValuePairsWithResultArgument(*ElementValuePairs, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitElementValuePairWithResult(n *ElementValuePair) interface{}{ return  my.UnimplementedVisitor("VisitElementValuePairWithResult(*ElementValuePair)")}
-
-func (my *AbstractResultVisitor)     VisitElementValuePairWithResultArgument(n *ElementValuePair, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitElementValuePairWithResultArgument(*ElementValuePair, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitElementValueArrayInitializerWithResult(n *ElementValueArrayInitializer) interface{}{ return  my.UnimplementedVisitor("VisitElementValueArrayInitializerWithResult(*ElementValueArrayInitializer)")}
-
-func (my *AbstractResultVisitor)     VisitElementValueArrayInitializerWithResultArgument(n *ElementValueArrayInitializer, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitElementValueArrayInitializerWithResultArgument(*ElementValueArrayInitializer, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitElementValuesWithResult(n *ElementValues) interface{}{ return  my.UnimplementedVisitor("VisitElementValuesWithResult(*ElementValues)")}
-
-func (my *AbstractResultVisitor)     VisitElementValuesWithResultArgument(n *ElementValues, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitElementValuesWithResultArgument(*ElementValues, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMarkerAnnotationWithResult(n *MarkerAnnotation) interface{}{ return  my.UnimplementedVisitor("VisitMarkerAnnotationWithResult(*MarkerAnnotation)")}
-
-func (my *AbstractResultVisitor)     VisitMarkerAnnotationWithResultArgument(n *MarkerAnnotation, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMarkerAnnotationWithResultArgument(*MarkerAnnotation, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSingleElementAnnotationWithResult(n *SingleElementAnnotation) interface{}{ return  my.UnimplementedVisitor("VisitSingleElementAnnotationWithResult(*SingleElementAnnotation)")}
-
-func (my *AbstractResultVisitor)     VisitSingleElementAnnotationWithResultArgument(n *SingleElementAnnotation, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSingleElementAnnotationWithResultArgument(*SingleElementAnnotation, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArrayInitializerWithResult(n *ArrayInitializer) interface{}{ return  my.UnimplementedVisitor("VisitArrayInitializerWithResult(*ArrayInitializer)")}
-
-func (my *AbstractResultVisitor)     VisitArrayInitializerWithResultArgument(n *ArrayInitializer, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArrayInitializerWithResultArgument(*ArrayInitializer, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitVariableInitializersWithResult(n *VariableInitializers) interface{}{ return  my.UnimplementedVisitor("VisitVariableInitializersWithResult(*VariableInitializers)")}
-
-func (my *AbstractResultVisitor)     VisitVariableInitializersWithResultArgument(n *VariableInitializers, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitVariableInitializersWithResultArgument(*VariableInitializers, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitBlockWithResult(n *Block) interface{}{ return  my.UnimplementedVisitor("VisitBlockWithResult(*Block)")}
-
-func (my *AbstractResultVisitor)     VisitBlockWithResultArgument(n *Block, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitBlockWithResultArgument(*Block, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitBlockStatementsWithResult(n *BlockStatements) interface{}{ return  my.UnimplementedVisitor("VisitBlockStatementsWithResult(*BlockStatements)")}
-
-func (my *AbstractResultVisitor)     VisitBlockStatementsWithResultArgument(n *BlockStatements, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitBlockStatementsWithResultArgument(*BlockStatements, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLocalVariableDeclarationStatementWithResult(n *LocalVariableDeclarationStatement) interface{}{ return  my.UnimplementedVisitor("VisitLocalVariableDeclarationStatementWithResult(*LocalVariableDeclarationStatement)")}
-
-func (my *AbstractResultVisitor)     VisitLocalVariableDeclarationStatementWithResultArgument(n *LocalVariableDeclarationStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLocalVariableDeclarationStatementWithResultArgument(*LocalVariableDeclarationStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLocalVariableDeclarationWithResult(n *LocalVariableDeclaration) interface{}{ return  my.UnimplementedVisitor("VisitLocalVariableDeclarationWithResult(*LocalVariableDeclaration)")}
-
-func (my *AbstractResultVisitor)     VisitLocalVariableDeclarationWithResultArgument(n *LocalVariableDeclaration, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLocalVariableDeclarationWithResultArgument(*LocalVariableDeclaration, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitIfThenStatementWithResult(n *IfThenStatement) interface{}{ return  my.UnimplementedVisitor("VisitIfThenStatementWithResult(*IfThenStatement)")}
-
-func (my *AbstractResultVisitor)     VisitIfThenStatementWithResultArgument(n *IfThenStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitIfThenStatementWithResultArgument(*IfThenStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitIfThenElseStatementWithResult(n *IfThenElseStatement) interface{}{ return  my.UnimplementedVisitor("VisitIfThenElseStatementWithResult(*IfThenElseStatement)")}
-
-func (my *AbstractResultVisitor)     VisitIfThenElseStatementWithResultArgument(n *IfThenElseStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitIfThenElseStatementWithResultArgument(*IfThenElseStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitIfThenElseStatementNoShortIfWithResult(n *IfThenElseStatementNoShortIf) interface{}{ return  my.UnimplementedVisitor("VisitIfThenElseStatementNoShortIfWithResult(*IfThenElseStatementNoShortIf)")}
-
-func (my *AbstractResultVisitor)     VisitIfThenElseStatementNoShortIfWithResultArgument(n *IfThenElseStatementNoShortIf, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitIfThenElseStatementNoShortIfWithResultArgument(*IfThenElseStatementNoShortIf, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEmptyStatementWithResult(n *EmptyStatement) interface{}{ return  my.UnimplementedVisitor("VisitEmptyStatementWithResult(*EmptyStatement)")}
-
-func (my *AbstractResultVisitor)     VisitEmptyStatementWithResultArgument(n *EmptyStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEmptyStatementWithResultArgument(*EmptyStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLabeledStatementWithResult(n *LabeledStatement) interface{}{ return  my.UnimplementedVisitor("VisitLabeledStatementWithResult(*LabeledStatement)")}
-
-func (my *AbstractResultVisitor)     VisitLabeledStatementWithResultArgument(n *LabeledStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLabeledStatementWithResultArgument(*LabeledStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLabeledStatementNoShortIfWithResult(n *LabeledStatementNoShortIf) interface{}{ return  my.UnimplementedVisitor("VisitLabeledStatementNoShortIfWithResult(*LabeledStatementNoShortIf)")}
-
-func (my *AbstractResultVisitor)     VisitLabeledStatementNoShortIfWithResultArgument(n *LabeledStatementNoShortIf, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLabeledStatementNoShortIfWithResultArgument(*LabeledStatementNoShortIf, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExpressionStatementWithResult(n *ExpressionStatement) interface{}{ return  my.UnimplementedVisitor("VisitExpressionStatementWithResult(*ExpressionStatement)")}
-
-func (my *AbstractResultVisitor)     VisitExpressionStatementWithResultArgument(n *ExpressionStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExpressionStatementWithResultArgument(*ExpressionStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSwitchStatementWithResult(n *SwitchStatement) interface{}{ return  my.UnimplementedVisitor("VisitSwitchStatementWithResult(*SwitchStatement)")}
-
-func (my *AbstractResultVisitor)     VisitSwitchStatementWithResultArgument(n *SwitchStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSwitchStatementWithResultArgument(*SwitchStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSwitchBlockWithResult(n *SwitchBlock) interface{}{ return  my.UnimplementedVisitor("VisitSwitchBlockWithResult(*SwitchBlock)")}
-
-func (my *AbstractResultVisitor)     VisitSwitchBlockWithResultArgument(n *SwitchBlock, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSwitchBlockWithResultArgument(*SwitchBlock, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSwitchBlockStatementGroupsWithResult(n *SwitchBlockStatementGroups) interface{}{ return  my.UnimplementedVisitor("VisitSwitchBlockStatementGroupsWithResult(*SwitchBlockStatementGroups)")}
-
-func (my *AbstractResultVisitor)     VisitSwitchBlockStatementGroupsWithResultArgument(n *SwitchBlockStatementGroups, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSwitchBlockStatementGroupsWithResultArgument(*SwitchBlockStatementGroups, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSwitchBlockStatementGroupWithResult(n *SwitchBlockStatementGroup) interface{}{ return  my.UnimplementedVisitor("VisitSwitchBlockStatementGroupWithResult(*SwitchBlockStatementGroup)")}
-
-func (my *AbstractResultVisitor)     VisitSwitchBlockStatementGroupWithResultArgument(n *SwitchBlockStatementGroup, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSwitchBlockStatementGroupWithResultArgument(*SwitchBlockStatementGroup, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSwitchLabelsWithResult(n *SwitchLabels) interface{}{ return  my.UnimplementedVisitor("VisitSwitchLabelsWithResult(*SwitchLabels)")}
-
-func (my *AbstractResultVisitor)     VisitSwitchLabelsWithResultArgument(n *SwitchLabels, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSwitchLabelsWithResultArgument(*SwitchLabels, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitWhileStatementWithResult(n *WhileStatement) interface{}{ return  my.UnimplementedVisitor("VisitWhileStatementWithResult(*WhileStatement)")}
-
-func (my *AbstractResultVisitor)     VisitWhileStatementWithResultArgument(n *WhileStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitWhileStatementWithResultArgument(*WhileStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitWhileStatementNoShortIfWithResult(n *WhileStatementNoShortIf) interface{}{ return  my.UnimplementedVisitor("VisitWhileStatementNoShortIfWithResult(*WhileStatementNoShortIf)")}
-
-func (my *AbstractResultVisitor)     VisitWhileStatementNoShortIfWithResultArgument(n *WhileStatementNoShortIf, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitWhileStatementNoShortIfWithResultArgument(*WhileStatementNoShortIf, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitDoStatementWithResult(n *DoStatement) interface{}{ return  my.UnimplementedVisitor("VisitDoStatementWithResult(*DoStatement)")}
-
-func (my *AbstractResultVisitor)     VisitDoStatementWithResultArgument(n *DoStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitDoStatementWithResultArgument(*DoStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitBasicForStatementWithResult(n *BasicForStatement) interface{}{ return  my.UnimplementedVisitor("VisitBasicForStatementWithResult(*BasicForStatement)")}
-
-func (my *AbstractResultVisitor)     VisitBasicForStatementWithResultArgument(n *BasicForStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitBasicForStatementWithResultArgument(*BasicForStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitForStatementNoShortIfWithResult(n *ForStatementNoShortIf) interface{}{ return  my.UnimplementedVisitor("VisitForStatementNoShortIfWithResult(*ForStatementNoShortIf)")}
-
-func (my *AbstractResultVisitor)     VisitForStatementNoShortIfWithResultArgument(n *ForStatementNoShortIf, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitForStatementNoShortIfWithResultArgument(*ForStatementNoShortIf, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitStatementExpressionListWithResult(n *StatementExpressionList) interface{}{ return  my.UnimplementedVisitor("VisitStatementExpressionListWithResult(*StatementExpressionList)")}
-
-func (my *AbstractResultVisitor)     VisitStatementExpressionListWithResultArgument(n *StatementExpressionList, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitStatementExpressionListWithResultArgument(*StatementExpressionList, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEnhancedForStatementWithResult(n *EnhancedForStatement) interface{}{ return  my.UnimplementedVisitor("VisitEnhancedForStatementWithResult(*EnhancedForStatement)")}
-
-func (my *AbstractResultVisitor)     VisitEnhancedForStatementWithResultArgument(n *EnhancedForStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEnhancedForStatementWithResultArgument(*EnhancedForStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitBreakStatementWithResult(n *BreakStatement) interface{}{ return  my.UnimplementedVisitor("VisitBreakStatementWithResult(*BreakStatement)")}
-
-func (my *AbstractResultVisitor)     VisitBreakStatementWithResultArgument(n *BreakStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitBreakStatementWithResultArgument(*BreakStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitContinueStatementWithResult(n *ContinueStatement) interface{}{ return  my.UnimplementedVisitor("VisitContinueStatementWithResult(*ContinueStatement)")}
-
-func (my *AbstractResultVisitor)     VisitContinueStatementWithResultArgument(n *ContinueStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitContinueStatementWithResultArgument(*ContinueStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitReturnStatementWithResult(n *ReturnStatement) interface{}{ return  my.UnimplementedVisitor("VisitReturnStatementWithResult(*ReturnStatement)")}
-
-func (my *AbstractResultVisitor)     VisitReturnStatementWithResultArgument(n *ReturnStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitReturnStatementWithResultArgument(*ReturnStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitThrowStatementWithResult(n *ThrowStatement) interface{}{ return  my.UnimplementedVisitor("VisitThrowStatementWithResult(*ThrowStatement)")}
-
-func (my *AbstractResultVisitor)     VisitThrowStatementWithResultArgument(n *ThrowStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitThrowStatementWithResultArgument(*ThrowStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSynchronizedStatementWithResult(n *SynchronizedStatement) interface{}{ return  my.UnimplementedVisitor("VisitSynchronizedStatementWithResult(*SynchronizedStatement)")}
-
-func (my *AbstractResultVisitor)     VisitSynchronizedStatementWithResultArgument(n *SynchronizedStatement, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSynchronizedStatementWithResultArgument(*SynchronizedStatement, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitCatchesWithResult(n *Catches) interface{}{ return  my.UnimplementedVisitor("VisitCatchesWithResult(*Catches)")}
-
-func (my *AbstractResultVisitor)     VisitCatchesWithResultArgument(n *Catches, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitCatchesWithResultArgument(*Catches, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitCatchClauseWithResult(n *CatchClause) interface{}{ return  my.UnimplementedVisitor("VisitCatchClauseWithResult(*CatchClause)")}
-
-func (my *AbstractResultVisitor)     VisitCatchClauseWithResultArgument(n *CatchClause, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitCatchClauseWithResultArgument(*CatchClause, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFinallyWithResult(n *Finally) interface{}{ return  my.UnimplementedVisitor("VisitFinallyWithResult(*Finally)")}
-
-func (my *AbstractResultVisitor)     VisitFinallyWithResultArgument(n *Finally, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFinallyWithResultArgument(*Finally, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArgumentListWithResult(n *ArgumentList) interface{}{ return  my.UnimplementedVisitor("VisitArgumentListWithResult(*ArgumentList)")}
-
-func (my *AbstractResultVisitor)     VisitArgumentListWithResultArgument(n *ArgumentList, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArgumentListWithResultArgument(*ArgumentList, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitDimExprsWithResult(n *DimExprs) interface{}{ return  my.UnimplementedVisitor("VisitDimExprsWithResult(*DimExprs)")}
-
-func (my *AbstractResultVisitor)     VisitDimExprsWithResultArgument(n *DimExprs, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitDimExprsWithResultArgument(*DimExprs, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitDimExprWithResult(n *DimExpr) interface{}{ return  my.UnimplementedVisitor("VisitDimExprWithResult(*DimExpr)")}
-
-func (my *AbstractResultVisitor)     VisitDimExprWithResultArgument(n *DimExpr, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitDimExprWithResultArgument(*DimExpr, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPostIncrementExpressionWithResult(n *PostIncrementExpression) interface{}{ return  my.UnimplementedVisitor("VisitPostIncrementExpressionWithResult(*PostIncrementExpression)")}
-
-func (my *AbstractResultVisitor)     VisitPostIncrementExpressionWithResultArgument(n *PostIncrementExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPostIncrementExpressionWithResultArgument(*PostIncrementExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPostDecrementExpressionWithResult(n *PostDecrementExpression) interface{}{ return  my.UnimplementedVisitor("VisitPostDecrementExpressionWithResult(*PostDecrementExpression)")}
-
-func (my *AbstractResultVisitor)     VisitPostDecrementExpressionWithResultArgument(n *PostDecrementExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPostDecrementExpressionWithResultArgument(*PostDecrementExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPreIncrementExpressionWithResult(n *PreIncrementExpression) interface{}{ return  my.UnimplementedVisitor("VisitPreIncrementExpressionWithResult(*PreIncrementExpression)")}
-
-func (my *AbstractResultVisitor)     VisitPreIncrementExpressionWithResultArgument(n *PreIncrementExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPreIncrementExpressionWithResultArgument(*PreIncrementExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPreDecrementExpressionWithResult(n *PreDecrementExpression) interface{}{ return  my.UnimplementedVisitor("VisitPreDecrementExpressionWithResult(*PreDecrementExpression)")}
-
-func (my *AbstractResultVisitor)     VisitPreDecrementExpressionWithResultArgument(n *PreDecrementExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPreDecrementExpressionWithResultArgument(*PreDecrementExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAndExpressionWithResult(n *AndExpression) interface{}{ return  my.UnimplementedVisitor("VisitAndExpressionWithResult(*AndExpression)")}
-
-func (my *AbstractResultVisitor)     VisitAndExpressionWithResultArgument(n *AndExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAndExpressionWithResultArgument(*AndExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExclusiveOrExpressionWithResult(n *ExclusiveOrExpression) interface{}{ return  my.UnimplementedVisitor("VisitExclusiveOrExpressionWithResult(*ExclusiveOrExpression)")}
-
-func (my *AbstractResultVisitor)     VisitExclusiveOrExpressionWithResultArgument(n *ExclusiveOrExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExclusiveOrExpressionWithResultArgument(*ExclusiveOrExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInclusiveOrExpressionWithResult(n *InclusiveOrExpression) interface{}{ return  my.UnimplementedVisitor("VisitInclusiveOrExpressionWithResult(*InclusiveOrExpression)")}
-
-func (my *AbstractResultVisitor)     VisitInclusiveOrExpressionWithResultArgument(n *InclusiveOrExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInclusiveOrExpressionWithResultArgument(*InclusiveOrExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConditionalAndExpressionWithResult(n *ConditionalAndExpression) interface{}{ return  my.UnimplementedVisitor("VisitConditionalAndExpressionWithResult(*ConditionalAndExpression)")}
-
-func (my *AbstractResultVisitor)     VisitConditionalAndExpressionWithResultArgument(n *ConditionalAndExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConditionalAndExpressionWithResultArgument(*ConditionalAndExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConditionalOrExpressionWithResult(n *ConditionalOrExpression) interface{}{ return  my.UnimplementedVisitor("VisitConditionalOrExpressionWithResult(*ConditionalOrExpression)")}
-
-func (my *AbstractResultVisitor)     VisitConditionalOrExpressionWithResultArgument(n *ConditionalOrExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConditionalOrExpressionWithResultArgument(*ConditionalOrExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConditionalExpressionWithResult(n *ConditionalExpression) interface{}{ return  my.UnimplementedVisitor("VisitConditionalExpressionWithResult(*ConditionalExpression)")}
-
-func (my *AbstractResultVisitor)     VisitConditionalExpressionWithResultArgument(n *ConditionalExpression, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConditionalExpressionWithResultArgument(*ConditionalExpression, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentWithResult(n *Assignment) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentWithResult(*Assignment)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentWithResultArgument(n *Assignment, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentWithResultArgument(*Assignment, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitCommaoptWithResult(n *Commaopt) interface{}{ return  my.UnimplementedVisitor("VisitCommaoptWithResult(*Commaopt)")}
-
-func (my *AbstractResultVisitor)     VisitCommaoptWithResultArgument(n *Commaopt, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitCommaoptWithResultArgument(*Commaopt, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEllipsisoptWithResult(n *Ellipsisopt) interface{}{ return  my.UnimplementedVisitor("VisitEllipsisoptWithResult(*Ellipsisopt)")}
-
-func (my *AbstractResultVisitor)     VisitEllipsisoptWithResultArgument(n *Ellipsisopt, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEllipsisoptWithResultArgument(*Ellipsisopt, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction0WithResult(n *LPGUserAction0) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction0WithResult(*LPGUserAction0)")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction0WithResultArgument(n *LPGUserAction0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction0WithResultArgument(*LPGUserAction0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction1WithResult(n *LPGUserAction1) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction1WithResult(*LPGUserAction1)")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction1WithResultArgument(n *LPGUserAction1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction1WithResultArgument(*LPGUserAction1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction2WithResult(n *LPGUserAction2) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction2WithResult(*LPGUserAction2)")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction2WithResultArgument(n *LPGUserAction2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction2WithResultArgument(*LPGUserAction2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction3WithResult(n *LPGUserAction3) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction3WithResult(*LPGUserAction3)")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction3WithResultArgument(n *LPGUserAction3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction3WithResultArgument(*LPGUserAction3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction4WithResult(n *LPGUserAction4) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction4WithResult(*LPGUserAction4)")}
-
-func (my *AbstractResultVisitor)     VisitLPGUserAction4WithResultArgument(n *LPGUserAction4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLPGUserAction4WithResultArgument(*LPGUserAction4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType0WithResult(n *IntegralType0) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType0WithResult(*IntegralType0)")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType0WithResultArgument(n *IntegralType0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType0WithResultArgument(*IntegralType0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType1WithResult(n *IntegralType1) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType1WithResult(*IntegralType1)")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType1WithResultArgument(n *IntegralType1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType1WithResultArgument(*IntegralType1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType2WithResult(n *IntegralType2) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType2WithResult(*IntegralType2)")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType2WithResultArgument(n *IntegralType2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType2WithResultArgument(*IntegralType2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType3WithResult(n *IntegralType3) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType3WithResult(*IntegralType3)")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType3WithResultArgument(n *IntegralType3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType3WithResultArgument(*IntegralType3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType4WithResult(n *IntegralType4) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType4WithResult(*IntegralType4)")}
-
-func (my *AbstractResultVisitor)     VisitIntegralType4WithResultArgument(n *IntegralType4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitIntegralType4WithResultArgument(*IntegralType4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFloatingPointType0WithResult(n *FloatingPointType0) interface{}{ return  my.UnimplementedVisitor("VisitFloatingPointType0WithResult(*FloatingPointType0)")}
-
-func (my *AbstractResultVisitor)     VisitFloatingPointType0WithResultArgument(n *FloatingPointType0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFloatingPointType0WithResultArgument(*FloatingPointType0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFloatingPointType1WithResult(n *FloatingPointType1) interface{}{ return  my.UnimplementedVisitor("VisitFloatingPointType1WithResult(*FloatingPointType1)")}
-
-func (my *AbstractResultVisitor)     VisitFloatingPointType1WithResultArgument(n *FloatingPointType1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFloatingPointType1WithResultArgument(*FloatingPointType1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitWildcardBounds0WithResult(n *WildcardBounds0) interface{}{ return  my.UnimplementedVisitor("VisitWildcardBounds0WithResult(*WildcardBounds0)")}
-
-func (my *AbstractResultVisitor)     VisitWildcardBounds0WithResultArgument(n *WildcardBounds0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitWildcardBounds0WithResultArgument(*WildcardBounds0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitWildcardBounds1WithResult(n *WildcardBounds1) interface{}{ return  my.UnimplementedVisitor("VisitWildcardBounds1WithResult(*WildcardBounds1)")}
-
-func (my *AbstractResultVisitor)     VisitWildcardBounds1WithResultArgument(n *WildcardBounds1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitWildcardBounds1WithResultArgument(*WildcardBounds1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier0WithResult(n *ClassModifier0) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier0WithResult(*ClassModifier0)")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier0WithResultArgument(n *ClassModifier0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier0WithResultArgument(*ClassModifier0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier1WithResult(n *ClassModifier1) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier1WithResult(*ClassModifier1)")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier1WithResultArgument(n *ClassModifier1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier1WithResultArgument(*ClassModifier1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier2WithResult(n *ClassModifier2) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier2WithResult(*ClassModifier2)")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier2WithResultArgument(n *ClassModifier2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier2WithResultArgument(*ClassModifier2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier3WithResult(n *ClassModifier3) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier3WithResult(*ClassModifier3)")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier3WithResultArgument(n *ClassModifier3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier3WithResultArgument(*ClassModifier3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier4WithResult(n *ClassModifier4) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier4WithResult(*ClassModifier4)")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier4WithResultArgument(n *ClassModifier4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier4WithResultArgument(*ClassModifier4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier5WithResult(n *ClassModifier5) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier5WithResult(*ClassModifier5)")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier5WithResultArgument(n *ClassModifier5, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier5WithResultArgument(*ClassModifier5, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier6WithResult(n *ClassModifier6) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier6WithResult(*ClassModifier6)")}
-
-func (my *AbstractResultVisitor)     VisitClassModifier6WithResultArgument(n *ClassModifier6, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassModifier6WithResultArgument(*ClassModifier6, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier0WithResult(n *FieldModifier0) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier0WithResult(*FieldModifier0)")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier0WithResultArgument(n *FieldModifier0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier0WithResultArgument(*FieldModifier0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier1WithResult(n *FieldModifier1) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier1WithResult(*FieldModifier1)")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier1WithResultArgument(n *FieldModifier1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier1WithResultArgument(*FieldModifier1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier2WithResult(n *FieldModifier2) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier2WithResult(*FieldModifier2)")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier2WithResultArgument(n *FieldModifier2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier2WithResultArgument(*FieldModifier2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier3WithResult(n *FieldModifier3) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier3WithResult(*FieldModifier3)")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier3WithResultArgument(n *FieldModifier3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier3WithResultArgument(*FieldModifier3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier4WithResult(n *FieldModifier4) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier4WithResult(*FieldModifier4)")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier4WithResultArgument(n *FieldModifier4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier4WithResultArgument(*FieldModifier4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier5WithResult(n *FieldModifier5) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier5WithResult(*FieldModifier5)")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier5WithResultArgument(n *FieldModifier5, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier5WithResultArgument(*FieldModifier5, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier6WithResult(n *FieldModifier6) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier6WithResult(*FieldModifier6)")}
-
-func (my *AbstractResultVisitor)     VisitFieldModifier6WithResultArgument(n *FieldModifier6, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldModifier6WithResultArgument(*FieldModifier6, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodDeclarator0WithResult(n *MethodDeclarator0) interface{}{ return  my.UnimplementedVisitor("VisitMethodDeclarator0WithResult(*MethodDeclarator0)")}
-
-func (my *AbstractResultVisitor)     VisitMethodDeclarator0WithResultArgument(n *MethodDeclarator0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodDeclarator0WithResultArgument(*MethodDeclarator0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodDeclarator1WithResult(n *MethodDeclarator1) interface{}{ return  my.UnimplementedVisitor("VisitMethodDeclarator1WithResult(*MethodDeclarator1)")}
-
-func (my *AbstractResultVisitor)     VisitMethodDeclarator1WithResultArgument(n *MethodDeclarator1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodDeclarator1WithResultArgument(*MethodDeclarator1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier0WithResult(n *MethodModifier0) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier0WithResult(*MethodModifier0)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier0WithResultArgument(n *MethodModifier0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier0WithResultArgument(*MethodModifier0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier1WithResult(n *MethodModifier1) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier1WithResult(*MethodModifier1)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier1WithResultArgument(n *MethodModifier1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier1WithResultArgument(*MethodModifier1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier2WithResult(n *MethodModifier2) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier2WithResult(*MethodModifier2)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier2WithResultArgument(n *MethodModifier2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier2WithResultArgument(*MethodModifier2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier3WithResult(n *MethodModifier3) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier3WithResult(*MethodModifier3)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier3WithResultArgument(n *MethodModifier3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier3WithResultArgument(*MethodModifier3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier4WithResult(n *MethodModifier4) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier4WithResult(*MethodModifier4)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier4WithResultArgument(n *MethodModifier4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier4WithResultArgument(*MethodModifier4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier5WithResult(n *MethodModifier5) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier5WithResult(*MethodModifier5)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier5WithResultArgument(n *MethodModifier5, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier5WithResultArgument(*MethodModifier5, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier6WithResult(n *MethodModifier6) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier6WithResult(*MethodModifier6)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier6WithResultArgument(n *MethodModifier6, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier6WithResultArgument(*MethodModifier6, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier7WithResult(n *MethodModifier7) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier7WithResult(*MethodModifier7)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier7WithResultArgument(n *MethodModifier7, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier7WithResultArgument(*MethodModifier7, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier8WithResult(n *MethodModifier8) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier8WithResult(*MethodModifier8)")}
-
-func (my *AbstractResultVisitor)     VisitMethodModifier8WithResultArgument(n *MethodModifier8, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodModifier8WithResultArgument(*MethodModifier8, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstructorModifier0WithResult(n *ConstructorModifier0) interface{}{ return  my.UnimplementedVisitor("VisitConstructorModifier0WithResult(*ConstructorModifier0)")}
-
-func (my *AbstractResultVisitor)     VisitConstructorModifier0WithResultArgument(n *ConstructorModifier0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstructorModifier0WithResultArgument(*ConstructorModifier0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstructorModifier1WithResult(n *ConstructorModifier1) interface{}{ return  my.UnimplementedVisitor("VisitConstructorModifier1WithResult(*ConstructorModifier1)")}
-
-func (my *AbstractResultVisitor)     VisitConstructorModifier1WithResultArgument(n *ConstructorModifier1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstructorModifier1WithResultArgument(*ConstructorModifier1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstructorModifier2WithResult(n *ConstructorModifier2) interface{}{ return  my.UnimplementedVisitor("VisitConstructorModifier2WithResult(*ConstructorModifier2)")}
-
-func (my *AbstractResultVisitor)     VisitConstructorModifier2WithResultArgument(n *ConstructorModifier2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstructorModifier2WithResultArgument(*ConstructorModifier2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExplicitConstructorInvocation0WithResult(n *ExplicitConstructorInvocation0) interface{}{ return  my.UnimplementedVisitor("VisitExplicitConstructorInvocation0WithResult(*ExplicitConstructorInvocation0)")}
-
-func (my *AbstractResultVisitor)     VisitExplicitConstructorInvocation0WithResultArgument(n *ExplicitConstructorInvocation0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExplicitConstructorInvocation0WithResultArgument(*ExplicitConstructorInvocation0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExplicitConstructorInvocation1WithResult(n *ExplicitConstructorInvocation1) interface{}{ return  my.UnimplementedVisitor("VisitExplicitConstructorInvocation1WithResult(*ExplicitConstructorInvocation1)")}
-
-func (my *AbstractResultVisitor)     VisitExplicitConstructorInvocation1WithResultArgument(n *ExplicitConstructorInvocation1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExplicitConstructorInvocation1WithResultArgument(*ExplicitConstructorInvocation1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExplicitConstructorInvocation2WithResult(n *ExplicitConstructorInvocation2) interface{}{ return  my.UnimplementedVisitor("VisitExplicitConstructorInvocation2WithResult(*ExplicitConstructorInvocation2)")}
-
-func (my *AbstractResultVisitor)     VisitExplicitConstructorInvocation2WithResultArgument(n *ExplicitConstructorInvocation2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExplicitConstructorInvocation2WithResultArgument(*ExplicitConstructorInvocation2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier0WithResult(n *InterfaceModifier0) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier0WithResult(*InterfaceModifier0)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier0WithResultArgument(n *InterfaceModifier0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier0WithResultArgument(*InterfaceModifier0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier1WithResult(n *InterfaceModifier1) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier1WithResult(*InterfaceModifier1)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier1WithResultArgument(n *InterfaceModifier1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier1WithResultArgument(*InterfaceModifier1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier2WithResult(n *InterfaceModifier2) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier2WithResult(*InterfaceModifier2)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier2WithResultArgument(n *InterfaceModifier2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier2WithResultArgument(*InterfaceModifier2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier3WithResult(n *InterfaceModifier3) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier3WithResult(*InterfaceModifier3)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier3WithResultArgument(n *InterfaceModifier3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier3WithResultArgument(*InterfaceModifier3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier4WithResult(n *InterfaceModifier4) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier4WithResult(*InterfaceModifier4)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier4WithResultArgument(n *InterfaceModifier4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier4WithResultArgument(*InterfaceModifier4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier5WithResult(n *InterfaceModifier5) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier5WithResult(*InterfaceModifier5)")}
-
-func (my *AbstractResultVisitor)     VisitInterfaceModifier5WithResultArgument(n *InterfaceModifier5, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitInterfaceModifier5WithResultArgument(*InterfaceModifier5, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExtendsInterfaces0WithResult(n *ExtendsInterfaces0) interface{}{ return  my.UnimplementedVisitor("VisitExtendsInterfaces0WithResult(*ExtendsInterfaces0)")}
-
-func (my *AbstractResultVisitor)     VisitExtendsInterfaces0WithResultArgument(n *ExtendsInterfaces0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExtendsInterfaces0WithResultArgument(*ExtendsInterfaces0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitExtendsInterfaces1WithResult(n *ExtendsInterfaces1) interface{}{ return  my.UnimplementedVisitor("VisitExtendsInterfaces1WithResult(*ExtendsInterfaces1)")}
-
-func (my *AbstractResultVisitor)     VisitExtendsInterfaces1WithResultArgument(n *ExtendsInterfaces1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitExtendsInterfaces1WithResultArgument(*ExtendsInterfaces1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstantModifier0WithResult(n *ConstantModifier0) interface{}{ return  my.UnimplementedVisitor("VisitConstantModifier0WithResult(*ConstantModifier0)")}
-
-func (my *AbstractResultVisitor)     VisitConstantModifier0WithResultArgument(n *ConstantModifier0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstantModifier0WithResultArgument(*ConstantModifier0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstantModifier1WithResult(n *ConstantModifier1) interface{}{ return  my.UnimplementedVisitor("VisitConstantModifier1WithResult(*ConstantModifier1)")}
-
-func (my *AbstractResultVisitor)     VisitConstantModifier1WithResultArgument(n *ConstantModifier1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstantModifier1WithResultArgument(*ConstantModifier1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitConstantModifier2WithResult(n *ConstantModifier2) interface{}{ return  my.UnimplementedVisitor("VisitConstantModifier2WithResult(*ConstantModifier2)")}
-
-func (my *AbstractResultVisitor)     VisitConstantModifier2WithResultArgument(n *ConstantModifier2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitConstantModifier2WithResultArgument(*ConstantModifier2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAbstractMethodModifier0WithResult(n *AbstractMethodModifier0) interface{}{ return  my.UnimplementedVisitor("VisitAbstractMethodModifier0WithResult(*AbstractMethodModifier0)")}
-
-func (my *AbstractResultVisitor)     VisitAbstractMethodModifier0WithResultArgument(n *AbstractMethodModifier0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAbstractMethodModifier0WithResultArgument(*AbstractMethodModifier0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAbstractMethodModifier1WithResult(n *AbstractMethodModifier1) interface{}{ return  my.UnimplementedVisitor("VisitAbstractMethodModifier1WithResult(*AbstractMethodModifier1)")}
-
-func (my *AbstractResultVisitor)     VisitAbstractMethodModifier1WithResultArgument(n *AbstractMethodModifier1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAbstractMethodModifier1WithResultArgument(*AbstractMethodModifier1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeElementDeclaration0WithResult(n *AnnotationTypeElementDeclaration0) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeElementDeclaration0WithResult(*AnnotationTypeElementDeclaration0)")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeElementDeclaration0WithResultArgument(n *AnnotationTypeElementDeclaration0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeElementDeclaration0WithResultArgument(*AnnotationTypeElementDeclaration0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeElementDeclaration1WithResult(n *AnnotationTypeElementDeclaration1) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeElementDeclaration1WithResult(*AnnotationTypeElementDeclaration1)")}
-
-func (my *AbstractResultVisitor)     VisitAnnotationTypeElementDeclaration1WithResultArgument(n *AnnotationTypeElementDeclaration1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAnnotationTypeElementDeclaration1WithResultArgument(*AnnotationTypeElementDeclaration1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssertStatement0WithResult(n *AssertStatement0) interface{}{ return  my.UnimplementedVisitor("VisitAssertStatement0WithResult(*AssertStatement0)")}
-
-func (my *AbstractResultVisitor)     VisitAssertStatement0WithResultArgument(n *AssertStatement0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssertStatement0WithResultArgument(*AssertStatement0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssertStatement1WithResult(n *AssertStatement1) interface{}{ return  my.UnimplementedVisitor("VisitAssertStatement1WithResult(*AssertStatement1)")}
-
-func (my *AbstractResultVisitor)     VisitAssertStatement1WithResultArgument(n *AssertStatement1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssertStatement1WithResultArgument(*AssertStatement1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSwitchLabel0WithResult(n *SwitchLabel0) interface{}{ return  my.UnimplementedVisitor("VisitSwitchLabel0WithResult(*SwitchLabel0)")}
-
-func (my *AbstractResultVisitor)     VisitSwitchLabel0WithResultArgument(n *SwitchLabel0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSwitchLabel0WithResultArgument(*SwitchLabel0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSwitchLabel1WithResult(n *SwitchLabel1) interface{}{ return  my.UnimplementedVisitor("VisitSwitchLabel1WithResult(*SwitchLabel1)")}
-
-func (my *AbstractResultVisitor)     VisitSwitchLabel1WithResultArgument(n *SwitchLabel1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSwitchLabel1WithResultArgument(*SwitchLabel1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitSwitchLabel2WithResult(n *SwitchLabel2) interface{}{ return  my.UnimplementedVisitor("VisitSwitchLabel2WithResult(*SwitchLabel2)")}
-
-func (my *AbstractResultVisitor)     VisitSwitchLabel2WithResultArgument(n *SwitchLabel2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitSwitchLabel2WithResultArgument(*SwitchLabel2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTryStatement0WithResult(n *TryStatement0) interface{}{ return  my.UnimplementedVisitor("VisitTryStatement0WithResult(*TryStatement0)")}
-
-func (my *AbstractResultVisitor)     VisitTryStatement0WithResultArgument(n *TryStatement0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTryStatement0WithResultArgument(*TryStatement0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitTryStatement1WithResult(n *TryStatement1) interface{}{ return  my.UnimplementedVisitor("VisitTryStatement1WithResult(*TryStatement1)")}
-
-func (my *AbstractResultVisitor)     VisitTryStatement1WithResultArgument(n *TryStatement1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitTryStatement1WithResultArgument(*TryStatement1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray0WithResult(n *PrimaryNoNewArray0) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray0WithResult(*PrimaryNoNewArray0)")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray0WithResultArgument(n *PrimaryNoNewArray0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray0WithResultArgument(*PrimaryNoNewArray0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray1WithResult(n *PrimaryNoNewArray1) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray1WithResult(*PrimaryNoNewArray1)")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray1WithResultArgument(n *PrimaryNoNewArray1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray1WithResultArgument(*PrimaryNoNewArray1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray2WithResult(n *PrimaryNoNewArray2) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray2WithResult(*PrimaryNoNewArray2)")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray2WithResultArgument(n *PrimaryNoNewArray2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray2WithResultArgument(*PrimaryNoNewArray2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray3WithResult(n *PrimaryNoNewArray3) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray3WithResult(*PrimaryNoNewArray3)")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray3WithResultArgument(n *PrimaryNoNewArray3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray3WithResultArgument(*PrimaryNoNewArray3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray4WithResult(n *PrimaryNoNewArray4) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray4WithResult(*PrimaryNoNewArray4)")}
-
-func (my *AbstractResultVisitor)     VisitPrimaryNoNewArray4WithResultArgument(n *PrimaryNoNewArray4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitPrimaryNoNewArray4WithResultArgument(*PrimaryNoNewArray4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLiteral0WithResult(n *Literal0) interface{}{ return  my.UnimplementedVisitor("VisitLiteral0WithResult(*Literal0)")}
-
-func (my *AbstractResultVisitor)     VisitLiteral0WithResultArgument(n *Literal0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLiteral0WithResultArgument(*Literal0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLiteral1WithResult(n *Literal1) interface{}{ return  my.UnimplementedVisitor("VisitLiteral1WithResult(*Literal1)")}
-
-func (my *AbstractResultVisitor)     VisitLiteral1WithResultArgument(n *Literal1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLiteral1WithResultArgument(*Literal1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLiteral2WithResult(n *Literal2) interface{}{ return  my.UnimplementedVisitor("VisitLiteral2WithResult(*Literal2)")}
-
-func (my *AbstractResultVisitor)     VisitLiteral2WithResultArgument(n *Literal2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLiteral2WithResultArgument(*Literal2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLiteral3WithResult(n *Literal3) interface{}{ return  my.UnimplementedVisitor("VisitLiteral3WithResult(*Literal3)")}
-
-func (my *AbstractResultVisitor)     VisitLiteral3WithResultArgument(n *Literal3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLiteral3WithResultArgument(*Literal3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLiteral4WithResult(n *Literal4) interface{}{ return  my.UnimplementedVisitor("VisitLiteral4WithResult(*Literal4)")}
-
-func (my *AbstractResultVisitor)     VisitLiteral4WithResultArgument(n *Literal4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLiteral4WithResultArgument(*Literal4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLiteral5WithResult(n *Literal5) interface{}{ return  my.UnimplementedVisitor("VisitLiteral5WithResult(*Literal5)")}
-
-func (my *AbstractResultVisitor)     VisitLiteral5WithResultArgument(n *Literal5, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLiteral5WithResultArgument(*Literal5, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitLiteral6WithResult(n *Literal6) interface{}{ return  my.UnimplementedVisitor("VisitLiteral6WithResult(*Literal6)")}
-
-func (my *AbstractResultVisitor)     VisitLiteral6WithResultArgument(n *Literal6, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitLiteral6WithResultArgument(*Literal6, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitBooleanLiteral0WithResult(n *BooleanLiteral0) interface{}{ return  my.UnimplementedVisitor("VisitBooleanLiteral0WithResult(*BooleanLiteral0)")}
-
-func (my *AbstractResultVisitor)     VisitBooleanLiteral0WithResultArgument(n *BooleanLiteral0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitBooleanLiteral0WithResultArgument(*BooleanLiteral0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitBooleanLiteral1WithResult(n *BooleanLiteral1) interface{}{ return  my.UnimplementedVisitor("VisitBooleanLiteral1WithResult(*BooleanLiteral1)")}
-
-func (my *AbstractResultVisitor)     VisitBooleanLiteral1WithResultArgument(n *BooleanLiteral1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitBooleanLiteral1WithResultArgument(*BooleanLiteral1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassInstanceCreationExpression0WithResult(n *ClassInstanceCreationExpression0) interface{}{ return  my.UnimplementedVisitor("VisitClassInstanceCreationExpression0WithResult(*ClassInstanceCreationExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitClassInstanceCreationExpression0WithResultArgument(n *ClassInstanceCreationExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassInstanceCreationExpression0WithResultArgument(*ClassInstanceCreationExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitClassInstanceCreationExpression1WithResult(n *ClassInstanceCreationExpression1) interface{}{ return  my.UnimplementedVisitor("VisitClassInstanceCreationExpression1WithResult(*ClassInstanceCreationExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitClassInstanceCreationExpression1WithResultArgument(n *ClassInstanceCreationExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitClassInstanceCreationExpression1WithResultArgument(*ClassInstanceCreationExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArrayCreationExpression0WithResult(n *ArrayCreationExpression0) interface{}{ return  my.UnimplementedVisitor("VisitArrayCreationExpression0WithResult(*ArrayCreationExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitArrayCreationExpression0WithResultArgument(n *ArrayCreationExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArrayCreationExpression0WithResultArgument(*ArrayCreationExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArrayCreationExpression1WithResult(n *ArrayCreationExpression1) interface{}{ return  my.UnimplementedVisitor("VisitArrayCreationExpression1WithResult(*ArrayCreationExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitArrayCreationExpression1WithResultArgument(n *ArrayCreationExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArrayCreationExpression1WithResultArgument(*ArrayCreationExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArrayCreationExpression2WithResult(n *ArrayCreationExpression2) interface{}{ return  my.UnimplementedVisitor("VisitArrayCreationExpression2WithResult(*ArrayCreationExpression2)")}
-
-func (my *AbstractResultVisitor)     VisitArrayCreationExpression2WithResultArgument(n *ArrayCreationExpression2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArrayCreationExpression2WithResultArgument(*ArrayCreationExpression2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArrayCreationExpression3WithResult(n *ArrayCreationExpression3) interface{}{ return  my.UnimplementedVisitor("VisitArrayCreationExpression3WithResult(*ArrayCreationExpression3)")}
-
-func (my *AbstractResultVisitor)     VisitArrayCreationExpression3WithResultArgument(n *ArrayCreationExpression3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArrayCreationExpression3WithResultArgument(*ArrayCreationExpression3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitDims0WithResult(n *Dims0) interface{}{ return  my.UnimplementedVisitor("VisitDims0WithResult(*Dims0)")}
-
-func (my *AbstractResultVisitor)     VisitDims0WithResultArgument(n *Dims0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitDims0WithResultArgument(*Dims0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitDims1WithResult(n *Dims1) interface{}{ return  my.UnimplementedVisitor("VisitDims1WithResult(*Dims1)")}
-
-func (my *AbstractResultVisitor)     VisitDims1WithResultArgument(n *Dims1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitDims1WithResultArgument(*Dims1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldAccess0WithResult(n *FieldAccess0) interface{}{ return  my.UnimplementedVisitor("VisitFieldAccess0WithResult(*FieldAccess0)")}
-
-func (my *AbstractResultVisitor)     VisitFieldAccess0WithResultArgument(n *FieldAccess0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldAccess0WithResultArgument(*FieldAccess0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldAccess1WithResult(n *FieldAccess1) interface{}{ return  my.UnimplementedVisitor("VisitFieldAccess1WithResult(*FieldAccess1)")}
-
-func (my *AbstractResultVisitor)     VisitFieldAccess1WithResultArgument(n *FieldAccess1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldAccess1WithResultArgument(*FieldAccess1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitFieldAccess2WithResult(n *FieldAccess2) interface{}{ return  my.UnimplementedVisitor("VisitFieldAccess2WithResult(*FieldAccess2)")}
-
-func (my *AbstractResultVisitor)     VisitFieldAccess2WithResultArgument(n *FieldAccess2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitFieldAccess2WithResultArgument(*FieldAccess2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation0WithResult(n *MethodInvocation0) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation0WithResult(*MethodInvocation0)")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation0WithResultArgument(n *MethodInvocation0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation0WithResultArgument(*MethodInvocation0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation1WithResult(n *MethodInvocation1) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation1WithResult(*MethodInvocation1)")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation1WithResultArgument(n *MethodInvocation1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation1WithResultArgument(*MethodInvocation1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation2WithResult(n *MethodInvocation2) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation2WithResult(*MethodInvocation2)")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation2WithResultArgument(n *MethodInvocation2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation2WithResultArgument(*MethodInvocation2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation3WithResult(n *MethodInvocation3) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation3WithResult(*MethodInvocation3)")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation3WithResultArgument(n *MethodInvocation3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation3WithResultArgument(*MethodInvocation3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation4WithResult(n *MethodInvocation4) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation4WithResult(*MethodInvocation4)")}
-
-func (my *AbstractResultVisitor)     VisitMethodInvocation4WithResultArgument(n *MethodInvocation4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMethodInvocation4WithResultArgument(*MethodInvocation4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArrayAccess0WithResult(n *ArrayAccess0) interface{}{ return  my.UnimplementedVisitor("VisitArrayAccess0WithResult(*ArrayAccess0)")}
-
-func (my *AbstractResultVisitor)     VisitArrayAccess0WithResultArgument(n *ArrayAccess0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArrayAccess0WithResultArgument(*ArrayAccess0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitArrayAccess1WithResult(n *ArrayAccess1) interface{}{ return  my.UnimplementedVisitor("VisitArrayAccess1WithResult(*ArrayAccess1)")}
-
-func (my *AbstractResultVisitor)     VisitArrayAccess1WithResultArgument(n *ArrayAccess1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitArrayAccess1WithResultArgument(*ArrayAccess1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitUnaryExpression0WithResult(n *UnaryExpression0) interface{}{ return  my.UnimplementedVisitor("VisitUnaryExpression0WithResult(*UnaryExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitUnaryExpression0WithResultArgument(n *UnaryExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitUnaryExpression0WithResultArgument(*UnaryExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitUnaryExpression1WithResult(n *UnaryExpression1) interface{}{ return  my.UnimplementedVisitor("VisitUnaryExpression1WithResult(*UnaryExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitUnaryExpression1WithResultArgument(n *UnaryExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitUnaryExpression1WithResultArgument(*UnaryExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitUnaryExpressionNotPlusMinus0WithResult(n *UnaryExpressionNotPlusMinus0) interface{}{ return  my.UnimplementedVisitor("VisitUnaryExpressionNotPlusMinus0WithResult(*UnaryExpressionNotPlusMinus0)")}
-
-func (my *AbstractResultVisitor)     VisitUnaryExpressionNotPlusMinus0WithResultArgument(n *UnaryExpressionNotPlusMinus0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitUnaryExpressionNotPlusMinus0WithResultArgument(*UnaryExpressionNotPlusMinus0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitUnaryExpressionNotPlusMinus1WithResult(n *UnaryExpressionNotPlusMinus1) interface{}{ return  my.UnimplementedVisitor("VisitUnaryExpressionNotPlusMinus1WithResult(*UnaryExpressionNotPlusMinus1)")}
-
-func (my *AbstractResultVisitor)     VisitUnaryExpressionNotPlusMinus1WithResultArgument(n *UnaryExpressionNotPlusMinus1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitUnaryExpressionNotPlusMinus1WithResultArgument(*UnaryExpressionNotPlusMinus1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitCastExpression0WithResult(n *CastExpression0) interface{}{ return  my.UnimplementedVisitor("VisitCastExpression0WithResult(*CastExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitCastExpression0WithResultArgument(n *CastExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitCastExpression0WithResultArgument(*CastExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitCastExpression1WithResult(n *CastExpression1) interface{}{ return  my.UnimplementedVisitor("VisitCastExpression1WithResult(*CastExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitCastExpression1WithResultArgument(n *CastExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitCastExpression1WithResultArgument(*CastExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMultiplicativeExpression0WithResult(n *MultiplicativeExpression0) interface{}{ return  my.UnimplementedVisitor("VisitMultiplicativeExpression0WithResult(*MultiplicativeExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitMultiplicativeExpression0WithResultArgument(n *MultiplicativeExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMultiplicativeExpression0WithResultArgument(*MultiplicativeExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMultiplicativeExpression1WithResult(n *MultiplicativeExpression1) interface{}{ return  my.UnimplementedVisitor("VisitMultiplicativeExpression1WithResult(*MultiplicativeExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitMultiplicativeExpression1WithResultArgument(n *MultiplicativeExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMultiplicativeExpression1WithResultArgument(*MultiplicativeExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitMultiplicativeExpression2WithResult(n *MultiplicativeExpression2) interface{}{ return  my.UnimplementedVisitor("VisitMultiplicativeExpression2WithResult(*MultiplicativeExpression2)")}
-
-func (my *AbstractResultVisitor)     VisitMultiplicativeExpression2WithResultArgument(n *MultiplicativeExpression2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitMultiplicativeExpression2WithResultArgument(*MultiplicativeExpression2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAdditiveExpression0WithResult(n *AdditiveExpression0) interface{}{ return  my.UnimplementedVisitor("VisitAdditiveExpression0WithResult(*AdditiveExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitAdditiveExpression0WithResultArgument(n *AdditiveExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAdditiveExpression0WithResultArgument(*AdditiveExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAdditiveExpression1WithResult(n *AdditiveExpression1) interface{}{ return  my.UnimplementedVisitor("VisitAdditiveExpression1WithResult(*AdditiveExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitAdditiveExpression1WithResultArgument(n *AdditiveExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAdditiveExpression1WithResultArgument(*AdditiveExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitShiftExpression0WithResult(n *ShiftExpression0) interface{}{ return  my.UnimplementedVisitor("VisitShiftExpression0WithResult(*ShiftExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitShiftExpression0WithResultArgument(n *ShiftExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitShiftExpression0WithResultArgument(*ShiftExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitShiftExpression1WithResult(n *ShiftExpression1) interface{}{ return  my.UnimplementedVisitor("VisitShiftExpression1WithResult(*ShiftExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitShiftExpression1WithResultArgument(n *ShiftExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitShiftExpression1WithResultArgument(*ShiftExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitShiftExpression2WithResult(n *ShiftExpression2) interface{}{ return  my.UnimplementedVisitor("VisitShiftExpression2WithResult(*ShiftExpression2)")}
-
-func (my *AbstractResultVisitor)     VisitShiftExpression2WithResultArgument(n *ShiftExpression2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitShiftExpression2WithResultArgument(*ShiftExpression2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression0WithResult(n *RelationalExpression0) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression0WithResult(*RelationalExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression0WithResultArgument(n *RelationalExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression0WithResultArgument(*RelationalExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression1WithResult(n *RelationalExpression1) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression1WithResult(*RelationalExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression1WithResultArgument(n *RelationalExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression1WithResultArgument(*RelationalExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression2WithResult(n *RelationalExpression2) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression2WithResult(*RelationalExpression2)")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression2WithResultArgument(n *RelationalExpression2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression2WithResultArgument(*RelationalExpression2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression3WithResult(n *RelationalExpression3) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression3WithResult(*RelationalExpression3)")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression3WithResultArgument(n *RelationalExpression3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression3WithResultArgument(*RelationalExpression3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression4WithResult(n *RelationalExpression4) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression4WithResult(*RelationalExpression4)")}
-
-func (my *AbstractResultVisitor)     VisitRelationalExpression4WithResultArgument(n *RelationalExpression4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitRelationalExpression4WithResultArgument(*RelationalExpression4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEqualityExpression0WithResult(n *EqualityExpression0) interface{}{ return  my.UnimplementedVisitor("VisitEqualityExpression0WithResult(*EqualityExpression0)")}
-
-func (my *AbstractResultVisitor)     VisitEqualityExpression0WithResultArgument(n *EqualityExpression0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEqualityExpression0WithResultArgument(*EqualityExpression0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitEqualityExpression1WithResult(n *EqualityExpression1) interface{}{ return  my.UnimplementedVisitor("VisitEqualityExpression1WithResult(*EqualityExpression1)")}
-
-func (my *AbstractResultVisitor)     VisitEqualityExpression1WithResultArgument(n *EqualityExpression1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitEqualityExpression1WithResultArgument(*EqualityExpression1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator0WithResult(n *AssignmentOperator0) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator0WithResult(*AssignmentOperator0)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator0WithResultArgument(n *AssignmentOperator0, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator0WithResultArgument(*AssignmentOperator0, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator1WithResult(n *AssignmentOperator1) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator1WithResult(*AssignmentOperator1)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator1WithResultArgument(n *AssignmentOperator1, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator1WithResultArgument(*AssignmentOperator1, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator2WithResult(n *AssignmentOperator2) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator2WithResult(*AssignmentOperator2)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator2WithResultArgument(n *AssignmentOperator2, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator2WithResultArgument(*AssignmentOperator2, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator3WithResult(n *AssignmentOperator3) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator3WithResult(*AssignmentOperator3)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator3WithResultArgument(n *AssignmentOperator3, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator3WithResultArgument(*AssignmentOperator3, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator4WithResult(n *AssignmentOperator4) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator4WithResult(*AssignmentOperator4)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator4WithResultArgument(n *AssignmentOperator4, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator4WithResultArgument(*AssignmentOperator4, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator5WithResult(n *AssignmentOperator5) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator5WithResult(*AssignmentOperator5)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator5WithResultArgument(n *AssignmentOperator5, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator5WithResultArgument(*AssignmentOperator5, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator6WithResult(n *AssignmentOperator6) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator6WithResult(*AssignmentOperator6)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator6WithResultArgument(n *AssignmentOperator6, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator6WithResultArgument(*AssignmentOperator6, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator7WithResult(n *AssignmentOperator7) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator7WithResult(*AssignmentOperator7)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator7WithResultArgument(n *AssignmentOperator7, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator7WithResultArgument(*AssignmentOperator7, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator8WithResult(n *AssignmentOperator8) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator8WithResult(*AssignmentOperator8)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator8WithResultArgument(n *AssignmentOperator8, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator8WithResultArgument(*AssignmentOperator8, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator9WithResult(n *AssignmentOperator9) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator9WithResult(*AssignmentOperator9)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator9WithResultArgument(n *AssignmentOperator9, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator9WithResultArgument(*AssignmentOperator9, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator10WithResult(n *AssignmentOperator10) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator10WithResult(*AssignmentOperator10)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator10WithResultArgument(n *AssignmentOperator10, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator10WithResultArgument(*AssignmentOperator10, interface{})")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator11WithResult(n *AssignmentOperator11) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator11WithResult(*AssignmentOperator11)")}
-
-func (my *AbstractResultVisitor)     VisitAssignmentOperator11WithResultArgument(n *AssignmentOperator11, o interface{}) interface{}{ return  my.UnimplementedVisitor("VisitAssignmentOperator11WithResultArgument(*AssignmentOperator11, interface{})")}
-
-
-func (my *AbstractResultVisitor)     VisitWithResult(n IAst) interface{}{
-        {
-         var n2,ok =n.(*AstToken)
-         if ok {
-            return my.dispatch.VisitAstTokenWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*identifier)
-         if ok {
-            return my.dispatch.VisitidentifierWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimitiveType)
-         if ok {
-            return my.dispatch.VisitPrimitiveTypeWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassType)
-         if ok {
-            return my.dispatch.VisitClassTypeWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceType)
-         if ok {
-            return my.dispatch.VisitInterfaceTypeWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeName)
-         if ok {
-            return my.dispatch.VisitTypeNameWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayType)
-         if ok {
-            return my.dispatch.VisitArrayTypeWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameter)
-         if ok {
-            return my.dispatch.VisitTypeParameterWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeBound)
-         if ok {
-            return my.dispatch.VisitTypeBoundWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AdditionalBoundList)
-         if ok {
-            return my.dispatch.VisitAdditionalBoundListWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AdditionalBound)
-         if ok {
-            return my.dispatch.VisitAdditionalBoundWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeArguments)
-         if ok {
-            return my.dispatch.VisitTypeArgumentsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ActualTypeArgumentList)
-         if ok {
-            return my.dispatch.VisitActualTypeArgumentListWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Wildcard)
-         if ok {
-            return my.dispatch.VisitWildcardWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PackageName)
-         if ok {
-            return my.dispatch.VisitPackageNameWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExpressionName)
-         if ok {
-            return my.dispatch.VisitExpressionNameWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodName)
-         if ok {
-            return my.dispatch.VisitMethodNameWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PackageOrTypeName)
-         if ok {
-            return my.dispatch.VisitPackageOrTypeNameWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AmbiguousName)
-         if ok {
-            return my.dispatch.VisitAmbiguousNameWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*CompilationUnit)
-         if ok {
-            return my.dispatch.VisitCompilationUnitWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ImportDeclarations)
-         if ok {
-            return my.dispatch.VisitImportDeclarationsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeDeclarations)
-         if ok {
-            return my.dispatch.VisitTypeDeclarationsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PackageDeclaration)
-         if ok {
-            return my.dispatch.VisitPackageDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SingleTypeImportDeclaration)
-         if ok {
-            return my.dispatch.VisitSingleTypeImportDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeImportOnDemandDeclaration)
-         if ok {
-            return my.dispatch.VisitTypeImportOnDemandDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SingleStaticImportDeclaration)
-         if ok {
-            return my.dispatch.VisitSingleStaticImportDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*StaticImportOnDemandDeclaration)
-         if ok {
-            return my.dispatch.VisitStaticImportOnDemandDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeDeclaration)
-         if ok {
-            return my.dispatch.VisitTypeDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*NormalClassDeclaration)
-         if ok {
-            return my.dispatch.VisitNormalClassDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifiers)
-         if ok {
-            return my.dispatch.VisitClassModifiersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameters)
-         if ok {
-            return my.dispatch.VisitTypeParametersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameterList)
-         if ok {
-            return my.dispatch.VisitTypeParameterListWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Super)
-         if ok {
-            return my.dispatch.VisitSuperWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Interfaces)
-         if ok {
-            return my.dispatch.VisitInterfacesWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceTypeList)
-         if ok {
-            return my.dispatch.VisitInterfaceTypeListWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassBody)
-         if ok {
-            return my.dispatch.VisitClassBodyWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassBodyDeclarations)
-         if ok {
-            return my.dispatch.VisitClassBodyDeclarationsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassMemberDeclaration)
-         if ok {
-            return my.dispatch.VisitClassMemberDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldDeclaration)
-         if ok {
-            return my.dispatch.VisitFieldDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclarators)
-         if ok {
-            return my.dispatch.VisitVariableDeclaratorsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclarator)
-         if ok {
-            return my.dispatch.VisitVariableDeclaratorWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclaratorId)
-         if ok {
-            return my.dispatch.VisitVariableDeclaratorIdWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifiers)
-         if ok {
-            return my.dispatch.VisitFieldModifiersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclaration)
-         if ok {
-            return my.dispatch.VisitMethodDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodHeader)
-         if ok {
-            return my.dispatch.VisitMethodHeaderWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ResultType)
-         if ok {
-            return my.dispatch.VisitResultTypeWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameterList)
-         if ok {
-            return my.dispatch.VisitFormalParameterListWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameters)
-         if ok {
-            return my.dispatch.VisitFormalParametersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameter)
-         if ok {
-            return my.dispatch.VisitFormalParameterWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableModifiers)
-         if ok {
-            return my.dispatch.VisitVariableModifiersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableModifier)
-         if ok {
-            return my.dispatch.VisitVariableModifierWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LastFormalParameter)
-         if ok {
-            return my.dispatch.VisitLastFormalParameterWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifiers)
-         if ok {
-            return my.dispatch.VisitMethodModifiersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Throws)
-         if ok {
-            return my.dispatch.VisitThrowsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExceptionTypeList)
-         if ok {
-            return my.dispatch.VisitExceptionTypeListWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodBody)
-         if ok {
-            return my.dispatch.VisitMethodBodyWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*StaticInitializer)
-         if ok {
-            return my.dispatch.VisitStaticInitializerWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorDeclaration)
-         if ok {
-            return my.dispatch.VisitConstructorDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorDeclarator)
-         if ok {
-            return my.dispatch.VisitConstructorDeclaratorWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifiers)
-         if ok {
-            return my.dispatch.VisitConstructorModifiersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorBody)
-         if ok {
-            return my.dispatch.VisitConstructorBodyWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumDeclaration)
-         if ok {
-            return my.dispatch.VisitEnumDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumBody)
-         if ok {
-            return my.dispatch.VisitEnumBodyWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumConstants)
-         if ok {
-            return my.dispatch.VisitEnumConstantsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumConstant)
-         if ok {
-            return my.dispatch.VisitEnumConstantWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Arguments)
-         if ok {
-            return my.dispatch.VisitArgumentsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumBodyDeclarations)
-         if ok {
-            return my.dispatch.VisitEnumBodyDeclarationsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*NormalInterfaceDeclaration)
-         if ok {
-            return my.dispatch.VisitNormalInterfaceDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifiers)
-         if ok {
-            return my.dispatch.VisitInterfaceModifiersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceBody)
-         if ok {
-            return my.dispatch.VisitInterfaceBodyWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceMemberDeclarations)
-         if ok {
-            return my.dispatch.VisitInterfaceMemberDeclarationsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceMemberDeclaration)
-         if ok {
-            return my.dispatch.VisitInterfaceMemberDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantDeclaration)
-         if ok {
-            return my.dispatch.VisitConstantDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifiers)
-         if ok {
-            return my.dispatch.VisitConstantModifiersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodDeclaration)
-         if ok {
-            return my.dispatch.VisitAbstractMethodDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifiers)
-         if ok {
-            return my.dispatch.VisitAbstractMethodModifiersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeDeclaration)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeBody)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeBodyWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclarations)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeElementDeclarationsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*DefaultValue)
-         if ok {
-            return my.dispatch.VisitDefaultValueWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Annotations)
-         if ok {
-            return my.dispatch.VisitAnnotationsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*NormalAnnotation)
-         if ok {
-            return my.dispatch.VisitNormalAnnotationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValuePairs)
-         if ok {
-            return my.dispatch.VisitElementValuePairsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValuePair)
-         if ok {
-            return my.dispatch.VisitElementValuePairWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValueArrayInitializer)
-         if ok {
-            return my.dispatch.VisitElementValueArrayInitializerWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValues)
-         if ok {
-            return my.dispatch.VisitElementValuesWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MarkerAnnotation)
-         if ok {
-            return my.dispatch.VisitMarkerAnnotationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SingleElementAnnotation)
-         if ok {
-            return my.dispatch.VisitSingleElementAnnotationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayInitializer)
-         if ok {
-            return my.dispatch.VisitArrayInitializerWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableInitializers)
-         if ok {
-            return my.dispatch.VisitVariableInitializersWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Block)
-         if ok {
-            return my.dispatch.VisitBlockWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*BlockStatements)
-         if ok {
-            return my.dispatch.VisitBlockStatementsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LocalVariableDeclarationStatement)
-         if ok {
-            return my.dispatch.VisitLocalVariableDeclarationStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LocalVariableDeclaration)
-         if ok {
-            return my.dispatch.VisitLocalVariableDeclarationWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenStatement)
-         if ok {
-            return my.dispatch.VisitIfThenStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenElseStatement)
-         if ok {
-            return my.dispatch.VisitIfThenElseStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenElseStatementNoShortIf)
-         if ok {
-            return my.dispatch.VisitIfThenElseStatementNoShortIfWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EmptyStatement)
-         if ok {
-            return my.dispatch.VisitEmptyStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LabeledStatement)
-         if ok {
-            return my.dispatch.VisitLabeledStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LabeledStatementNoShortIf)
-         if ok {
-            return my.dispatch.VisitLabeledStatementNoShortIfWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExpressionStatement)
-         if ok {
-            return my.dispatch.VisitExpressionStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchStatement)
-         if ok {
-            return my.dispatch.VisitSwitchStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlock)
-         if ok {
-            return my.dispatch.VisitSwitchBlockWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlockStatementGroups)
-         if ok {
-            return my.dispatch.VisitSwitchBlockStatementGroupsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlockStatementGroup)
-         if ok {
-            return my.dispatch.VisitSwitchBlockStatementGroupWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabels)
-         if ok {
-            return my.dispatch.VisitSwitchLabelsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*WhileStatement)
-         if ok {
-            return my.dispatch.VisitWhileStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*WhileStatementNoShortIf)
-         if ok {
-            return my.dispatch.VisitWhileStatementNoShortIfWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*DoStatement)
-         if ok {
-            return my.dispatch.VisitDoStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*BasicForStatement)
-         if ok {
-            return my.dispatch.VisitBasicForStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ForStatementNoShortIf)
-         if ok {
-            return my.dispatch.VisitForStatementNoShortIfWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*StatementExpressionList)
-         if ok {
-            return my.dispatch.VisitStatementExpressionListWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EnhancedForStatement)
-         if ok {
-            return my.dispatch.VisitEnhancedForStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*BreakStatement)
-         if ok {
-            return my.dispatch.VisitBreakStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ContinueStatement)
-         if ok {
-            return my.dispatch.VisitContinueStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ReturnStatement)
-         if ok {
-            return my.dispatch.VisitReturnStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ThrowStatement)
-         if ok {
-            return my.dispatch.VisitThrowStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SynchronizedStatement)
-         if ok {
-            return my.dispatch.VisitSynchronizedStatementWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Catches)
-         if ok {
-            return my.dispatch.VisitCatchesWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*CatchClause)
-         if ok {
-            return my.dispatch.VisitCatchClauseWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Finally)
-         if ok {
-            return my.dispatch.VisitFinallyWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArgumentList)
-         if ok {
-            return my.dispatch.VisitArgumentListWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*DimExprs)
-         if ok {
-            return my.dispatch.VisitDimExprsWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*DimExpr)
-         if ok {
-            return my.dispatch.VisitDimExprWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PostIncrementExpression)
-         if ok {
-            return my.dispatch.VisitPostIncrementExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PostDecrementExpression)
-         if ok {
-            return my.dispatch.VisitPostDecrementExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PreIncrementExpression)
-         if ok {
-            return my.dispatch.VisitPreIncrementExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PreDecrementExpression)
-         if ok {
-            return my.dispatch.VisitPreDecrementExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AndExpression)
-         if ok {
-            return my.dispatch.VisitAndExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExclusiveOrExpression)
-         if ok {
-            return my.dispatch.VisitExclusiveOrExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InclusiveOrExpression)
-         if ok {
-            return my.dispatch.VisitInclusiveOrExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalAndExpression)
-         if ok {
-            return my.dispatch.VisitConditionalAndExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalOrExpression)
-         if ok {
-            return my.dispatch.VisitConditionalOrExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalExpression)
-         if ok {
-            return my.dispatch.VisitConditionalExpressionWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Assignment)
-         if ok {
-            return my.dispatch.VisitAssignmentWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Commaopt)
-         if ok {
-            return my.dispatch.VisitCommaoptWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Ellipsisopt)
-         if ok {
-            return my.dispatch.VisitEllipsisoptWithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction0)
-         if ok {
-            return my.dispatch.VisitLPGUserAction0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction1)
-         if ok {
-            return my.dispatch.VisitLPGUserAction1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction2)
-         if ok {
-            return my.dispatch.VisitLPGUserAction2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction3)
-         if ok {
-            return my.dispatch.VisitLPGUserAction3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction4)
-         if ok {
-            return my.dispatch.VisitLPGUserAction4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType0)
-         if ok {
-            return my.dispatch.VisitIntegralType0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType1)
-         if ok {
-            return my.dispatch.VisitIntegralType1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType2)
-         if ok {
-            return my.dispatch.VisitIntegralType2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType3)
-         if ok {
-            return my.dispatch.VisitIntegralType3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType4)
-         if ok {
-            return my.dispatch.VisitIntegralType4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FloatingPointType0)
-         if ok {
-            return my.dispatch.VisitFloatingPointType0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FloatingPointType1)
-         if ok {
-            return my.dispatch.VisitFloatingPointType1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*WildcardBounds0)
-         if ok {
-            return my.dispatch.VisitWildcardBounds0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*WildcardBounds1)
-         if ok {
-            return my.dispatch.VisitWildcardBounds1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier0)
-         if ok {
-            return my.dispatch.VisitClassModifier0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier1)
-         if ok {
-            return my.dispatch.VisitClassModifier1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier2)
-         if ok {
-            return my.dispatch.VisitClassModifier2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier3)
-         if ok {
-            return my.dispatch.VisitClassModifier3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier4)
-         if ok {
-            return my.dispatch.VisitClassModifier4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier5)
-         if ok {
-            return my.dispatch.VisitClassModifier5WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier6)
-         if ok {
-            return my.dispatch.VisitClassModifier6WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier0)
-         if ok {
-            return my.dispatch.VisitFieldModifier0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier1)
-         if ok {
-            return my.dispatch.VisitFieldModifier1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier2)
-         if ok {
-            return my.dispatch.VisitFieldModifier2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier3)
-         if ok {
-            return my.dispatch.VisitFieldModifier3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier4)
-         if ok {
-            return my.dispatch.VisitFieldModifier4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier5)
-         if ok {
-            return my.dispatch.VisitFieldModifier5WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier6)
-         if ok {
-            return my.dispatch.VisitFieldModifier6WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclarator0)
-         if ok {
-            return my.dispatch.VisitMethodDeclarator0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclarator1)
-         if ok {
-            return my.dispatch.VisitMethodDeclarator1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier0)
-         if ok {
-            return my.dispatch.VisitMethodModifier0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier1)
-         if ok {
-            return my.dispatch.VisitMethodModifier1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier2)
-         if ok {
-            return my.dispatch.VisitMethodModifier2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier3)
-         if ok {
-            return my.dispatch.VisitMethodModifier3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier4)
-         if ok {
-            return my.dispatch.VisitMethodModifier4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier5)
-         if ok {
-            return my.dispatch.VisitMethodModifier5WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier6)
-         if ok {
-            return my.dispatch.VisitMethodModifier6WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier7)
-         if ok {
-            return my.dispatch.VisitMethodModifier7WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier8)
-         if ok {
-            return my.dispatch.VisitMethodModifier8WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier0)
-         if ok {
-            return my.dispatch.VisitConstructorModifier0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier1)
-         if ok {
-            return my.dispatch.VisitConstructorModifier1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier2)
-         if ok {
-            return my.dispatch.VisitConstructorModifier2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation0)
-         if ok {
-            return my.dispatch.VisitExplicitConstructorInvocation0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation1)
-         if ok {
-            return my.dispatch.VisitExplicitConstructorInvocation1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation2)
-         if ok {
-            return my.dispatch.VisitExplicitConstructorInvocation2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier0)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier1)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier2)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier3)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier4)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier5)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier5WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExtendsInterfaces0)
-         if ok {
-            return my.dispatch.VisitExtendsInterfaces0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ExtendsInterfaces1)
-         if ok {
-            return my.dispatch.VisitExtendsInterfaces1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier0)
-         if ok {
-            return my.dispatch.VisitConstantModifier0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier1)
-         if ok {
-            return my.dispatch.VisitConstantModifier1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier2)
-         if ok {
-            return my.dispatch.VisitConstantModifier2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifier0)
-         if ok {
-            return my.dispatch.VisitAbstractMethodModifier0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifier1)
-         if ok {
-            return my.dispatch.VisitAbstractMethodModifier1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclaration0)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeElementDeclaration0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclaration1)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeElementDeclaration1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssertStatement0)
-         if ok {
-            return my.dispatch.VisitAssertStatement0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssertStatement1)
-         if ok {
-            return my.dispatch.VisitAssertStatement1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel0)
-         if ok {
-            return my.dispatch.VisitSwitchLabel0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel1)
-         if ok {
-            return my.dispatch.VisitSwitchLabel1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel2)
-         if ok {
-            return my.dispatch.VisitSwitchLabel2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TryStatement0)
-         if ok {
-            return my.dispatch.VisitTryStatement0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*TryStatement1)
-         if ok {
-            return my.dispatch.VisitTryStatement1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray0)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray1)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray2)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray3)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray4)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal0)
-         if ok {
-            return my.dispatch.VisitLiteral0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal1)
-         if ok {
-            return my.dispatch.VisitLiteral1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal2)
-         if ok {
-            return my.dispatch.VisitLiteral2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal3)
-         if ok {
-            return my.dispatch.VisitLiteral3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal4)
-         if ok {
-            return my.dispatch.VisitLiteral4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal5)
-         if ok {
-            return my.dispatch.VisitLiteral5WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal6)
-         if ok {
-            return my.dispatch.VisitLiteral6WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*BooleanLiteral0)
-         if ok {
-            return my.dispatch.VisitBooleanLiteral0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*BooleanLiteral1)
-         if ok {
-            return my.dispatch.VisitBooleanLiteral1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassInstanceCreationExpression0)
-         if ok {
-            return my.dispatch.VisitClassInstanceCreationExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassInstanceCreationExpression1)
-         if ok {
-            return my.dispatch.VisitClassInstanceCreationExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression0)
-         if ok {
-            return my.dispatch.VisitArrayCreationExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression1)
-         if ok {
-            return my.dispatch.VisitArrayCreationExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression2)
-         if ok {
-            return my.dispatch.VisitArrayCreationExpression2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression3)
-         if ok {
-            return my.dispatch.VisitArrayCreationExpression3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Dims0)
-         if ok {
-            return my.dispatch.VisitDims0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*Dims1)
-         if ok {
-            return my.dispatch.VisitDims1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess0)
-         if ok {
-            return my.dispatch.VisitFieldAccess0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess1)
-         if ok {
-            return my.dispatch.VisitFieldAccess1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess2)
-         if ok {
-            return my.dispatch.VisitFieldAccess2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation0)
-         if ok {
-            return my.dispatch.VisitMethodInvocation0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation1)
-         if ok {
-            return my.dispatch.VisitMethodInvocation1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation2)
-         if ok {
-            return my.dispatch.VisitMethodInvocation2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation3)
-         if ok {
-            return my.dispatch.VisitMethodInvocation3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation4)
-         if ok {
-            return my.dispatch.VisitMethodInvocation4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayAccess0)
-         if ok {
-            return my.dispatch.VisitArrayAccess0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayAccess1)
-         if ok {
-            return my.dispatch.VisitArrayAccess1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpression0)
-         if ok {
-            return my.dispatch.VisitUnaryExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpression1)
-         if ok {
-            return my.dispatch.VisitUnaryExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpressionNotPlusMinus0)
-         if ok {
-            return my.dispatch.VisitUnaryExpressionNotPlusMinus0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpressionNotPlusMinus1)
-         if ok {
-            return my.dispatch.VisitUnaryExpressionNotPlusMinus1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*CastExpression0)
-         if ok {
-            return my.dispatch.VisitCastExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*CastExpression1)
-         if ok {
-            return my.dispatch.VisitCastExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression0)
-         if ok {
-            return my.dispatch.VisitMultiplicativeExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression1)
-         if ok {
-            return my.dispatch.VisitMultiplicativeExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression2)
-         if ok {
-            return my.dispatch.VisitMultiplicativeExpression2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AdditiveExpression0)
-         if ok {
-            return my.dispatch.VisitAdditiveExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AdditiveExpression1)
-         if ok {
-            return my.dispatch.VisitAdditiveExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression0)
-         if ok {
-            return my.dispatch.VisitShiftExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression1)
-         if ok {
-            return my.dispatch.VisitShiftExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression2)
-         if ok {
-            return my.dispatch.VisitShiftExpression2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression0)
-         if ok {
-            return my.dispatch.VisitRelationalExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression1)
-         if ok {
-            return my.dispatch.VisitRelationalExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression2)
-         if ok {
-            return my.dispatch.VisitRelationalExpression2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression3)
-         if ok {
-            return my.dispatch.VisitRelationalExpression3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression4)
-         if ok {
-            return my.dispatch.VisitRelationalExpression4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EqualityExpression0)
-         if ok {
-            return my.dispatch.VisitEqualityExpression0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*EqualityExpression1)
-         if ok {
-            return my.dispatch.VisitEqualityExpression1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator0)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator0WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator1)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator1WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator2)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator2WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator3)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator3WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator4)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator4WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator5)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator5WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator6)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator6WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator7)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator7WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator8)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator8WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator9)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator9WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator10)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator10WithResult(n2)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator11)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator11WithResult(n2)
-          }
-        }
-    return nil
-    }
-func (my *AbstractResultVisitor)     VisitWithResultArgument(n IAst, o interface{}) interface{}{
-        {
-         var n2,ok =n.(*AstToken)
-         if ok {
-            return my.dispatch.VisitAstTokenWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*identifier)
-         if ok {
-            return my.dispatch.VisitidentifierWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimitiveType)
-         if ok {
-            return my.dispatch.VisitPrimitiveTypeWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassType)
-         if ok {
-            return my.dispatch.VisitClassTypeWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceType)
-         if ok {
-            return my.dispatch.VisitInterfaceTypeWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeName)
-         if ok {
-            return my.dispatch.VisitTypeNameWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayType)
-         if ok {
-            return my.dispatch.VisitArrayTypeWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameter)
-         if ok {
-            return my.dispatch.VisitTypeParameterWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeBound)
-         if ok {
-            return my.dispatch.VisitTypeBoundWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AdditionalBoundList)
-         if ok {
-            return my.dispatch.VisitAdditionalBoundListWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AdditionalBound)
-         if ok {
-            return my.dispatch.VisitAdditionalBoundWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeArguments)
-         if ok {
-            return my.dispatch.VisitTypeArgumentsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ActualTypeArgumentList)
-         if ok {
-            return my.dispatch.VisitActualTypeArgumentListWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Wildcard)
-         if ok {
-            return my.dispatch.VisitWildcardWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PackageName)
-         if ok {
-            return my.dispatch.VisitPackageNameWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExpressionName)
-         if ok {
-            return my.dispatch.VisitExpressionNameWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodName)
-         if ok {
-            return my.dispatch.VisitMethodNameWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PackageOrTypeName)
-         if ok {
-            return my.dispatch.VisitPackageOrTypeNameWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AmbiguousName)
-         if ok {
-            return my.dispatch.VisitAmbiguousNameWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*CompilationUnit)
-         if ok {
-            return my.dispatch.VisitCompilationUnitWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ImportDeclarations)
-         if ok {
-            return my.dispatch.VisitImportDeclarationsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeDeclarations)
-         if ok {
-            return my.dispatch.VisitTypeDeclarationsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PackageDeclaration)
-         if ok {
-            return my.dispatch.VisitPackageDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SingleTypeImportDeclaration)
-         if ok {
-            return my.dispatch.VisitSingleTypeImportDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeImportOnDemandDeclaration)
-         if ok {
-            return my.dispatch.VisitTypeImportOnDemandDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SingleStaticImportDeclaration)
-         if ok {
-            return my.dispatch.VisitSingleStaticImportDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*StaticImportOnDemandDeclaration)
-         if ok {
-            return my.dispatch.VisitStaticImportOnDemandDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeDeclaration)
-         if ok {
-            return my.dispatch.VisitTypeDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*NormalClassDeclaration)
-         if ok {
-            return my.dispatch.VisitNormalClassDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifiers)
-         if ok {
-            return my.dispatch.VisitClassModifiersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameters)
-         if ok {
-            return my.dispatch.VisitTypeParametersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TypeParameterList)
-         if ok {
-            return my.dispatch.VisitTypeParameterListWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Super)
-         if ok {
-            return my.dispatch.VisitSuperWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Interfaces)
-         if ok {
-            return my.dispatch.VisitInterfacesWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceTypeList)
-         if ok {
-            return my.dispatch.VisitInterfaceTypeListWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassBody)
-         if ok {
-            return my.dispatch.VisitClassBodyWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassBodyDeclarations)
-         if ok {
-            return my.dispatch.VisitClassBodyDeclarationsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassMemberDeclaration)
-         if ok {
-            return my.dispatch.VisitClassMemberDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldDeclaration)
-         if ok {
-            return my.dispatch.VisitFieldDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclarators)
-         if ok {
-            return my.dispatch.VisitVariableDeclaratorsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclarator)
-         if ok {
-            return my.dispatch.VisitVariableDeclaratorWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableDeclaratorId)
-         if ok {
-            return my.dispatch.VisitVariableDeclaratorIdWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifiers)
-         if ok {
-            return my.dispatch.VisitFieldModifiersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclaration)
-         if ok {
-            return my.dispatch.VisitMethodDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodHeader)
-         if ok {
-            return my.dispatch.VisitMethodHeaderWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ResultType)
-         if ok {
-            return my.dispatch.VisitResultTypeWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameterList)
-         if ok {
-            return my.dispatch.VisitFormalParameterListWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameters)
-         if ok {
-            return my.dispatch.VisitFormalParametersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FormalParameter)
-         if ok {
-            return my.dispatch.VisitFormalParameterWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableModifiers)
-         if ok {
-            return my.dispatch.VisitVariableModifiersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableModifier)
-         if ok {
-            return my.dispatch.VisitVariableModifierWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LastFormalParameter)
-         if ok {
-            return my.dispatch.VisitLastFormalParameterWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifiers)
-         if ok {
-            return my.dispatch.VisitMethodModifiersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Throws)
-         if ok {
-            return my.dispatch.VisitThrowsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExceptionTypeList)
-         if ok {
-            return my.dispatch.VisitExceptionTypeListWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodBody)
-         if ok {
-            return my.dispatch.VisitMethodBodyWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*StaticInitializer)
-         if ok {
-            return my.dispatch.VisitStaticInitializerWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorDeclaration)
-         if ok {
-            return my.dispatch.VisitConstructorDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorDeclarator)
-         if ok {
-            return my.dispatch.VisitConstructorDeclaratorWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifiers)
-         if ok {
-            return my.dispatch.VisitConstructorModifiersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorBody)
-         if ok {
-            return my.dispatch.VisitConstructorBodyWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumDeclaration)
-         if ok {
-            return my.dispatch.VisitEnumDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumBody)
-         if ok {
-            return my.dispatch.VisitEnumBodyWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumConstants)
-         if ok {
-            return my.dispatch.VisitEnumConstantsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumConstant)
-         if ok {
-            return my.dispatch.VisitEnumConstantWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Arguments)
-         if ok {
-            return my.dispatch.VisitArgumentsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EnumBodyDeclarations)
-         if ok {
-            return my.dispatch.VisitEnumBodyDeclarationsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*NormalInterfaceDeclaration)
-         if ok {
-            return my.dispatch.VisitNormalInterfaceDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifiers)
-         if ok {
-            return my.dispatch.VisitInterfaceModifiersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceBody)
-         if ok {
-            return my.dispatch.VisitInterfaceBodyWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceMemberDeclarations)
-         if ok {
-            return my.dispatch.VisitInterfaceMemberDeclarationsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceMemberDeclaration)
-         if ok {
-            return my.dispatch.VisitInterfaceMemberDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantDeclaration)
-         if ok {
-            return my.dispatch.VisitConstantDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifiers)
-         if ok {
-            return my.dispatch.VisitConstantModifiersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodDeclaration)
-         if ok {
-            return my.dispatch.VisitAbstractMethodDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifiers)
-         if ok {
-            return my.dispatch.VisitAbstractMethodModifiersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeDeclaration)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeBody)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeBodyWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclarations)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeElementDeclarationsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*DefaultValue)
-         if ok {
-            return my.dispatch.VisitDefaultValueWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Annotations)
-         if ok {
-            return my.dispatch.VisitAnnotationsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*NormalAnnotation)
-         if ok {
-            return my.dispatch.VisitNormalAnnotationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValuePairs)
-         if ok {
-            return my.dispatch.VisitElementValuePairsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValuePair)
-         if ok {
-            return my.dispatch.VisitElementValuePairWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValueArrayInitializer)
-         if ok {
-            return my.dispatch.VisitElementValueArrayInitializerWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ElementValues)
-         if ok {
-            return my.dispatch.VisitElementValuesWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MarkerAnnotation)
-         if ok {
-            return my.dispatch.VisitMarkerAnnotationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SingleElementAnnotation)
-         if ok {
-            return my.dispatch.VisitSingleElementAnnotationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayInitializer)
-         if ok {
-            return my.dispatch.VisitArrayInitializerWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*VariableInitializers)
-         if ok {
-            return my.dispatch.VisitVariableInitializersWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Block)
-         if ok {
-            return my.dispatch.VisitBlockWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*BlockStatements)
-         if ok {
-            return my.dispatch.VisitBlockStatementsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LocalVariableDeclarationStatement)
-         if ok {
-            return my.dispatch.VisitLocalVariableDeclarationStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LocalVariableDeclaration)
-         if ok {
-            return my.dispatch.VisitLocalVariableDeclarationWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenStatement)
-         if ok {
-            return my.dispatch.VisitIfThenStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenElseStatement)
-         if ok {
-            return my.dispatch.VisitIfThenElseStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*IfThenElseStatementNoShortIf)
-         if ok {
-            return my.dispatch.VisitIfThenElseStatementNoShortIfWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EmptyStatement)
-         if ok {
-            return my.dispatch.VisitEmptyStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LabeledStatement)
-         if ok {
-            return my.dispatch.VisitLabeledStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LabeledStatementNoShortIf)
-         if ok {
-            return my.dispatch.VisitLabeledStatementNoShortIfWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExpressionStatement)
-         if ok {
-            return my.dispatch.VisitExpressionStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchStatement)
-         if ok {
-            return my.dispatch.VisitSwitchStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlock)
-         if ok {
-            return my.dispatch.VisitSwitchBlockWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlockStatementGroups)
-         if ok {
-            return my.dispatch.VisitSwitchBlockStatementGroupsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchBlockStatementGroup)
-         if ok {
-            return my.dispatch.VisitSwitchBlockStatementGroupWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabels)
-         if ok {
-            return my.dispatch.VisitSwitchLabelsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*WhileStatement)
-         if ok {
-            return my.dispatch.VisitWhileStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*WhileStatementNoShortIf)
-         if ok {
-            return my.dispatch.VisitWhileStatementNoShortIfWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*DoStatement)
-         if ok {
-            return my.dispatch.VisitDoStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*BasicForStatement)
-         if ok {
-            return my.dispatch.VisitBasicForStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ForStatementNoShortIf)
-         if ok {
-            return my.dispatch.VisitForStatementNoShortIfWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*StatementExpressionList)
-         if ok {
-            return my.dispatch.VisitStatementExpressionListWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EnhancedForStatement)
-         if ok {
-            return my.dispatch.VisitEnhancedForStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*BreakStatement)
-         if ok {
-            return my.dispatch.VisitBreakStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ContinueStatement)
-         if ok {
-            return my.dispatch.VisitContinueStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ReturnStatement)
-         if ok {
-            return my.dispatch.VisitReturnStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ThrowStatement)
-         if ok {
-            return my.dispatch.VisitThrowStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SynchronizedStatement)
-         if ok {
-            return my.dispatch.VisitSynchronizedStatementWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Catches)
-         if ok {
-            return my.dispatch.VisitCatchesWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*CatchClause)
-         if ok {
-            return my.dispatch.VisitCatchClauseWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Finally)
-         if ok {
-            return my.dispatch.VisitFinallyWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArgumentList)
-         if ok {
-            return my.dispatch.VisitArgumentListWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*DimExprs)
-         if ok {
-            return my.dispatch.VisitDimExprsWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*DimExpr)
-         if ok {
-            return my.dispatch.VisitDimExprWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PostIncrementExpression)
-         if ok {
-            return my.dispatch.VisitPostIncrementExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PostDecrementExpression)
-         if ok {
-            return my.dispatch.VisitPostDecrementExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PreIncrementExpression)
-         if ok {
-            return my.dispatch.VisitPreIncrementExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PreDecrementExpression)
-         if ok {
-            return my.dispatch.VisitPreDecrementExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AndExpression)
-         if ok {
-            return my.dispatch.VisitAndExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExclusiveOrExpression)
-         if ok {
-            return my.dispatch.VisitExclusiveOrExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InclusiveOrExpression)
-         if ok {
-            return my.dispatch.VisitInclusiveOrExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalAndExpression)
-         if ok {
-            return my.dispatch.VisitConditionalAndExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalOrExpression)
-         if ok {
-            return my.dispatch.VisitConditionalOrExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConditionalExpression)
-         if ok {
-            return my.dispatch.VisitConditionalExpressionWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Assignment)
-         if ok {
-            return my.dispatch.VisitAssignmentWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Commaopt)
-         if ok {
-            return my.dispatch.VisitCommaoptWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Ellipsisopt)
-         if ok {
-            return my.dispatch.VisitEllipsisoptWithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction0)
-         if ok {
-            return my.dispatch.VisitLPGUserAction0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction1)
-         if ok {
-            return my.dispatch.VisitLPGUserAction1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction2)
-         if ok {
-            return my.dispatch.VisitLPGUserAction2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction3)
-         if ok {
-            return my.dispatch.VisitLPGUserAction3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*LPGUserAction4)
-         if ok {
-            return my.dispatch.VisitLPGUserAction4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType0)
-         if ok {
-            return my.dispatch.VisitIntegralType0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType1)
-         if ok {
-            return my.dispatch.VisitIntegralType1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType2)
-         if ok {
-            return my.dispatch.VisitIntegralType2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType3)
-         if ok {
-            return my.dispatch.VisitIntegralType3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*IntegralType4)
-         if ok {
-            return my.dispatch.VisitIntegralType4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FloatingPointType0)
-         if ok {
-            return my.dispatch.VisitFloatingPointType0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FloatingPointType1)
-         if ok {
-            return my.dispatch.VisitFloatingPointType1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*WildcardBounds0)
-         if ok {
-            return my.dispatch.VisitWildcardBounds0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*WildcardBounds1)
-         if ok {
-            return my.dispatch.VisitWildcardBounds1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier0)
-         if ok {
-            return my.dispatch.VisitClassModifier0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier1)
-         if ok {
-            return my.dispatch.VisitClassModifier1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier2)
-         if ok {
-            return my.dispatch.VisitClassModifier2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier3)
-         if ok {
-            return my.dispatch.VisitClassModifier3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier4)
-         if ok {
-            return my.dispatch.VisitClassModifier4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier5)
-         if ok {
-            return my.dispatch.VisitClassModifier5WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassModifier6)
-         if ok {
-            return my.dispatch.VisitClassModifier6WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier0)
-         if ok {
-            return my.dispatch.VisitFieldModifier0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier1)
-         if ok {
-            return my.dispatch.VisitFieldModifier1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier2)
-         if ok {
-            return my.dispatch.VisitFieldModifier2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier3)
-         if ok {
-            return my.dispatch.VisitFieldModifier3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier4)
-         if ok {
-            return my.dispatch.VisitFieldModifier4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier5)
-         if ok {
-            return my.dispatch.VisitFieldModifier5WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldModifier6)
-         if ok {
-            return my.dispatch.VisitFieldModifier6WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclarator0)
-         if ok {
-            return my.dispatch.VisitMethodDeclarator0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodDeclarator1)
-         if ok {
-            return my.dispatch.VisitMethodDeclarator1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier0)
-         if ok {
-            return my.dispatch.VisitMethodModifier0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier1)
-         if ok {
-            return my.dispatch.VisitMethodModifier1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier2)
-         if ok {
-            return my.dispatch.VisitMethodModifier2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier3)
-         if ok {
-            return my.dispatch.VisitMethodModifier3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier4)
-         if ok {
-            return my.dispatch.VisitMethodModifier4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier5)
-         if ok {
-            return my.dispatch.VisitMethodModifier5WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier6)
-         if ok {
-            return my.dispatch.VisitMethodModifier6WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier7)
-         if ok {
-            return my.dispatch.VisitMethodModifier7WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodModifier8)
-         if ok {
-            return my.dispatch.VisitMethodModifier8WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier0)
-         if ok {
-            return my.dispatch.VisitConstructorModifier0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier1)
-         if ok {
-            return my.dispatch.VisitConstructorModifier1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstructorModifier2)
-         if ok {
-            return my.dispatch.VisitConstructorModifier2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation0)
-         if ok {
-            return my.dispatch.VisitExplicitConstructorInvocation0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation1)
-         if ok {
-            return my.dispatch.VisitExplicitConstructorInvocation1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExplicitConstructorInvocation2)
-         if ok {
-            return my.dispatch.VisitExplicitConstructorInvocation2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier0)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier1)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier2)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier3)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier4)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*InterfaceModifier5)
-         if ok {
-            return my.dispatch.VisitInterfaceModifier5WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExtendsInterfaces0)
-         if ok {
-            return my.dispatch.VisitExtendsInterfaces0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ExtendsInterfaces1)
-         if ok {
-            return my.dispatch.VisitExtendsInterfaces1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier0)
-         if ok {
-            return my.dispatch.VisitConstantModifier0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier1)
-         if ok {
-            return my.dispatch.VisitConstantModifier1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ConstantModifier2)
-         if ok {
-            return my.dispatch.VisitConstantModifier2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifier0)
-         if ok {
-            return my.dispatch.VisitAbstractMethodModifier0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AbstractMethodModifier1)
-         if ok {
-            return my.dispatch.VisitAbstractMethodModifier1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclaration0)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeElementDeclaration0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AnnotationTypeElementDeclaration1)
-         if ok {
-            return my.dispatch.VisitAnnotationTypeElementDeclaration1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssertStatement0)
-         if ok {
-            return my.dispatch.VisitAssertStatement0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssertStatement1)
-         if ok {
-            return my.dispatch.VisitAssertStatement1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel0)
-         if ok {
-            return my.dispatch.VisitSwitchLabel0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel1)
-         if ok {
-            return my.dispatch.VisitSwitchLabel1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*SwitchLabel2)
-         if ok {
-            return my.dispatch.VisitSwitchLabel2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TryStatement0)
-         if ok {
-            return my.dispatch.VisitTryStatement0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*TryStatement1)
-         if ok {
-            return my.dispatch.VisitTryStatement1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray0)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray1)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray2)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray3)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*PrimaryNoNewArray4)
-         if ok {
-            return my.dispatch.VisitPrimaryNoNewArray4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal0)
-         if ok {
-            return my.dispatch.VisitLiteral0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal1)
-         if ok {
-            return my.dispatch.VisitLiteral1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal2)
-         if ok {
-            return my.dispatch.VisitLiteral2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal3)
-         if ok {
-            return my.dispatch.VisitLiteral3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal4)
-         if ok {
-            return my.dispatch.VisitLiteral4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal5)
-         if ok {
-            return my.dispatch.VisitLiteral5WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Literal6)
-         if ok {
-            return my.dispatch.VisitLiteral6WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*BooleanLiteral0)
-         if ok {
-            return my.dispatch.VisitBooleanLiteral0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*BooleanLiteral1)
-         if ok {
-            return my.dispatch.VisitBooleanLiteral1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassInstanceCreationExpression0)
-         if ok {
-            return my.dispatch.VisitClassInstanceCreationExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ClassInstanceCreationExpression1)
-         if ok {
-            return my.dispatch.VisitClassInstanceCreationExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression0)
-         if ok {
-            return my.dispatch.VisitArrayCreationExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression1)
-         if ok {
-            return my.dispatch.VisitArrayCreationExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression2)
-         if ok {
-            return my.dispatch.VisitArrayCreationExpression2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayCreationExpression3)
-         if ok {
-            return my.dispatch.VisitArrayCreationExpression3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Dims0)
-         if ok {
-            return my.dispatch.VisitDims0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*Dims1)
-         if ok {
-            return my.dispatch.VisitDims1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess0)
-         if ok {
-            return my.dispatch.VisitFieldAccess0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess1)
-         if ok {
-            return my.dispatch.VisitFieldAccess1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*FieldAccess2)
-         if ok {
-            return my.dispatch.VisitFieldAccess2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation0)
-         if ok {
-            return my.dispatch.VisitMethodInvocation0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation1)
-         if ok {
-            return my.dispatch.VisitMethodInvocation1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation2)
-         if ok {
-            return my.dispatch.VisitMethodInvocation2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation3)
-         if ok {
-            return my.dispatch.VisitMethodInvocation3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MethodInvocation4)
-         if ok {
-            return my.dispatch.VisitMethodInvocation4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayAccess0)
-         if ok {
-            return my.dispatch.VisitArrayAccess0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ArrayAccess1)
-         if ok {
-            return my.dispatch.VisitArrayAccess1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpression0)
-         if ok {
-            return my.dispatch.VisitUnaryExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpression1)
-         if ok {
-            return my.dispatch.VisitUnaryExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpressionNotPlusMinus0)
-         if ok {
-            return my.dispatch.VisitUnaryExpressionNotPlusMinus0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*UnaryExpressionNotPlusMinus1)
-         if ok {
-            return my.dispatch.VisitUnaryExpressionNotPlusMinus1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*CastExpression0)
-         if ok {
-            return my.dispatch.VisitCastExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*CastExpression1)
-         if ok {
-            return my.dispatch.VisitCastExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression0)
-         if ok {
-            return my.dispatch.VisitMultiplicativeExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression1)
-         if ok {
-            return my.dispatch.VisitMultiplicativeExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*MultiplicativeExpression2)
-         if ok {
-            return my.dispatch.VisitMultiplicativeExpression2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AdditiveExpression0)
-         if ok {
-            return my.dispatch.VisitAdditiveExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AdditiveExpression1)
-         if ok {
-            return my.dispatch.VisitAdditiveExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression0)
-         if ok {
-            return my.dispatch.VisitShiftExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression1)
-         if ok {
-            return my.dispatch.VisitShiftExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*ShiftExpression2)
-         if ok {
-            return my.dispatch.VisitShiftExpression2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression0)
-         if ok {
-            return my.dispatch.VisitRelationalExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression1)
-         if ok {
-            return my.dispatch.VisitRelationalExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression2)
-         if ok {
-            return my.dispatch.VisitRelationalExpression2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression3)
-         if ok {
-            return my.dispatch.VisitRelationalExpression3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*RelationalExpression4)
-         if ok {
-            return my.dispatch.VisitRelationalExpression4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EqualityExpression0)
-         if ok {
-            return my.dispatch.VisitEqualityExpression0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*EqualityExpression1)
-         if ok {
-            return my.dispatch.VisitEqualityExpression1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator0)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator0WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator1)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator1WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator2)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator2WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator3)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator3WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator4)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator4WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator5)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator5WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator6)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator6WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator7)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator7WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator8)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator8WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator9)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator9WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator10)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator10WithResultArgument(n2,o)
-          }
-        }
-        {
-         var n2,ok =n.(*AssignmentOperator11)
-         if ok {
-            return my.dispatch.VisitAssignmentOperator11WithResultArgument(n2,o)
-          }
-        }
-    return nil
-    }
-func AnyCastToAbstractResultVisitor(i interface{}) *AbstractResultVisitor {
-	if nil == i{
-		return nil
-	}else{
-		return i.(*AbstractResultVisitor)
 	}
 }
 

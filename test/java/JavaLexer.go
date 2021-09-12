@@ -98,6 +98,7 @@ func NewJavaLexer(filename string,  tab int ,input_chars []rune) *JavaLexer {
             return NewNullPointerException("LexStream was not initialized")
         }
         my.lexStream.SetPrsStream(prsStream)
+        prsStream.SetLexStream(my.lexStream)
         prsStream.MakeToken(start_offSet, end_offSet, 0) // Token list must start with a bad token
         return nil
     }
@@ -242,7 +243,7 @@ func (my *JavaLexer) PrintValue(startOffset int, endOffset int){
     print(string(s))
 }
 
-    //#line 280 "LexerTemplateF.gi
+    //#line 281 "LexerTemplateF.gi
 
     func (my *JavaLexer)  RuleAction(ruleNumber int){
         switch ruleNumber {
@@ -715,7 +716,7 @@ func (my *JavaLexer) PrintValue(startOffset int, endOffset int){
                   break
             }
     
-    //#line 284 "LexerTemplateF.gi
+    //#line 285 "LexerTemplateF.gi
 
     
             default:

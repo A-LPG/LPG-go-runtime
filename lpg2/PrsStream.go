@@ -21,6 +21,7 @@ func NewPrsStream(iLexStream ILexStream) *PrsStream{
 	if iLexStream != nil {
 		my.iLexStream = iLexStream
 		iLexStream.SetPrsStream(my)
+		my.SetLexStream(iLexStream)
 		my.ResetTokenStream()
 	}
 	return my
@@ -90,7 +91,7 @@ func (my * PrsStream) ResetLexStream(lexStream ILexStream)  {
 	my.iLexStream = lexStream
 	if lexStream != nil {
 		lexStream.SetPrsStream(my)
-
+		my.SetLexStream(lexStream)
 	}
 }
 

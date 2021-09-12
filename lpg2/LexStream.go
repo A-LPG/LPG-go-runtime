@@ -144,7 +144,6 @@ func (my *LexStream) SetPrsStream(prsStream IPrsStream)  {
     if nil == prsStream{
         return
     }
-    prsStream.SetLexStream(my)
     my.prsStream = prsStream
 }
 func (my *LexStream) GetIPrsStream() IPrsStream{

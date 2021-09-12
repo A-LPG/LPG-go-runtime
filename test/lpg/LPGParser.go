@@ -28,7 +28,10 @@ func NewLPGParser(lexStream ILexStream) (*LPGParser,error){
     my.dtParser,e =  NewDeterministicParser(nil, my.prsTable,  my,nil) 
     if e == nil{
         if lexStream != nil{
-            my.Reset(lexStream)
+            err := my.Reset(lexStream)
+            if err != nil {
+                return nil, err
+            }
         }
         return  my,nil
     }
@@ -115,8 +118,10 @@ func (my *LPGParser)  GetRhsErrorIToken(i int) *ErrorToken{
 
 func (my *LPGParser)  Reset(lexStream ILexStream ) error{
     my.prsStream = NewPrsStream(lexStream)
-    my.dtParser.Reset(my.prsStream,nil,nil,nil)
-
+    err := my.dtParser.Reset(my.prsStream,nil,nil,nil)
+    if err != nil {
+        return err
+    }
     var ex = my.prsStream.RemapTerminalSymbols(my.OrderedTerminalSymbols(), my.prsTable.GetEoftSymbol())
     if ex == nil{
         return nil
@@ -204,7 +209,7 @@ func (my *LPGParser) ParserWithMonitor(error_repair_count int ,  monitor Monitor
     //#line 222 "LPGParser.g
 
 
-    //#line 324 "dtParserTemplateF.gi
+    //#line 329 "dtParserTemplateF.gi
 
    
     func (my *LPGParser)  RuleAction(ruleNumber int){
@@ -1987,7 +1992,7 @@ func (my *LPGParser) ParserWithMonitor(error_repair_count int ,  monitor Monitor
                 (my.GetRhsSym(1).(*action_segmentList)).AddElement(my.GetRhsSym(2).(IAst))
                 break
             }
-    //#line 328 "dtParserTemplateF.gi
+    //#line 333 "dtParserTemplateF.gi
 
     
             default:
@@ -9656,1335 +9661,626 @@ func (my *AbstractVisitor)     EndVisitterminal_symbol1(n  *terminal_symbol1) { 
 
 
 func (my *AbstractVisitor)     Visit(n IAst) bool{
-        {
-         var n2,ok =n.(*ASTNodeToken)
-         if ok {
+     switch n2 := n.(type) {
+        case *ASTNodeToken:{
             return my.dispatch.VisitASTNodeToken(n2)
-          }
         }
-        {
-         var n2,ok =n.(*LPG)
-         if ok {
+        case *LPG:{
             return my.dispatch.VisitLPG(n2)
-          }
         }
-        {
-         var n2,ok =n.(*LPG_itemList)
-         if ok {
+        case *LPG_itemList:{
             return my.dispatch.VisitLPG_itemList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*AliasSeg)
-         if ok {
+        case *AliasSeg:{
             return my.dispatch.VisitAliasSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*AstSeg)
-         if ok {
+        case *AstSeg:{
             return my.dispatch.VisitAstSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*DefineSeg)
-         if ok {
+        case *DefineSeg:{
             return my.dispatch.VisitDefineSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*EofSeg)
-         if ok {
+        case *EofSeg:{
             return my.dispatch.VisitEofSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*EolSeg)
-         if ok {
+        case *EolSeg:{
             return my.dispatch.VisitEolSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*ErrorSeg)
-         if ok {
+        case *ErrorSeg:{
             return my.dispatch.VisitErrorSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*ExportSeg)
-         if ok {
+        case *ExportSeg:{
             return my.dispatch.VisitExportSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*GlobalsSeg)
-         if ok {
+        case *GlobalsSeg:{
             return my.dispatch.VisitGlobalsSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*HeadersSeg)
-         if ok {
+        case *HeadersSeg:{
             return my.dispatch.VisitHeadersSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*IdentifierSeg)
-         if ok {
+        case *IdentifierSeg:{
             return my.dispatch.VisitIdentifierSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*ImportSeg)
-         if ok {
+        case *ImportSeg:{
             return my.dispatch.VisitImportSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*IncludeSeg)
-         if ok {
+        case *IncludeSeg:{
             return my.dispatch.VisitIncludeSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*KeywordsSeg)
-         if ok {
+        case *KeywordsSeg:{
             return my.dispatch.VisitKeywordsSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*NamesSeg)
-         if ok {
+        case *NamesSeg:{
             return my.dispatch.VisitNamesSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*NoticeSeg)
-         if ok {
+        case *NoticeSeg:{
             return my.dispatch.VisitNoticeSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*RulesSeg)
-         if ok {
+        case *RulesSeg:{
             return my.dispatch.VisitRulesSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*SoftKeywordsSeg)
-         if ok {
+        case *SoftKeywordsSeg:{
             return my.dispatch.VisitSoftKeywordsSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*StartSeg)
-         if ok {
+        case *StartSeg:{
             return my.dispatch.VisitStartSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*TerminalsSeg)
-         if ok {
+        case *TerminalsSeg:{
             return my.dispatch.VisitTerminalsSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*TrailersSeg)
-         if ok {
+        case *TrailersSeg:{
             return my.dispatch.VisitTrailersSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*TypesSeg)
-         if ok {
+        case *TypesSeg:{
             return my.dispatch.VisitTypesSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*RecoverSeg)
-         if ok {
+        case *RecoverSeg:{
             return my.dispatch.VisitRecoverSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*PredecessorSeg)
-         if ok {
+        case *PredecessorSeg:{
             return my.dispatch.VisitPredecessorSeg(n2)
-          }
         }
-        {
-         var n2,ok =n.(*option_specList)
-         if ok {
+        case *option_specList:{
             return my.dispatch.Visitoption_specList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*option_spec)
-         if ok {
+        case *option_spec:{
             return my.dispatch.Visitoption_spec(n2)
-          }
         }
-        {
-         var n2,ok =n.(*optionList)
-         if ok {
+        case *optionList:{
             return my.dispatch.VisitoptionList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*option)
-         if ok {
+        case *option:{
             return my.dispatch.Visitoption(n2)
-          }
         }
-        {
-         var n2,ok =n.(*SYMBOLList)
-         if ok {
+        case *SYMBOLList:{
             return my.dispatch.VisitSYMBOLList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpecList)
-         if ok {
+        case *aliasSpecList:{
             return my.dispatch.VisitaliasSpecList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*alias_lhs_macro_name)
-         if ok {
+        case *alias_lhs_macro_name:{
             return my.dispatch.Visitalias_lhs_macro_name(n2)
-          }
         }
-        {
-         var n2,ok =n.(*defineSpecList)
-         if ok {
+        case *defineSpecList:{
             return my.dispatch.VisitdefineSpecList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*defineSpec)
-         if ok {
+        case *defineSpec:{
             return my.dispatch.VisitdefineSpec(n2)
-          }
         }
-        {
-         var n2,ok =n.(*macro_segment)
-         if ok {
+        case *macro_segment:{
             return my.dispatch.Visitmacro_segment(n2)
-          }
         }
-        {
-         var n2,ok =n.(*terminal_symbolList)
-         if ok {
+        case *terminal_symbolList:{
             return my.dispatch.Visitterminal_symbolList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*action_segmentList)
-         if ok {
+        case *action_segmentList:{
             return my.dispatch.Visitaction_segmentList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*import_segment)
-         if ok {
+        case *import_segment:{
             return my.dispatch.Visitimport_segment(n2)
-          }
         }
-        {
-         var n2,ok =n.(*drop_commandList)
-         if ok {
+        case *drop_commandList:{
             return my.dispatch.Visitdrop_commandList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*drop_ruleList)
-         if ok {
+        case *drop_ruleList:{
             return my.dispatch.Visitdrop_ruleList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*drop_rule)
-         if ok {
+        case *drop_rule:{
             return my.dispatch.Visitdrop_rule(n2)
-          }
         }
-        {
-         var n2,ok =n.(*optMacroName)
-         if ok {
+        case *optMacroName:{
             return my.dispatch.VisitoptMacroName(n2)
-          }
         }
-        {
-         var n2,ok =n.(*include_segment)
-         if ok {
+        case *include_segment:{
             return my.dispatch.Visitinclude_segment(n2)
-          }
         }
-        {
-         var n2,ok =n.(*keywordSpecList)
-         if ok {
+        case *keywordSpecList:{
             return my.dispatch.VisitkeywordSpecList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*keywordSpec)
-         if ok {
+        case *keywordSpec:{
             return my.dispatch.VisitkeywordSpec(n2)
-          }
         }
-        {
-         var n2,ok =n.(*nameSpecList)
-         if ok {
+        case *nameSpecList:{
             return my.dispatch.VisitnameSpecList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*nameSpec)
-         if ok {
+        case *nameSpec:{
             return my.dispatch.VisitnameSpec(n2)
-          }
         }
-        {
-         var n2,ok =n.(*rules_segment)
-         if ok {
+        case *rules_segment:{
             return my.dispatch.Visitrules_segment(n2)
-          }
         }
-        {
-         var n2,ok =n.(*nonTermList)
-         if ok {
+        case *nonTermList:{
             return my.dispatch.VisitnonTermList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*nonTerm)
-         if ok {
+        case *nonTerm:{
             return my.dispatch.VisitnonTerm(n2)
-          }
         }
-        {
-         var n2,ok =n.(*RuleName)
-         if ok {
+        case *RuleName:{
             return my.dispatch.VisitRuleName(n2)
-          }
         }
-        {
-         var n2,ok =n.(*ruleList)
-         if ok {
+        case *ruleList:{
             return my.dispatch.VisitruleList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*rule)
-         if ok {
+        case *rule:{
             return my.dispatch.Visitrule(n2)
-          }
         }
-        {
-         var n2,ok =n.(*symWithAttrsList)
-         if ok {
+        case *symWithAttrsList:{
             return my.dispatch.VisitsymWithAttrsList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*symAttrs)
-         if ok {
+        case *symAttrs:{
             return my.dispatch.VisitsymAttrs(n2)
-          }
         }
-        {
-         var n2,ok =n.(*action_segment)
-         if ok {
+        case *action_segment:{
             return my.dispatch.Visitaction_segment(n2)
-          }
         }
-        {
-         var n2,ok =n.(*start_symbolList)
-         if ok {
+        case *start_symbolList:{
             return my.dispatch.Visitstart_symbolList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*terminalList)
-         if ok {
+        case *terminalList:{
             return my.dispatch.VisitterminalList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*terminal)
-         if ok {
+        case *terminal:{
             return my.dispatch.Visitterminal(n2)
-          }
         }
-        {
-         var n2,ok =n.(*optTerminalAlias)
-         if ok {
+        case *optTerminalAlias:{
             return my.dispatch.VisitoptTerminalAlias(n2)
-          }
         }
-        {
-         var n2,ok =n.(*type_declarationsList)
-         if ok {
+        case *type_declarationsList:{
             return my.dispatch.Visittype_declarationsList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*type_declarations)
-         if ok {
+        case *type_declarations:{
             return my.dispatch.Visittype_declarations(n2)
-          }
         }
-        {
-         var n2,ok =n.(*symbol_pairList)
-         if ok {
+        case *symbol_pairList:{
             return my.dispatch.Visitsymbol_pairList(n2)
-          }
         }
-        {
-         var n2,ok =n.(*symbol_pair)
-         if ok {
+        case *symbol_pair:{
             return my.dispatch.Visitsymbol_pair(n2)
-          }
         }
-        {
-         var n2,ok =n.(*recover_symbol)
-         if ok {
+        case *recover_symbol:{
             return my.dispatch.Visitrecover_symbol(n2)
-          }
         }
-        {
-         var n2,ok =n.(*END_KEY_OPT)
-         if ok {
+        case *END_KEY_OPT:{
             return my.dispatch.VisitEND_KEY_OPT(n2)
-          }
         }
-        {
-         var n2,ok =n.(*option_value0)
-         if ok {
+        case *option_value0:{
             return my.dispatch.Visitoption_value0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*option_value1)
-         if ok {
+        case *option_value1:{
             return my.dispatch.Visitoption_value1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec0)
-         if ok {
+        case *aliasSpec0:{
             return my.dispatch.VisitaliasSpec0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec1)
-         if ok {
+        case *aliasSpec1:{
             return my.dispatch.VisitaliasSpec1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec2)
-         if ok {
+        case *aliasSpec2:{
             return my.dispatch.VisitaliasSpec2(n2)
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec3)
-         if ok {
+        case *aliasSpec3:{
             return my.dispatch.VisitaliasSpec3(n2)
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec4)
-         if ok {
+        case *aliasSpec4:{
             return my.dispatch.VisitaliasSpec4(n2)
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec5)
-         if ok {
+        case *aliasSpec5:{
             return my.dispatch.VisitaliasSpec5(n2)
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs0)
-         if ok {
+        case *alias_rhs0:{
             return my.dispatch.Visitalias_rhs0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs1)
-         if ok {
+        case *alias_rhs1:{
             return my.dispatch.Visitalias_rhs1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs2)
-         if ok {
+        case *alias_rhs2:{
             return my.dispatch.Visitalias_rhs2(n2)
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs3)
-         if ok {
+        case *alias_rhs3:{
             return my.dispatch.Visitalias_rhs3(n2)
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs4)
-         if ok {
+        case *alias_rhs4:{
             return my.dispatch.Visitalias_rhs4(n2)
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs5)
-         if ok {
+        case *alias_rhs5:{
             return my.dispatch.Visitalias_rhs5(n2)
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs6)
-         if ok {
+        case *alias_rhs6:{
             return my.dispatch.Visitalias_rhs6(n2)
-          }
         }
-        {
-         var n2,ok =n.(*macro_name_symbol0)
-         if ok {
+        case *macro_name_symbol0:{
             return my.dispatch.Visitmacro_name_symbol0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*macro_name_symbol1)
-         if ok {
+        case *macro_name_symbol1:{
             return my.dispatch.Visitmacro_name_symbol1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*drop_command0)
-         if ok {
+        case *drop_command0:{
             return my.dispatch.Visitdrop_command0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*drop_command1)
-         if ok {
+        case *drop_command1:{
             return my.dispatch.Visitdrop_command1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*name0)
-         if ok {
+        case *name0:{
             return my.dispatch.Visitname0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*name1)
-         if ok {
+        case *name1:{
             return my.dispatch.Visitname1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*name2)
-         if ok {
+        case *name2:{
             return my.dispatch.Visitname2(n2)
-          }
         }
-        {
-         var n2,ok =n.(*name3)
-         if ok {
+        case *name3:{
             return my.dispatch.Visitname3(n2)
-          }
         }
-        {
-         var n2,ok =n.(*name4)
-         if ok {
+        case *name4:{
             return my.dispatch.Visitname4(n2)
-          }
         }
-        {
-         var n2,ok =n.(*name5)
-         if ok {
+        case *name5:{
             return my.dispatch.Visitname5(n2)
-          }
         }
-        {
-         var n2,ok =n.(*produces0)
-         if ok {
+        case *produces0:{
             return my.dispatch.Visitproduces0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*produces1)
-         if ok {
+        case *produces1:{
             return my.dispatch.Visitproduces1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*produces2)
-         if ok {
+        case *produces2:{
             return my.dispatch.Visitproduces2(n2)
-          }
         }
-        {
-         var n2,ok =n.(*produces3)
-         if ok {
+        case *produces3:{
             return my.dispatch.Visitproduces3(n2)
-          }
         }
-        {
-         var n2,ok =n.(*symWithAttrs0)
-         if ok {
+        case *symWithAttrs0:{
             return my.dispatch.VisitsymWithAttrs0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*symWithAttrs1)
-         if ok {
+        case *symWithAttrs1:{
             return my.dispatch.VisitsymWithAttrs1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*start_symbol0)
-         if ok {
+        case *start_symbol0:{
             return my.dispatch.Visitstart_symbol0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*start_symbol1)
-         if ok {
+        case *start_symbol1:{
             return my.dispatch.Visitstart_symbol1(n2)
-          }
         }
-        {
-         var n2,ok =n.(*terminal_symbol0)
-         if ok {
+        case *terminal_symbol0:{
             return my.dispatch.Visitterminal_symbol0(n2)
-          }
         }
-        {
-         var n2,ok =n.(*terminal_symbol1)
-         if ok {
+        case *terminal_symbol1:{
             return my.dispatch.Visitterminal_symbol1(n2)
-          }
         }
-       return  false
-    }
+        default:{ return false}
+     }
+}
 func (my *AbstractVisitor)     EndVisit(n  IAst){
-        {
-         var n2,ok =n.(*ASTNodeToken)
-         if ok {
+     switch n2 := n.(type) {
+        case *ASTNodeToken:{
             my.dispatch.EndVisitASTNodeToken(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*LPG)
-         if ok {
+        case *LPG:{
             my.dispatch.EndVisitLPG(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*LPG_itemList)
-         if ok {
+        case *LPG_itemList:{
             my.dispatch.EndVisitLPG_itemList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*AliasSeg)
-         if ok {
+        case *AliasSeg:{
             my.dispatch.EndVisitAliasSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*AstSeg)
-         if ok {
+        case *AstSeg:{
             my.dispatch.EndVisitAstSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*DefineSeg)
-         if ok {
+        case *DefineSeg:{
             my.dispatch.EndVisitDefineSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*EofSeg)
-         if ok {
+        case *EofSeg:{
             my.dispatch.EndVisitEofSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*EolSeg)
-         if ok {
+        case *EolSeg:{
             my.dispatch.EndVisitEolSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*ErrorSeg)
-         if ok {
+        case *ErrorSeg:{
             my.dispatch.EndVisitErrorSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*ExportSeg)
-         if ok {
+        case *ExportSeg:{
             my.dispatch.EndVisitExportSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*GlobalsSeg)
-         if ok {
+        case *GlobalsSeg:{
             my.dispatch.EndVisitGlobalsSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*HeadersSeg)
-         if ok {
+        case *HeadersSeg:{
             my.dispatch.EndVisitHeadersSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*IdentifierSeg)
-         if ok {
+        case *IdentifierSeg:{
             my.dispatch.EndVisitIdentifierSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*ImportSeg)
-         if ok {
+        case *ImportSeg:{
             my.dispatch.EndVisitImportSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*IncludeSeg)
-         if ok {
+        case *IncludeSeg:{
             my.dispatch.EndVisitIncludeSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*KeywordsSeg)
-         if ok {
+        case *KeywordsSeg:{
             my.dispatch.EndVisitKeywordsSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*NamesSeg)
-         if ok {
+        case *NamesSeg:{
             my.dispatch.EndVisitNamesSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*NoticeSeg)
-         if ok {
+        case *NoticeSeg:{
             my.dispatch.EndVisitNoticeSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*RulesSeg)
-         if ok {
+        case *RulesSeg:{
             my.dispatch.EndVisitRulesSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*SoftKeywordsSeg)
-         if ok {
+        case *SoftKeywordsSeg:{
             my.dispatch.EndVisitSoftKeywordsSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*StartSeg)
-         if ok {
+        case *StartSeg:{
             my.dispatch.EndVisitStartSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*TerminalsSeg)
-         if ok {
+        case *TerminalsSeg:{
             my.dispatch.EndVisitTerminalsSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*TrailersSeg)
-         if ok {
+        case *TrailersSeg:{
             my.dispatch.EndVisitTrailersSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*TypesSeg)
-         if ok {
+        case *TypesSeg:{
             my.dispatch.EndVisitTypesSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*RecoverSeg)
-         if ok {
+        case *RecoverSeg:{
             my.dispatch.EndVisitRecoverSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*PredecessorSeg)
-         if ok {
+        case *PredecessorSeg:{
             my.dispatch.EndVisitPredecessorSeg(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*option_specList)
-         if ok {
+        case *option_specList:{
             my.dispatch.EndVisitoption_specList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*option_spec)
-         if ok {
+        case *option_spec:{
             my.dispatch.EndVisitoption_spec(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*optionList)
-         if ok {
+        case *optionList:{
             my.dispatch.EndVisitoptionList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*option)
-         if ok {
+        case *option:{
             my.dispatch.EndVisitoption(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*SYMBOLList)
-         if ok {
+        case *SYMBOLList:{
             my.dispatch.EndVisitSYMBOLList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpecList)
-         if ok {
+        case *aliasSpecList:{
             my.dispatch.EndVisitaliasSpecList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*alias_lhs_macro_name)
-         if ok {
+        case *alias_lhs_macro_name:{
             my.dispatch.EndVisitalias_lhs_macro_name(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*defineSpecList)
-         if ok {
+        case *defineSpecList:{
             my.dispatch.EndVisitdefineSpecList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*defineSpec)
-         if ok {
+        case *defineSpec:{
             my.dispatch.EndVisitdefineSpec(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*macro_segment)
-         if ok {
+        case *macro_segment:{
             my.dispatch.EndVisitmacro_segment(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*terminal_symbolList)
-         if ok {
+        case *terminal_symbolList:{
             my.dispatch.EndVisitterminal_symbolList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*action_segmentList)
-         if ok {
+        case *action_segmentList:{
             my.dispatch.EndVisitaction_segmentList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*import_segment)
-         if ok {
+        case *import_segment:{
             my.dispatch.EndVisitimport_segment(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*drop_commandList)
-         if ok {
+        case *drop_commandList:{
             my.dispatch.EndVisitdrop_commandList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*drop_ruleList)
-         if ok {
+        case *drop_ruleList:{
             my.dispatch.EndVisitdrop_ruleList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*drop_rule)
-         if ok {
+        case *drop_rule:{
             my.dispatch.EndVisitdrop_rule(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*optMacroName)
-         if ok {
+        case *optMacroName:{
             my.dispatch.EndVisitoptMacroName(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*include_segment)
-         if ok {
+        case *include_segment:{
             my.dispatch.EndVisitinclude_segment(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*keywordSpecList)
-         if ok {
+        case *keywordSpecList:{
             my.dispatch.EndVisitkeywordSpecList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*keywordSpec)
-         if ok {
+        case *keywordSpec:{
             my.dispatch.EndVisitkeywordSpec(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*nameSpecList)
-         if ok {
+        case *nameSpecList:{
             my.dispatch.EndVisitnameSpecList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*nameSpec)
-         if ok {
+        case *nameSpec:{
             my.dispatch.EndVisitnameSpec(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*rules_segment)
-         if ok {
+        case *rules_segment:{
             my.dispatch.EndVisitrules_segment(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*nonTermList)
-         if ok {
+        case *nonTermList:{
             my.dispatch.EndVisitnonTermList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*nonTerm)
-         if ok {
+        case *nonTerm:{
             my.dispatch.EndVisitnonTerm(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*RuleName)
-         if ok {
+        case *RuleName:{
             my.dispatch.EndVisitRuleName(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*ruleList)
-         if ok {
+        case *ruleList:{
             my.dispatch.EndVisitruleList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*rule)
-         if ok {
+        case *rule:{
             my.dispatch.EndVisitrule(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*symWithAttrsList)
-         if ok {
+        case *symWithAttrsList:{
             my.dispatch.EndVisitsymWithAttrsList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*symAttrs)
-         if ok {
+        case *symAttrs:{
             my.dispatch.EndVisitsymAttrs(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*action_segment)
-         if ok {
+        case *action_segment:{
             my.dispatch.EndVisitaction_segment(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*start_symbolList)
-         if ok {
+        case *start_symbolList:{
             my.dispatch.EndVisitstart_symbolList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*terminalList)
-         if ok {
+        case *terminalList:{
             my.dispatch.EndVisitterminalList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*terminal)
-         if ok {
+        case *terminal:{
             my.dispatch.EndVisitterminal(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*optTerminalAlias)
-         if ok {
+        case *optTerminalAlias:{
             my.dispatch.EndVisitoptTerminalAlias(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*type_declarationsList)
-         if ok {
+        case *type_declarationsList:{
             my.dispatch.EndVisittype_declarationsList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*type_declarations)
-         if ok {
+        case *type_declarations:{
             my.dispatch.EndVisittype_declarations(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*symbol_pairList)
-         if ok {
+        case *symbol_pairList:{
             my.dispatch.EndVisitsymbol_pairList(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*symbol_pair)
-         if ok {
+        case *symbol_pair:{
             my.dispatch.EndVisitsymbol_pair(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*recover_symbol)
-         if ok {
+        case *recover_symbol:{
             my.dispatch.EndVisitrecover_symbol(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*END_KEY_OPT)
-         if ok {
+        case *END_KEY_OPT:{
             my.dispatch.EndVisitEND_KEY_OPT(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*option_value0)
-         if ok {
+        case *option_value0:{
             my.dispatch.EndVisitoption_value0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*option_value1)
-         if ok {
+        case *option_value1:{
             my.dispatch.EndVisitoption_value1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec0)
-         if ok {
+        case *aliasSpec0:{
             my.dispatch.EndVisitaliasSpec0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec1)
-         if ok {
+        case *aliasSpec1:{
             my.dispatch.EndVisitaliasSpec1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec2)
-         if ok {
+        case *aliasSpec2:{
             my.dispatch.EndVisitaliasSpec2(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec3)
-         if ok {
+        case *aliasSpec3:{
             my.dispatch.EndVisitaliasSpec3(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec4)
-         if ok {
+        case *aliasSpec4:{
             my.dispatch.EndVisitaliasSpec4(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*aliasSpec5)
-         if ok {
+        case *aliasSpec5:{
             my.dispatch.EndVisitaliasSpec5(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs0)
-         if ok {
+        case *alias_rhs0:{
             my.dispatch.EndVisitalias_rhs0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs1)
-         if ok {
+        case *alias_rhs1:{
             my.dispatch.EndVisitalias_rhs1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs2)
-         if ok {
+        case *alias_rhs2:{
             my.dispatch.EndVisitalias_rhs2(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs3)
-         if ok {
+        case *alias_rhs3:{
             my.dispatch.EndVisitalias_rhs3(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs4)
-         if ok {
+        case *alias_rhs4:{
             my.dispatch.EndVisitalias_rhs4(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs5)
-         if ok {
+        case *alias_rhs5:{
             my.dispatch.EndVisitalias_rhs5(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*alias_rhs6)
-         if ok {
+        case *alias_rhs6:{
             my.dispatch.EndVisitalias_rhs6(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*macro_name_symbol0)
-         if ok {
+        case *macro_name_symbol0:{
             my.dispatch.EndVisitmacro_name_symbol0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*macro_name_symbol1)
-         if ok {
+        case *macro_name_symbol1:{
             my.dispatch.EndVisitmacro_name_symbol1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*drop_command0)
-         if ok {
+        case *drop_command0:{
             my.dispatch.EndVisitdrop_command0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*drop_command1)
-         if ok {
+        case *drop_command1:{
             my.dispatch.EndVisitdrop_command1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*name0)
-         if ok {
+        case *name0:{
             my.dispatch.EndVisitname0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*name1)
-         if ok {
+        case *name1:{
             my.dispatch.EndVisitname1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*name2)
-         if ok {
+        case *name2:{
             my.dispatch.EndVisitname2(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*name3)
-         if ok {
+        case *name3:{
             my.dispatch.EndVisitname3(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*name4)
-         if ok {
+        case *name4:{
             my.dispatch.EndVisitname4(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*name5)
-         if ok {
+        case *name5:{
             my.dispatch.EndVisitname5(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*produces0)
-         if ok {
+        case *produces0:{
             my.dispatch.EndVisitproduces0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*produces1)
-         if ok {
+        case *produces1:{
             my.dispatch.EndVisitproduces1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*produces2)
-         if ok {
+        case *produces2:{
             my.dispatch.EndVisitproduces2(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*produces3)
-         if ok {
+        case *produces3:{
             my.dispatch.EndVisitproduces3(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*symWithAttrs0)
-         if ok {
+        case *symWithAttrs0:{
             my.dispatch.EndVisitsymWithAttrs0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*symWithAttrs1)
-         if ok {
+        case *symWithAttrs1:{
             my.dispatch.EndVisitsymWithAttrs1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*start_symbol0)
-         if ok {
+        case *start_symbol0:{
             my.dispatch.EndVisitstart_symbol0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*start_symbol1)
-         if ok {
+        case *start_symbol1:{
             my.dispatch.EndVisitstart_symbol1(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*terminal_symbol0)
-         if ok {
+        case *terminal_symbol0:{
             my.dispatch.EndVisitterminal_symbol0(n2)
-            return
-          }
         }
-        {
-         var n2,ok =n.(*terminal_symbol1)
-         if ok {
+        case *terminal_symbol1:{
             my.dispatch.EndVisitterminal_symbol1(n2)
-            return
-          }
         }
+        default:{ }
+     }
 }
 func AnyCastToAbstractVisitor(i interface{}) *AbstractVisitor {
 	if nil == i{
