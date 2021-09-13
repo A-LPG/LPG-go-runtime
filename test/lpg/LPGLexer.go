@@ -1525,7 +1525,7 @@ type  LPGLexerLpgLexStream struct{
 func  NewLPGLexerLpgLexStream( fileName string, inputChars []rune, tab int) (*LPGLexerLpgLexStream,error){
         t := new(LPGLexerLpgLexStream)
         var e error
-        t.LexStream ,e = NewLexStream(fileName,inputChars,tab,nil)
+        t.LexStream ,e = NewLexStreamExt(t,fileName,inputChars,tab,nil)
         return t,e
 }
 

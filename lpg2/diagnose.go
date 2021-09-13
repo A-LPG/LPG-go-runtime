@@ -79,7 +79,13 @@ const MAX_DISTANCE int = 30
 const MIN_DISTANCE int = 3
 const NIL int = -1
 
+type DiagnoseParserBase interface {
+	ReallocateStacks()
+}
 type DiagnoseParser struct {
+
+	dispatch DiagnoseParserBase
+
 	monitor   Monitor
 	tokStream TokenStream
 
@@ -131,9 +137,14 @@ type DiagnoseParser struct {
 	main_configuration_stack *ConfigurationStack
 	STACK_INCREMENT int
 }
-
+func NewDiagnoseParserExt(dispatch DiagnoseParserBase,tokStream TokenStream, prs ParseTable, maxErrors int, maxTime int, monitor Monitor) *DiagnoseParser {
+	my := NewDiagnoseParser(tokStream,prs,maxErrors,maxTime,monitor)
+	my.dispatch=dispatch
+	return my
+}
 func NewDiagnoseParser(tokStream TokenStream, prs ParseTable, maxErrors int, maxTime int, monitor Monitor) *DiagnoseParser {
 	my := new(DiagnoseParser)
+	my.dispatch = my
 	my.STACK_INCREMENT  = 256
 	my.monitor = monitor
 	my.maxErrors = maxErrors
@@ -315,7 +326,7 @@ func (my *DiagnoseParser) DiagnoseEntry(marker_kind int, error_token int) {
 	// error_token.
 	//
 	if len(my.stateStack) == 0 {
-		my.ReallocateStacks()
+		my.dispatch.ReallocateStacks()
 	}
 
 	my.tempStackTop = 0
@@ -395,7 +406,7 @@ func (my *DiagnoseParser) DiagnoseEntry(marker_kind int, error_token int) {
 			// compute next action on current symbol ...
 			//
 			if my.tempStackTop+1 >= len(my.stateStack) {
-				my.ReallocateStacks()
+				my.dispatch.ReallocateStacks()
 			}
 			if !(pos < my.tempStackTop) {
 				pos = my.tempStackTop
@@ -454,7 +465,7 @@ func (my *DiagnoseParser) DiagnoseEntry(marker_kind int, error_token int) {
 			}
 
 			if my.nextStackTop+1 >= len(my.stateStack) {
-				my.ReallocateStacks()
+				my.dispatch.ReallocateStacks()
 			}
 
 			my.tempStackTop = my.nextStackTop
@@ -499,7 +510,7 @@ func (my *DiagnoseParser) DiagnoseEntry(marker_kind int, error_token int) {
 				// compute next action on current symbol ...
 				//
 				if my.tempStackTop+1 >= len(my.stateStack) {
-					my.ReallocateStacks()
+					my.dispatch.ReallocateStacks()
 				}
 				if !(next_pos < my.tempStackTop) {
 					next_pos = my.tempStackTop
@@ -718,7 +729,7 @@ func (my *DiagnoseParser) ParseForError(current_kind int) int {
 
 		my.tempStackTop += 1
 		if my.tempStackTop >= len(my.tempStack) {
-			my.ReallocateStacks()
+			my.dispatch.ReallocateStacks()
 		}
 		my.tempStack[my.tempStackTop] = act
 		act = my.TAction(act, current_kind)
@@ -825,7 +836,7 @@ func (my *DiagnoseParser) ParseUpToError(action *IntTuple, current_kind int, err
 
 		my.tempStackTop += 1
 		if my.tempStackTop >= len(my.tempStack) {
-			my.ReallocateStacks()
+			my.dispatch.ReallocateStacks()
 		}
 		my.tempStack[my.tempStackTop] = act
 		act = my.TAction(act, current_kind)

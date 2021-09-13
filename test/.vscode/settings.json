@@ -4,6 +4,6 @@
         "mode": "external",
          "outputDir": "../",
         "built_in_template": "go",
-        "visitor": "default"
+        "visitor": "preorder"
     }
 }

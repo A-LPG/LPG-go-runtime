@@ -6,6 +6,7 @@ import "fmt"
 // PrsStream holds an arraylist of tokens "lexed" from the input stream.
 //
 type PrsStream struct {
+	 dispatch IPrsStream
      iLexStream ILexStream 
      kindMap []int
      tokens *TokenArrayList
@@ -13,9 +14,14 @@ type PrsStream struct {
      index int
      len int
 }
-
+func NewPrsStreamExt(dispatch IPrsStream,iLexStream ILexStream) *PrsStream{
+	my := NewPrsStream(iLexStream)
+	my.dispatch = dispatch
+	return my
+}
 func NewPrsStream(iLexStream ILexStream) *PrsStream{
 	my := new(PrsStream)
+	my.dispatch = my
 	my.index=0
 	my.len=0
 	if iLexStream != nil {
@@ -84,14 +90,14 @@ func (my * PrsStream) ResetTokenStream()  {
 }
 func (my * PrsStream) SetLexStream(lexStream ILexStream)  {
 	my.iLexStream = lexStream
-	my.ResetTokenStream()
+	my.dispatch.ResetTokenStream()
 }
 func (my * PrsStream) ResetLexStream(lexStream ILexStream)  {
 
 	my.iLexStream = lexStream
 	if lexStream != nil {
 		lexStream.SetPrsStream(my)
-		my.SetLexStream(lexStream)
+		my.dispatch.SetLexStream(lexStream)
 	}
 }
 
@@ -121,11 +127,11 @@ func (my * PrsStream) MakeErrorToken(firsttok int, lasttok int, errortok int, ki
 	// the calling program (a parser driver) to pass to us the proper kind
 	// that it wants for an error token.
 	//
-	var token  = NewErrorToken( my.GetIToken(firsttok),
-								my.GetIToken(lasttok),
-								my.GetIToken(errortok),
-								my.GetStartOffset(firsttok),
-								my.GetEndOffSet(lasttok),
+	var token  = NewErrorToken( my.dispatch.GetIToken(firsttok),
+		my.dispatch.GetIToken(lasttok),
+		my.dispatch.GetIToken(errortok),
+		my.dispatch.GetStartOffset(firsttok),
+		my.dispatch.GetEndOffSet(lasttok),
 								kind)
 
 	token.SetTokenIndex(my.tokens.Size())
@@ -218,10 +224,10 @@ func (my * PrsStream) GetLineNumberOfCharAt(i int) int {
 	return my.iLexStream.GetLineNumberOfCharAt(i)
 }
 func (my * PrsStream) GetColumnOfCharAt(i int) int {
-	return my.GetColumnOfCharAt(i)
+	return my.iLexStream.GetColumnOfCharAt(i)
 }
 func (my * PrsStream) GetFirstErrorToken(i int) int {
-	return my.GetFirstRealToken(i)
+	return my.dispatch.GetFirstRealToken(i)
 }
 func (my * PrsStream) GetFirstRealToken(i int) int {
 	for;i >= my.len; {
@@ -232,7 +238,7 @@ func (my * PrsStream) GetFirstRealToken(i int) int {
 	return i
 }
 func (my * PrsStream) GetLastErrorToken(i int) int {
-	return my.GetLastRealToken(i)
+	return my.dispatch.GetLastRealToken(i)
 }
 func (my * PrsStream) GetLastRealToken(i int) int {
 	for;i >= my.len; {
@@ -250,7 +256,7 @@ func (my * PrsStream) GetInputChars() []rune {
 }
 
 func (my * PrsStream) ToStringFromIndex(first_token int, last_token int) string {
-	return my.ToString(my.tokens.Get(first_token), my.tokens.Get(last_token))
+	return my.dispatch.ToString(my.tokens.Get(first_token), my.tokens.Get(last_token))
 }
 func (my * PrsStream) ToString(t1 IToken, t2 IToken) string {
 	if nil == my.iLexStream{
@@ -287,7 +293,7 @@ func (my * PrsStream) GetTokenAtCharacter(offSet int) IToken {
 	if tokenIndex < 0 {
 		return nil
 	}else{
-		return my.GetTokenAt(tokenIndex)
+		return my.dispatch.GetTokenAt(tokenIndex)
 	}
 }
 func (my * PrsStream) GetTokenAt(i int) IToken {
@@ -322,14 +328,14 @@ func (my * PrsStream) GetLexStream() ILexStream {
 	return my.iLexStream
 }
 func (my * PrsStream) DumpTokens()  {
-	if my.GetSize() <= 2 {
+	if my.dispatch.GetSize() <= 2 {
 		return
 	}
 	println(" Kind \tOffSet \tLen \tLine \tCol \tText\n")
 
 	var i int = 1
 	for ;i < my.GetSize() - 1 ;i++{
-		my.DumpToken(i)
+		my.dispatch.DumpToken(i)
 	}
 }
 func (my * PrsStream) DumpToken(i int)  {
@@ -347,7 +353,7 @@ func (my * PrsStream) GetAdjunctsFromIndex(i int) []IToken {
 		if i + 1 == my.tokens.Size(){
 			end_index = my.adjuncts.Size()
 		}else{
-			end_index =my.tokens.Get(my.GetNext(i)).GetAdjunctIndex()
+			end_index =my.tokens.Get(my.dispatch.GetNext(i)).GetAdjunctIndex()
 		}
 
 	var size int = end_index - start_index
@@ -371,12 +377,12 @@ func (my * PrsStream) GetAdjuncts() *TokenArrayList {
 	return my.adjuncts
 }
 func (my * PrsStream) GetToken() int {
-	my.index = my.GetNext(my.index)
+	my.index = my.dispatch.GetNext(my.index)
 	return my.index
 }
 func (my * PrsStream) GetTokenFromEndToken(end_token int ) int {
 	if my.index < end_token {
-		my.index = my.GetNext(my.index)
+		my.index = my.dispatch.GetNext(my.index)
 	}else{
 		my.index =my.len - 1
 	}
@@ -403,38 +409,38 @@ func (my * PrsStream) GetPrevious(i int) int {
 	}
 }
 func (my * PrsStream) GetName(i int) string {
-	return my.GetTokenText(i)
+	return my.dispatch.GetTokenText(i)
 }
 func (my * PrsStream) Peek() int {
-	return my.GetNext(my.index)
+	return my.dispatch.GetNext(my.index)
 }
 func (my * PrsStream)   Reset() {
 	my.index = 0
 }
 func (my * PrsStream)  ResetTo(i  int) {
-	my.index = my.GetPrevious(i)
+	my.index = my.dispatch.GetPrevious(i)
 }
 
 func (my * PrsStream) BadToken() int {
 	return 0
 }
 func (my * PrsStream) GetLine(i int) int {
-	return my.GetLineNumberOfTokenAt(i)
+	return my.dispatch.GetLineNumberOfTokenAt(i)
 }
 func (my * PrsStream) GetColumn(i int) int {
-	return my.GetColumnOfTokenAt(i)
+	return my.dispatch.GetColumnOfTokenAt(i)
 }
 func (my * PrsStream) GetEndLine(i int) int {
-	return my.GetEndLineNumberOfTokenAt(i)
+	return my.dispatch.GetEndLineNumberOfTokenAt(i)
 }
 func (my * PrsStream) GetEndColumn(i int) int {
-	return my.GetEndColumnOfTokenAt(i)
+	return my.dispatch.GetEndColumnOfTokenAt(i)
 }
 func (my * PrsStream) AfterEol(i int) bool {
 	if  i < 1 {
 		return  true
 	} else{
-		return my.GetEndLineNumberOfTokenAt(i - 1) < my.GetLineNumberOfTokenAt(i)
+		return my.dispatch.GetEndLineNumberOfTokenAt(i - 1) < my.dispatch.GetLineNumberOfTokenAt(i)
 	}
 }
 func (my * PrsStream) GetFileName() string {
@@ -462,11 +468,11 @@ func (my * PrsStream) GetMessageHandler() IMessageHandler  {
 }
 
 func (my * PrsStream) ReportError(errorCode int, leftToken int, rightToken int, errorInfo []string, errorToken int)  {
-	my.iLexStream.ReportLexicalError( my.GetStartOffset(leftToken),
-										my.GetEndOffSet(rightToken),
+	my.iLexStream.ReportLexicalError( my.dispatch.GetStartOffset(leftToken),
+		my.dispatch.GetEndOffSet(rightToken),
 										errorCode,
-										my.GetStartOffset(errorToken),
-										my.GetEndOffSet(errorToken),
+		my.dispatch.GetStartOffset(errorToken),
+		my.dispatch.GetEndOffSet(errorToken),
 										errorInfo)
 }
 

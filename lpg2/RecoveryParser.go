@@ -18,7 +18,7 @@ func NewRecoveryParser(parser *BacktrackingParser, action *IntSegmentedTuple, to
 	prs ParseTable, maxErrors int, maxTime int, monitor Monitor) *RecoveryParser {
 	t := new(RecoveryParser)
 	t.scope_repair = NewPrimaryRepairInfo()
-	t.DiagnoseParser = NewDiagnoseParser(tokStream, prs, maxErrors, maxTime, monitor)
+	t.DiagnoseParser = NewDiagnoseParserExt(t,tokStream, prs, maxErrors, maxTime, monitor)
 	t.parser = parser
 	t.action = action
 	t.tokens = tokens

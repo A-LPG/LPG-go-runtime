@@ -15,6 +15,7 @@ import (
 //
 
 type LexStream struct {
+     dispatch ILexStream
      DEFAULT_TAB int
      index int
      streamLength int
@@ -27,10 +28,22 @@ type LexStream struct {
      errMsg IMessageHandler
 }
 
-
+func NewLexStreamExt(dispatch ILexStream,fileName string, inputChars []rune, tab int, lineOffSets *IntSegmentedTuple) (*LexStream,error){
+    var my,err = NewLexStream(fileName,inputChars,tab,lineOffSets)
+    if err != nil{
+        return nil, err
+    }
+    if dispatch != nil{
+        my.dispatch = dispatch
+    }else{
+        my.dispatch=my
+    }
+    return my, nil
+}
 
 func NewLexStream(fileName string, inputChars []rune, tab int, lineOffSets *IntSegmentedTuple) (*LexStream,error){
     my := new(LexStream)
+    my.dispatch = my
     my.DEFAULT_TAB  = 1
     my.index  = -1
     my.streamLength = 0
@@ -145,6 +158,8 @@ func (my *LexStream) SetPrsStream(prsStream IPrsStream)  {
         return
     }
     my.prsStream = prsStream
+    my.prsStream.SetLexStream(my.dispatch)
+
 }
 func (my *LexStream) GetIPrsStream() IPrsStream{
     return my.prsStream
@@ -176,7 +191,7 @@ func (my *LexStream) GetLineNumberOfCharAt(i int) int {
     }
 }
 func (my *LexStream) GetColumnOfCharAt(i int) int {
-    var lineNo int = my.GetLineNumberOfCharAt(i)
+    var lineNo int = my.dispatch.GetLineNumberOfCharAt(i)
     var start int = my.lineOffSets.Get(lineNo - 1)
     if start + 1 >= my.streamLength {
         return 1
@@ -191,12 +206,12 @@ func (my *LexStream) GetColumnOfCharAt(i int) int {
     return i - start
 }
 func (my *LexStream) GetToken() int {
-    my.index = my.GetNext(my.index)
+    my.index = my.dispatch.GetNext(my.index)
     return my.index
 }
 func (my *LexStream) GetTokenFromEndToken(end_token int ) int {
      if my.index < end_token {
-         my.index =my.GetNext(my.index)
+         my.index =my.dispatch.GetNext(my.index)
      }else{
          my.index =my.streamLength
      }
@@ -206,7 +221,7 @@ func (my *LexStream) GetKind(i int) int {
     return 0
 }
 func (my *LexStream) next(i int) int {
-    return my.GetNext(i)
+    return my.dispatch.GetNext(i)
 }
 func (my *LexStream) GetNext(i int) int {
      i+=1
@@ -217,7 +232,7 @@ func (my *LexStream) GetNext(i int) int {
      }
 }
 func (my *LexStream) previous(i int) int {
-    return my.GetPrevious(i)
+    return my.dispatch.GetPrevious(i)
 }
 func (my *LexStream) GetPrevious(i int) int {
     if i <= 0 {
@@ -227,10 +242,10 @@ func (my *LexStream) GetPrevious(i int) int {
     }
 }
 func (my *LexStream) GetName(i int) string {
-    if i >= my.GetStreamLength() {
+    if i >= my.dispatch.GetStreamLength() {
         return ""
     }else{
-        return  "" + my.GetCharValue(i)
+        return  "" + my.dispatch.GetCharValue(i)
     }
 }
 func (my *LexStream) Peek() int {
@@ -247,33 +262,33 @@ func (my *LexStream) BadToken() int {
     return 0
 }
 func (my *LexStream) GetLine(i int) int {
-    return my.GetLineNumberOfCharAt(i)
+    return my.dispatch.GetLineNumberOfCharAt(i)
 }
 
 func (my *LexStream) GetColumn(i int) int {
-    return my.GetColumnOfCharAt(i)
+    return my.dispatch.GetColumnOfCharAt(i)
 }
 func (my *LexStream) GetEndLine(i int) int {
-    return my.GetLine(i)
+    return my.dispatch.GetLine(i)
 }
 func (my *LexStream) GetEndColumn(i int) int {
-    return my.GetColumnOfCharAt(i)
+    return my.dispatch.GetColumnOfCharAt(i)
 }
 func (my *LexStream) AfterEol(i int) bool {
     if i < 1 {
         return  true
     } else{
-        return my.GetLineNumberOfCharAt(i - 1) < my.GetLineNumberOfCharAt(i)
+        return my.dispatch.GetLineNumberOfCharAt(i - 1) < my.dispatch.GetLineNumberOfCharAt(i)
     }
 }
 func (my *LexStream) GetFirstErrorToken(i int) int {
-    return my.GetFirstRealToken(i)
+    return my.dispatch.GetFirstRealToken(i)
 }
 func (my *LexStream) GetFirstRealToken(i int) int {
     return i
 }
 func (my *LexStream) GetLastErrorToken(i int) int {
-    return my.GetLastRealToken(i)
+    return my.dispatch.GetLastRealToken(i)
 }
 func (my *LexStream) GetLastRealToken(i int) int {
     return i
@@ -297,7 +312,7 @@ func (my *LexStream) MakeToken(startLoc int, endLoc int, kind int)  {
     if my.prsStream != nil {
         my.prsStream.MakeToken(startLoc, endLoc, kind)
     } else {
-        my.ReportLexicalErrorPosition(startLoc, endLoc)// make it a lexical error
+        my.dispatch.ReportLexicalErrorPosition(startLoc, endLoc)// make it a lexical error
     }
 }
 
@@ -312,10 +327,10 @@ func (my *LexStream) GetLocation(leftLoc int, rightLoc int) []int {
 
     return []int{leftLoc,
                  length,
-                 my.GetLineNumberOfCharAt(leftLoc),
-                 my.GetColumnOfCharAt(leftLoc),
-                 my.GetLineNumberOfCharAt(rightLoc),
-                 my.GetColumnOfCharAt(rightLoc)}
+        my.dispatch.GetLineNumberOfCharAt(leftLoc),
+        my.dispatch.GetColumnOfCharAt(leftLoc),
+        my.dispatch.GetLineNumberOfCharAt(rightLoc),
+        my.dispatch.GetColumnOfCharAt(rightLoc)}
 }
 func (my *LexStream) ReportLexicalErrorPosition(leftLoc int, rightLoc int) {
 
@@ -334,15 +349,15 @@ func (my *LexStream) ReportLexicalErrorPosition(leftLoc int, rightLoc int) {
             tokenText = "End-of-file "
         }else{
             if   errorCode == INVALID_TOKEN_CODE{
-                tokenText= "\"" + my.ToString(leftLoc,  rightLoc+ 1) + "\" "
+                tokenText= "\"" + my.dispatch.ToString(leftLoc,  rightLoc+ 1) + "\" "
             }else{
-                tokenText = "\"" + my.GetCharValue(leftLoc) + "\" "
+                tokenText = "\"" + my.dispatch.GetCharValue(leftLoc) + "\" "
             }
         }
         var errorLeftLoc = 0
         var errorRightLoc = 0
         var errorInfo = []string{tokenText}
-        my.ReportLexicalError( leftLoc, rightLoc,errorCode, errorLeftLoc, errorRightLoc, errorInfo)
+         my.dispatch.ReportLexicalError( leftLoc, rightLoc,errorCode, errorLeftLoc, errorRightLoc, errorInfo)
 
 }
 func (my *LexStream) ReportLexicalError(leftLoc int, rightLoc int, errorCode int, errorLeftLoc int,
@@ -372,15 +387,15 @@ func (my *LexStream) ReportLexicalError(leftLoc int, rightLoc int, errorCode int
          * It is called with the following arguments:
          */
         my.errMsg.HandleMessage(errorCode,
-                                  my.GetLocation(leftLoc, rightLoc),
-                                  my.GetLocation(errorLeftLoc, errorRightLoc),
-                                  my.GetFileName(),
+            my.dispatch.GetLocation(leftLoc, rightLoc),
+            my.dispatch.GetLocation(errorLeftLoc, errorRightLoc),
+            my.dispatch.GetFileName(),
                                   errorInfo)
     }
 }
 
 func (my *LexStream) ReportError(errorCode int, leftToken int, rightToken int, errorInfo []string, errorToken int)  {
-    my.ReportLexicalError(leftToken, rightToken, errorCode,  errorToken,errorToken, errorInfo)
+    my.dispatch.ReportLexicalError(leftToken, rightToken, errorCode,  errorToken,errorToken, errorInfo)
 }
 
 func (my *LexStream) ToString(startOffSet int, endOffSet int) string {

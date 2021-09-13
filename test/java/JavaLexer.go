@@ -733,7 +733,7 @@ type  JavaLexerLpgLexStream struct{
 func  NewJavaLexerLpgLexStream( fileName string, inputChars []rune, tab int) (*JavaLexerLpgLexStream,error){
         t := new(JavaLexerLpgLexStream)
         var e error
-        t.LexStream ,e = NewLexStream(fileName,inputChars,tab,nil)
+        t.LexStream ,e = NewLexStreamExt(t,fileName,inputChars,tab,nil)
         return t,e
 }
 
