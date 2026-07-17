@@ -389,9 +389,29 @@ func (my *BacktrackingParser) ParseActions(marker_kind int) (interface{}, error)
 			my.Process_reductions()
 		} else { // a shift or shift-reduce action
 			if my.tokStream.GetKind(curtok) > my.NT_OFFSET {
-				_stream, _ := my.tokStream.(IPrsStream)
-				badtok, _ := _stream.GetIToken(curtok).(*ErrorToken)
-				return nil, NewBadParseException(badtok.GetErrorToken().GetTokenIndex())
+				//
+				// A replayed nonterminal ErrorToken (inserted by scope
+				// recovery). If the RuleAction/ParseTable supply prosthetic-AST
+				// factories, synthesize a placeholder node; otherwise keep the
+				// historical behavior of throwing a BadParseException.
+				//
+				var synthesized IAst = nil
+				if raProvider, ok := my.ra.(ProstheticAstProvider); ok {
+					if prsProvider, ok2 := my.prs.(ProsthesisIndexProvider); ok2 {
+						factories := raProvider.GetProstheticAst()
+						slot := prsProvider.GetProsthesisIndex(my.tokStream.GetKind(curtok))
+						if factories != nil && slot >= 0 && slot < len(factories) && factories[slot] != nil {
+							_stream, _ := my.tokStream.(IPrsStream)
+							synthesized = factories[slot](_stream.GetIToken(curtok))
+						}
+					}
+				}
+				if synthesized == nil {
+					_stream, _ := my.tokStream.(IPrsStream)
+					badtok, _ := _stream.GetIToken(curtok).(*ErrorToken)
+					return nil, NewBadParseException(badtok.GetErrorToken().GetTokenIndex())
+				}
+				my.parseStack[my.stateStackTop] = synthesized
 			}
 			my.lastToken = curtok
 			ti += 1
