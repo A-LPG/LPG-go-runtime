@@ -88,6 +88,7 @@ const JavaLexerprs_BACKTRACK bool = false
 func (my * JavaLexerprs) GetBacktrack() bool {
      return JavaLexerprs_BACKTRACK
 }
+func (my * JavaLexerprs) IsGLR() bool { return false }
 func (my * JavaLexerprs) GetStartSymbol() int{
     return my.Lhs(0)
 }

@@ -90,6 +90,7 @@ const JavaParserprs_BACKTRACK bool = true
 func (my * JavaParserprs) GetBacktrack() bool {
      return JavaParserprs_BACKTRACK
 }
+func (my * JavaParserprs) IsGLR() bool { return false }
 func (my * JavaParserprs) GetStartSymbol() int{
     return my.Lhs(0)
 }

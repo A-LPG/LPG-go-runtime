@@ -88,6 +88,7 @@ const LPGLexerprs_BACKTRACK bool = false
 func (my * LPGLexerprs) GetBacktrack() bool {
      return LPGLexerprs_BACKTRACK
 }
+func (my * LPGLexerprs) IsGLR() bool { return false }
 func (my * LPGLexerprs) GetStartSymbol() int{
     return my.Lhs(0)
 }

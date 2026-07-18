@@ -88,6 +88,7 @@ const JavaKWLexerprs_BACKTRACK bool = false
 func (my * JavaKWLexerprs) GetBacktrack() bool {
      return JavaKWLexerprs_BACKTRACK
 }
+func (my * JavaKWLexerprs) IsGLR() bool { return false }
 func (my * JavaKWLexerprs) GetStartSymbol() int{
     return my.Lhs(0)
 }

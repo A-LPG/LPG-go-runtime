@@ -69,6 +69,7 @@ func (mockTable) GetAcceptAction() int          { return 0 }
 func (mockTable) IsNullable(int) bool           { return false }
 func (mockTable) IsValidForParser() bool        { return true }
 func (mockTable) GetBacktrack() bool            { return false }
+func (mockTable) IsGLR() bool                   { return false }
 
 func TestExpectedTerminalNames(t *testing.T) {
 	var prs mockTable

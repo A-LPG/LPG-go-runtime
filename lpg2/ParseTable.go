@@ -96,4 +96,6 @@ type ParseTable interface {
 	IsValidForParser() bool
 
 	GetBacktrack() bool
+
+	IsGLR() bool
 }
